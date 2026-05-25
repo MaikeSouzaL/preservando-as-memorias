@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { serializeAuthSession } from "@/src/lib/auth-session";
 import { updatePlatformData, type CuratorProfile } from "@/src/lib/platform-data";
 import { hashPassword, verifyPassword } from "@/src/lib/password";
+import { connectToDatabase } from "@/src/lib/mongodb";
+import { Curator } from "@/src/models/Curator";
 
 export const dynamic = "force-dynamic";
 
@@ -26,39 +28,78 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Informe e-mail e senha." }, { status: 400 });
     }
 
-    const profile = await updatePlatformData((data) => {
-      const index = data.profiles.findIndex((item) => item.email.toLowerCase().trim() === email);
-      const current = index >= 0 ? data.profiles[index] : data.profile.email.toLowerCase().trim() === email ? data.profile : null;
+    const useMongo = !!process.env.MONGODB_URI;
+    let profile: CuratorProfile | null = null;
 
-      if (!current) {
-        return null;
+    if (useMongo) {
+      // 1. Conecta ao MongoDB Atlas
+      await connectToDatabase();
+
+      // 2. Busca o curador no MongoDB
+      const curator = await Curator.findOne({ email });
+      if (!curator) {
+        return NextResponse.json({ error: "E-mail ou senha inválidos." }, { status: 401 });
       }
 
-      const hashMatches = verifyPassword(password, current.passwordHash);
-      const legacyMatches = !current.passwordHash && current.password === password;
-
-      if (!hashMatches && !legacyMatches) {
-        return null;
+      // 3. Verifica a senha hashada (no schema Mongoose o campo é "password")
+      const matches = verifyPassword(password, curator.password || "");
+      if (!matches) {
+        return NextResponse.json({ error: "E-mail ou senha inválidos." }, { status: 401 });
       }
 
-      const migrated: CuratorProfile = {
-        ...current,
+      profile = {
+        name: curator.name,
+        email: curator.email,
+        bio: curator.bio,
+        theme: curator.theme,
+        privacy: curator.privacy,
+        notifyVelas: curator.notifyVelas,
+        notifyTributos: curator.notifyTributos,
+        multiFactorEnabled: curator.multiFactorEnabled,
+        language: curator.language,
+        timezone: curator.timezone,
+        globalAudio: curator.globalAudio,
+        isAdmin: curator.isAdmin,
+        avatarUrl: curator.avatarUrl,
         password: undefined,
-        passwordHash: current.passwordHash ?? hashPassword(password),
+        passwordHash: curator.password,
       };
+    } else {
+      // Fallback para o arquivo JSON local
+      profile = await updatePlatformData((data) => {
+        const index = data.profiles.findIndex((item) => item.email.toLowerCase().trim() === email);
+        const current = index >= 0 ? data.profiles[index] : data.profile.email.toLowerCase().trim() === email ? data.profile : null;
 
-      if (index >= 0) {
-        data.profiles[index] = migrated;
-      } else {
-        data.profiles.push(migrated);
-      }
+        if (!current) {
+          return null;
+        }
 
-      if (data.profile.email.toLowerCase().trim() === email) {
-        data.profile = migrated;
-      }
+        const hashMatches = verifyPassword(password, current.passwordHash);
+        const legacyMatches = !current.passwordHash && current.password === password;
 
-      return migrated;
-    });
+        if (!hashMatches && !legacyMatches) {
+          return null;
+        }
+
+        const migrated: CuratorProfile = {
+          ...current,
+          password: undefined,
+          passwordHash: current.passwordHash ?? hashPassword(password),
+        };
+
+        if (index >= 0) {
+          data.profiles[index] = migrated;
+        } else {
+          data.profiles.push(migrated);
+        }
+
+        if (data.profile.email.toLowerCase().trim() === email) {
+          data.profile = migrated;
+        }
+
+        return migrated;
+      });
+    }
 
     if (!profile) {
       return NextResponse.json({ error: "E-mail ou senha inválidos." }, { status: 401 });
@@ -82,7 +123,8 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch {
+  } catch (err: any) {
+    console.error("Erro no login:", err);
     return NextResponse.json({ error: "Não foi possível entrar agora." }, { status: 500 });
   }
 }
