@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
 
 declare global {
-
   var mongoose: MongooseCache | undefined;
 }
 
@@ -21,7 +18,9 @@ if (!cached) {
 const localCache = cached!;
 
 export async function connectToDatabase() {
-  if (!MONGODB_URI) {
+  const uri = process.env.MONGODB_URI;
+  
+  if (!uri) {
     throw new Error("Por favor, defina a variável MONGODB_URI no arquivo .env");
   }
 
@@ -34,7 +33,7 @@ export async function connectToDatabase() {
       bufferCommands: false,
     };
 
-    localCache.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+    localCache.promise = mongoose.connect(uri, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
   }
