@@ -247,53 +247,23 @@ const PlatformStoreSchema = new mongoose.Schema({
 
 const PlatformStore = mongoose.models.PlatformStore || mongoose.model("PlatformStore", PlatformStoreSchema);
 
-async function ensureDataFile() {
-  const useMongo = !!process.env.MONGODB_URI;
-  if (useMongo) {
-    await connectToDatabase();
-    const doc = await PlatformStore.findOne({ key: "global_store" });
-    if (!doc) {
-      await PlatformStore.create({ key: "global_store", data: defaultData });
-    }
-    return;
-  }
-
-  await mkdir(dataDir, { recursive: true });
-  try {
-    await readFile(dataFile, "utf8");
-  } catch {
-    await writePlatformData(defaultData);
-  }
-}
-
 export async function readPlatformData(): Promise<PlatformData> {
-  const useMongo = !!process.env.MONGODB_URI;
-  if (useMongo) {
-    await connectToDatabase();
-    const doc = await PlatformStore.findOne({ key: "global_store" });
-    const rawData = doc ? doc.data : defaultData;
-    return normalizePlatformData(rawData as Partial<PlatformData>);
+  await connectToDatabase();
+  const doc = await PlatformStore.findOne({ key: "global_store" });
+  if (!doc) {
+    const newDoc = await PlatformStore.create({ key: "global_store", data: defaultData });
+    return normalizePlatformData(newDoc.data as Partial<PlatformData>);
   }
-
-  await ensureDataFile();
-  const raw = await readFile(dataFile, "utf8");
-  return normalizePlatformData(JSON.parse(raw.replace(/^\uFEFF/, "")) as Partial<PlatformData>);
+  return normalizePlatformData(doc.data as Partial<PlatformData>);
 }
 
 export async function writePlatformData(data: PlatformData) {
-  const useMongo = !!process.env.MONGODB_URI;
-  if (useMongo) {
-    await connectToDatabase();
-    await PlatformStore.findOneAndUpdate(
-      { key: "global_store" },
-      { data },
-      { upsert: true, new: true }
-    );
-    return;
-  }
-
-  await mkdir(dataDir, { recursive: true });
-  await writeFile(dataFile, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  await connectToDatabase();
+  await PlatformStore.findOneAndUpdate(
+    { key: "global_store" },
+    { data },
+    { upsert: true, new: true }
+  );
 }
 
 export async function updatePlatformData<T>(updater: (data: PlatformData) => T | Promise<T>) {
