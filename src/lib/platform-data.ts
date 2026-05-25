@@ -236,9 +236,29 @@ function normalizePlatformData(data: Partial<PlatformData>): PlatformData {
   return normalized;
 }
 
-async function ensureDataFile() {
-  await mkdir(dataDir, { recursive: true });
+import { connectToDatabase } from "@/src/lib/mongodb";
+import mongoose from "mongoose";
 
+// Schema e Model Mongoose do PlatformStore
+const PlatformStoreSchema = new mongoose.Schema({
+  key: { type: String, default: "global_store", unique: true },
+  data: { type: mongoose.Schema.Types.Mixed, required: true }
+}, { timestamps: true });
+
+const PlatformStore = mongoose.models.PlatformStore || mongoose.model("PlatformStore", PlatformStoreSchema);
+
+async function ensureDataFile() {
+  const useMongo = !!process.env.MONGODB_URI;
+  if (useMongo) {
+    await connectToDatabase();
+    const doc = await PlatformStore.findOne({ key: "global_store" });
+    if (!doc) {
+      await PlatformStore.create({ key: "global_store", data: defaultData });
+    }
+    return;
+  }
+
+  await mkdir(dataDir, { recursive: true });
   try {
     await readFile(dataFile, "utf8");
   } catch {
@@ -247,12 +267,31 @@ async function ensureDataFile() {
 }
 
 export async function readPlatformData(): Promise<PlatformData> {
+  const useMongo = !!process.env.MONGODB_URI;
+  if (useMongo) {
+    await connectToDatabase();
+    const doc = await PlatformStore.findOne({ key: "global_store" });
+    const rawData = doc ? doc.data : defaultData;
+    return normalizePlatformData(rawData as Partial<PlatformData>);
+  }
+
   await ensureDataFile();
   const raw = await readFile(dataFile, "utf8");
   return normalizePlatformData(JSON.parse(raw.replace(/^\uFEFF/, "")) as Partial<PlatformData>);
 }
 
 export async function writePlatformData(data: PlatformData) {
+  const useMongo = !!process.env.MONGODB_URI;
+  if (useMongo) {
+    await connectToDatabase();
+    await PlatformStore.findOneAndUpdate(
+      { key: "global_store" },
+      { data },
+      { upsert: true, new: true }
+    );
+    return;
+  }
+
   await mkdir(dataDir, { recursive: true });
   await writeFile(dataFile, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
