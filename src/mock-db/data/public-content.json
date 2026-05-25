@@ -1,0 +1,125 @@
+{
+  "brand": {
+    "name": "Preservando a Memoria",
+    "tagline": "Porque uma historia merece viver para sempre."
+  },
+  "landing": {
+    "headline": "Transforme lembrancas em legados digitais eternos",
+    "subheadline": "Crie memoriais com fotos, homenagens, QR Codes e uma experiencia acolhedora para familiares e visitantes.",
+    "benefits": [
+      "Memorial publico com QR Code",
+      "Galeria de fotos, videos e audios",
+      "Homenagens moderadas pela familia",
+      "Relatorios de visitas e interacoes"
+    ],
+    "socialProof": {
+      "families": "+1.200 familias",
+      "tributes": "+35 mil homenagens",
+      "visits": "+420 mil visitas"
+    }
+  },
+  "plansPreview": [
+    {
+      "name": "Essencial",
+      "price": "R$ 19,90/mes",
+      "note": "1 memorial"
+    },
+    {
+      "name": "Familia",
+      "price": "R$ 49,90/mes",
+      "note": "Memoriais ilimitados"
+    },
+    {
+      "name": "Legado",
+      "price": "R$ 99,90/mes",
+      "note": "Recursos premium de IA"
+    }
+  ],
+  "about": {
+    "mission": "Ajudar familias a transformar lembrancas em legados digitais duradouros, acessiveis em qualquer lugar.",
+    "story": "O Preservando a Memoria nasceu da necessidade de unir afeto, tecnologia e respeito em um espaco seguro para homenagear quem partiu.",
+    "values": [
+      "Respeito e sensibilidade",
+      "Confianca e privacidade",
+      "Memoria afetiva com tecnologia",
+      "Acessibilidade para todas as idades"
+    ]
+  },
+  "plans": [
+    {
+      "name": "Essencial",
+      "price": "R$ 19,90/mes",
+      "description": "Ideal para iniciar um memorial com recursos fundamentais.",
+      "cta": "Comecar agora",
+      "features": [
+        "1 memorial",
+        "Galeria basica",
+        "QR Code padrao",
+        "Suporte por email"
+      ]
+    },
+    {
+      "name": "Familia",
+      "price": "R$ 49,90/mes",
+      "description": "Plano recomendado para familias com mais de um memorial.",
+      "cta": "Assinar plano familia",
+      "highlight": true,
+      "features": [
+        "Memoriais ilimitados",
+        "Homenagens moderadas",
+        "Relatorios de visitas",
+        "Convites familiares"
+      ]
+    },
+    {
+      "name": "Legado",
+      "price": "R$ 99,90/mes",
+      "description": "Experiencia premium com IA e personalizacao avancada.",
+      "cta": "Migrar para legado",
+      "features": [
+        "Tudo do plano Familia",
+        "IA para biografia",
+        "Restauro e colorizacao de fotos",
+        "Prioridade no suporte"
+      ]
+    }
+  ],
+  "contact": {
+    "channels": [
+      {
+        "label": "Email",
+        "value": "suporte@preservandoamemoria.com"
+      },
+      {
+        "label": "WhatsApp",
+        "value": "+55 11 97777-0000"
+      },
+      {
+        "label": "Horario",
+        "value": "Seg a Sex, 9h as 18h"
+      }
+    ]
+  },
+  "faq": [
+    {
+      "question": "Como funciona o QR Code do memorial?",
+      "answer": "Ao gerar o memorial, a plataforma cria um QR Code exclusivo. Ao escanear, visitantes acessam a pagina publica com historias, fotos e homenagens."
+    },
+    {
+      "question": "Posso controlar quem deixa homenagens?",
+      "answer": "Sim. No painel da familia, voce define se homenagens sao publicadas automaticamente ou passam por moderacao."
+    },
+    {
+      "question": "Meus dados e midias estao seguros?",
+      "answer": "Sim. A arquitetura foi pensada para privacidade e controle de acesso, com configuracoes granulares de visibilidade."
+    },
+    {
+      "question": "Existe plano para mais de um memorial?",
+      "answer": "Sim. O plano Familia permite memoriais ilimitados com gestao centralizada em um unico painel."
+    },
+    {
+      "question": "Posso cancelar quando quiser?",
+      "answer": "Sim. O cancelamento pode ser feito no painel de assinaturas, respeitando regras de faturamento do periodo vigente."
+    }
+  ]
+}
