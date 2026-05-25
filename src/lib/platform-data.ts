@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import os from "node:os";
 export type { BillingCycle, PlatformConfig, PlatformPlan } from "@/src/lib/platform-types";
 import type { PlatformConfig } from "@/src/lib/platform-types";
 
@@ -123,7 +124,10 @@ export type PlatformData = {
   complaints: ManagedComplaint[];
 };
 
-const dataDir = path.join(process.cwd(), "src", "data");
+const isServerless = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+const dataDir = isServerless 
+  ? os.tmpdir() 
+  : path.join(process.cwd(), "src", "data");
 const dataFile = path.join(dataDir, "platform-store.json");
 let writeQueue: Promise<unknown> = Promise.resolve();
 
