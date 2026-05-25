@@ -248,22 +248,31 @@ const PlatformStoreSchema = new mongoose.Schema({
 const PlatformStore = mongoose.models.PlatformStore || mongoose.model("PlatformStore", PlatformStoreSchema);
 
 export async function readPlatformData(): Promise<PlatformData> {
-  await connectToDatabase();
-  const doc = await PlatformStore.findOne({ key: "global_store" });
-  if (!doc) {
-    const newDoc = await PlatformStore.create({ key: "global_store", data: defaultData });
-    return normalizePlatformData(newDoc.data as Partial<PlatformData>);
+  try {
+    await connectToDatabase();
+    const doc = await PlatformStore.findOne({ key: "global_store" });
+    if (!doc) {
+      const newDoc = await PlatformStore.create({ key: "global_store", data: defaultData });
+      return normalizePlatformData(newDoc.data as Partial<PlatformData>);
+    }
+    return normalizePlatformData(doc.data as Partial<PlatformData>);
+  } catch (err) {
+    console.warn("MongoDB indisponível ou em fase de build, usando dados locais temporários:", err);
+    return normalizePlatformData(defaultData as Partial<PlatformData>);
   }
-  return normalizePlatformData(doc.data as Partial<PlatformData>);
 }
 
 export async function writePlatformData(data: PlatformData) {
-  await connectToDatabase();
-  await PlatformStore.findOneAndUpdate(
-    { key: "global_store" },
-    { data },
-    { upsert: true, new: true }
-  );
+  try {
+    await connectToDatabase();
+    await PlatformStore.findOneAndUpdate(
+      { key: "global_store" },
+      { data },
+      { upsert: true, new: true }
+    );
+  } catch (err) {
+    console.error("Erro ao salvar dados no MongoDB, dados não foram gravados:", err);
+  }
 }
 
 export async function updatePlatformData<T>(updater: (data: PlatformData) => T | Promise<T>) {
