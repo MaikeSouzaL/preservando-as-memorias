@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function CadastroPage() {
   const router = useRouter();
@@ -169,6 +170,31 @@ export default function CadastroPage() {
                 {isRegistering ? "Criando seu legado..." : "Criar conta"}
               </button>
             </form>
+
+            <div className="flex items-center py-2">
+              <div className="h-px flex-grow border-t border-outline-variant/30" />
+              <span className="mx-4 text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant">ou continue com</span>
+              <div className="h-px flex-grow border-t border-outline-variant/30" />
+            </div>
+
+            <div className="w-full">
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem("has_logged_in", "true");
+                  const useRealAuth = process.env.NEXT_PUBLIC_HAS_GOOGLE_AUTH === "true";
+                  if (useRealAuth) {
+                    signIn("google", { callbackUrl: "/dashboard" });
+                  } else {
+                    window.location.href = "/dashboard";
+                  }
+                }}
+                className="group flex w-full items-center justify-center rounded-lg border border-outline-variant/30 py-3 text-on-surface transition hover:bg-surface-container-high cursor-pointer"
+              >
+                <span className="material-symbols-outlined mr-2 text-on-surface-variant transition group-hover:text-on-surface">mail</span>
+                <span className="text-sm">Cadastrar com Google</span>
+              </button>
+            </div>
 
             <p className="pt-base text-center text-sm text-on-surface-variant">
               Ja possui conta?{" "}
