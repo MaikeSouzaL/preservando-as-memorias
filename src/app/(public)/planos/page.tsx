@@ -2,6 +2,8 @@ import Link from "next/link";
 import { readPlatformData } from "@/src/lib/platform-data";
 import { centsToBRL, cycleLabel } from "@/src/lib/platform-types";
 
+export const dynamic = "force-dynamic";
+
 export default async function PlanosPage() {
   const data = await readPlatformData();
   const plans = data.config.plans.filter((plan) => plan.active);

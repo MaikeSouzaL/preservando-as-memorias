@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getAuthSession } from "@/src/lib/auth-session";
 import { readPlatformData } from "@/src/lib/platform-data";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const session = await getAuthSession();
   if (!session) {

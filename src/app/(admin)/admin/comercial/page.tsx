@@ -1,6 +1,8 @@
 import { CommercialSettingsPanel } from "@/src/components/admin/commercial-settings-panel";
 import { readPlatformData, type PlatformOrder } from "@/src/lib/platform-data";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminCommercialPage() {
   const data = await readPlatformData();
   const paidOrders = data.orders.filter((order) => order.status === "paid");

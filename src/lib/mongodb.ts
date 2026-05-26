@@ -21,7 +21,8 @@ export async function connectToDatabase() {
   const uri = process.env.MONGODB_URI;
   
   if (!uri) {
-    throw new Error("Por favor, defina a variável MONGODB_URI no arquivo .env");
+    console.warn("MONGODB_URI não definida. Retornando null (provável fase de build).");
+    return null;
   }
 
   if (localCache.conn) {
