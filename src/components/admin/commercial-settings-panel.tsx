@@ -92,7 +92,7 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
 
       <aside className="space-y-6">
         <section className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6">
-          <p className="text-[0.75rem] uppercase tracking-[0.15em] text-outline">Sua comissão fixa</p>
+          <p className="text-[0.75rem] uppercase tracking-[0.15em] text-outline">Comissão do sistema fixa</p>
           <h2 className="mt-2 font-h2 text-5xl text-tertiary">{config.ownerCommissionPercent}%</h2>
           <p className="mt-3 text-sm text-on-surface-variant">
             Essa porcentagem é calculada em cima de cada pagamento confirmado, independente do valor definido pelo administrador do sistema.
@@ -104,8 +104,8 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
           <h3 className="mt-2 font-h3 text-xl text-on-surface">{selectedPlan.name}</h3>
           <div className="mt-5 space-y-3 text-sm">
             <Line label="Preço cobrado" value={centsToBRL(selectedPlan.priceCents)} />
-            <Line label="Sua comissão" value={centsToBRL(projectedCommission)} strong />
-            <Line label="Repasse ao operador" value={centsToBRL(operatorRevenue)} />
+            <Line label="Comissão do sistema" value={centsToBRL(projectedCommission)} strong />
+            <Line label="Seu valor líquido" value={centsToBRL(operatorRevenue)} />
             <Line label="Recorrência" value={cycleLabel(selectedPlan.cycle)} />
           </div>
         </section>
