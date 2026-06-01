@@ -114,8 +114,9 @@ export default function LandingPage() {
             <Link href="/cadastro" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs hidden sm:inline">
               Cadastrar
             </Link>
-            <Link href="/memorial?from=landing" className="rounded-full border border-[#e9c349]/30 bg-[#e9c349]/5 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/15 sm:px-5 sm:text-xs sm:tracking-widest">
-              Ver demo
+            <Link href="/funeraria/login" className="rounded-full border border-[#e9c349]/40 bg-[#e9c349]/10 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/25 hover:border-[#e9c349] sm:px-4 sm:text-xs sm:tracking-widest flex items-center gap-1.5 font-bold">
+              <span className="material-symbols-outlined text-xs sm:text-sm">business</span>
+              Área da Funerária
             </Link>
           </div>
         </div>
@@ -144,6 +145,9 @@ export default function LandingPage() {
               <a href="#simulator" className="rounded-full border border-[#e9c349]/20 bg-white/5 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e0e3e2] transition hover:border-[#e9c349]/40 hover:bg-white/10">
                 Como funciona
               </a>
+              <Link href="/memorial?from=landing" className="rounded-full border border-[#e9c349] bg-[#e9c349]/10 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:bg-[#e9c349]/20 hover:shadow-[0_0_30px_rgba(233,195,73,0.1)]">
+                Ver demo
+              </Link>
             </div>
           </div>
 
