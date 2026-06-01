@@ -33,7 +33,7 @@ export async function GET() {
     ? data.memorials.filter((memorial) => memorial.id !== "default" && (session.isAdmin || memorial.ownerId.toLowerCase().trim() === session.email))
     : data.memorials.filter((memorial) => memorial.id !== "default" && memorial.status === "ativo");
   const memorialIds = new Set(memorials.map((memorial) => memorial.id));
-  const qrCodes = data.qrCodes.filter((qrCode) => memorialIds.has(qrCode.memorialId));
+  const qrCodes = data.qrCodes.filter((qrCode) => qrCode.memorialId && memorialIds.has(qrCode.memorialId));
 
   return NextResponse.json({ memorials, qrCodes });
 }
@@ -69,32 +69,46 @@ export async function POST(request: Request) {
           ? `${birthDate ? new Date(birthDate).getFullYear() : "?"} - ${deathDate ? new Date(deathDate).getFullYear() : "?"}`
           : "";
 
-      const gallery = parseLines(body.galleryUrls).slice(0, 8).map((line, index) => {
-        const [titlePart, urlPart] = line.includes("|") ? line.split("|") : [`Foto ${index + 1}`, line];
+      const gallery = Array.isArray(body.gallery)
+        ? body.gallery.slice(0, 12).map((item: { id?: string; title?: string; url: string }, index: number) => ({
+            id: item.id || `gal_${baseId}_${index}_${Date.now().toString(36)}`,
+            title: (item.title || `Foto ${index + 1}`).trim(),
+            url: item.url.trim(),
+          }))
+        : parseLines(body.galleryUrls).slice(0, 12).map((line, index) => {
+            const [titlePart, urlPart] = line.includes("|") ? line.split("|") : [`Foto ${index + 1}`, line];
 
-        return {
-          id: `gal_${baseId}_${index}_${Date.now().toString(36)}`,
-          title: titlePart.trim() || `Foto ${index + 1}`,
-          url: (urlPart ?? line).trim(),
-        };
-      });
+            return {
+              id: `gal_${baseId}_${index}_${Date.now().toString(36)}`,
+              title: titlePart.trim() || `Foto ${index + 1}`,
+              url: (urlPart ?? line).trim(),
+            };
+          });
 
       const timelineYear = asString(body.timelineYear);
       const timelineTitle = asString(body.timelineTitle);
       const timelineDescription = asString(body.timelineDescription);
-      const timelineEvents =
-        timelineYear || timelineTitle || timelineDescription
-          ? [
-              {
-                id: `tle_${baseId}_${Date.now().toString(36)}`,
-                year: timelineYear || (birthDate ? String(new Date(birthDate).getFullYear()) : "Memória"),
-                title: timelineTitle || "Uma lembrança especial",
-                description: timelineDescription || biography.slice(0, 180),
-                longStory: timelineDescription || biography,
-                imageUrl: asString(body.timelineImageUrl) || asString(body.imageUrl) || "/images/hero-bg.png",
-              },
-            ]
-          : [];
+      const timelineEvents = Array.isArray(body.timelineEvents)
+        ? body.timelineEvents.map((event: { id?: string; year?: string; title?: string; description?: string; imageUrl?: string }, index: number) => ({
+            id: event.id || `tle_${baseId}_${index}_${Date.now().toString(36)}`,
+            year: asString(event.year) || "Memória",
+            title: asString(event.title) || "Momento marcante",
+            description: asString(event.description),
+            longStory: asString(event.description),
+            imageUrl: asString(event.imageUrl) || "/images/hero-bg.png",
+          }))
+        : (timelineYear || timelineTitle || timelineDescription
+            ? [
+                {
+                  id: `tle_${baseId}_${Date.now().toString(36)}`,
+                  year: timelineYear || (birthDate ? String(new Date(birthDate).getFullYear()) : "Memória"),
+                  title: timelineTitle || "Uma lembrança especial",
+                  description: timelineDescription || biography.slice(0, 180),
+                  longStory: timelineDescription || biography,
+                  imageUrl: asString(body.timelineImageUrl) || asString(body.imageUrl) || "/images/hero-bg.png",
+                },
+              ]
+            : []);
 
       const memorial = {
         id,
@@ -108,6 +122,7 @@ export async function POST(request: Request) {
         biography,
         imageUrl: asString(body.imageUrl) || "/images/hero-bg.png",
         audioUrl: asString(body.audioUrl) || undefined,
+        videoUrl: asString(body.videoUrl) || undefined,
         gallery,
         timelineEvents,
         status: "ativo" as const,
@@ -119,7 +134,7 @@ export async function POST(request: Request) {
       const qrCode = {
         id: `qr_${baseId}_${Date.now().toString(36)}`,
         memorialId: id,
-        publicPath: `/memorial?memorial=${id}`,
+        publicPath: `/memorial-publico?memorial=${id}`,
         scans: 0,
         status: "ativo" as const,
         createdAt: now,

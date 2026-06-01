@@ -1,6 +1,3 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
-import os from "node:os";
 export type { BillingCycle, PlatformConfig, PlatformPlan } from "@/src/lib/platform-types";
 import type { PlatformConfig } from "@/src/lib/platform-types";
 
@@ -33,7 +30,12 @@ export type ManagedMemorial = {
   audioUrl?: string;
   gallery: ManagedGalleryItem[];
   timelineEvents: ManagedTimelineEvent[];
-  status: "ativo" | "rascunho";
+  status: "ativo" | "rascunho" | "pending_payment";
+  paymentStatus?: "paid" | "pending";
+  qrUnlocked?: boolean;
+  source?: "customer" | "funeral_home_offer" | "funeral_home";
+  funeralHomeId?: string;
+  offerLinkId?: string;
   visits: number;
   createdAt: string;
   updatedAt: string;
@@ -41,10 +43,12 @@ export type ManagedMemorial = {
 
 export type ManagedQrCode = {
   id: string;
-  memorialId: string;
+  memorialId?: string;
+  offerLinkId?: string;
   publicPath: string;
   scans: number;
-  status: "ativo" | "pausado";
+  status: "ativo" | "pausado" | "bloqueado";
+  kind?: "memorial" | "offer";
   createdAt: string;
   lastScanAt?: string;
 };
@@ -91,6 +95,126 @@ export type PlatformOrder = {
   platformCommissionCents: number;
   operatorAmountCents: number;
   status: "paid" | "pending";
+  source?: "plan" | "funeral_home_offer" | "funeral_home";
+  offerLinkId?: string;
+  funeralHomeId?: string;
+  draftMemorialId?: string;
+  payerType?: "funeral_home" | "family";
+  createdAt: string;
+};
+
+export type FuneralHome = {
+  id: string;
+  name: string;
+  slug: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  cnpj?: string;
+  city?: string;
+  state?: string;
+  address?: string;
+  passwordHash: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type FuneralHomeOfferLink = {
+  id: string;
+  funeralHomeId?: string;
+  title: string;
+  slug: string;
+  description: string;
+  cycle: "monthly" | "annual" | "one_time";
+  priceCents: number;
+  status: "active" | "paused";
+  accessCount: number;
+  conversionCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type FuneralService = {
+  id: string;
+  funeralHomeId: string;
+  deceasedName: string;
+  deceasedBirthDate?: string;
+  deceasedDeathDate: string;
+  deceasedCauseOfDeath?: string;
+  deceasedDocumentNumber?: string;
+  familyContactName: string;
+  familyContactPhone: string;
+  familyContactEmail?: string;
+  familyContactRelation: string;
+  serviceType: 'sepultamento' | 'cremacao' | 'translado' | 'preparacao';
+  casketType?: string;
+  additionalServices: string[];
+  totalAmountCents: number;
+  paidAmountCents: number;
+  paymentMethod?: 'pix' | 'card' | 'boleto' | 'cash' | 'installment';
+  status: 'em_andamento' | 'concluido' | 'cancelado';
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type FuneralSchedule = {
+  id: string;
+  funeralHomeId: string;
+  serviceId?: string;
+  deceasedName: string;
+  type: 'velorio' | 'cerimonia' | 'sepultamento' | 'cremacao' | 'translado';
+  dateTime: string;
+  location: string;
+  address?: string;
+  status: 'agendado' | 'em_andamento' | 'concluido' | 'cancelado';
+  assignedStaff?: string[];
+  notes?: string;
+  createdAt: string;
+};
+
+export type InventoryItem = {
+  id: string;
+  funeralHomeId: string;
+  name: string;
+  category: 'urna' | 'flores' | 'veu' | 'ornamento' | 'livro' | 'outros';
+  description?: string;
+  quantity: number;
+  minQuantity: number;
+  unitPriceCents: number;
+  costPriceCents?: number;
+  imageUrl?: string;
+  status: 'disponivel' | 'esgotado' | 'reservado';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StaffMember = {
+  id: string;
+  funeralHomeId: string;
+  name: string;
+  role: 'tanatopraxista' | 'cerimonialista' | 'motorista' | 'atendente' | 'gerente' | 'outros';
+  phone: string;
+  email?: string;
+  commissionPercent?: number;
+  schedule: 'manha' | 'tarde' | 'noite' | 'integral' | 'folga';
+  isActive: boolean;
+  createdAt: string;
+};
+
+export type FuneralDocument = {
+  id: string;
+  funeralHomeId: string;
+  serviceId?: string;
+  type: 'certidao_obito' | 'autorizacao_sepultamento' | 'autorizacao_cremacao' | 'alvara' | 'guia_translado' | 'outros';
+  documentNumber?: string;
+  issuer?: string;
+  issueDate: string;
+  expiryDate?: string;
+  status: 'pendente' | 'emitido' | 'valido' | 'expirado';
+  fileUrl?: string;
+  notes?: string;
   createdAt: string;
 };
 
@@ -119,16 +243,18 @@ export type PlatformData = {
   tributes: ManagedTribute[];
   candles: ManagedCandle[];
   orders: PlatformOrder[];
+  funeralHomes: FuneralHome[];
+  offerLinks: FuneralHomeOfferLink[];
+  funeralServices: FuneralService[];
+  funeralSchedules: FuneralSchedule[];
+  inventoryItems: InventoryItem[];
+  staffMembers: StaffMember[];
+  funeralDocuments: FuneralDocument[];
   profile: CuratorProfile;
   profiles: CuratorProfile[];
   complaints: ManagedComplaint[];
 };
 
-const isServerless = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
-const dataDir = isServerless 
-  ? os.tmpdir() 
-  : path.join(process.cwd(), "src", "data");
-const dataFile = path.join(dataDir, "platform-store.json");
 let writeQueue: Promise<unknown> = Promise.resolve();
 
 const defaultConfig: PlatformConfig = {
@@ -176,6 +302,13 @@ const defaultData: PlatformData = {
   tributes: [],
   candles: [],
   orders: [],
+  funeralHomes: [],
+  offerLinks: [],
+  funeralServices: [],
+  funeralSchedules: [],
+  inventoryItems: [],
+  staffMembers: [],
+  funeralDocuments: [],
   profile: {
     name: "Novo Curador",
     email: "curador@plataforma.com",
@@ -205,6 +338,13 @@ function normalizePlatformData(data: Partial<PlatformData>): PlatformData {
     tributes: Array.isArray(data.tributes) ? data.tributes : [],
     candles: Array.isArray(data.candles) ? data.candles : [],
     orders: data.orders ?? [],
+    funeralHomes: Array.isArray(data.funeralHomes) ? data.funeralHomes : [],
+    offerLinks: Array.isArray(data.offerLinks) ? data.offerLinks : [],
+    funeralServices: Array.isArray(data.funeralServices) ? data.funeralServices : [],
+    funeralSchedules: Array.isArray(data.funeralSchedules) ? data.funeralSchedules : [],
+    inventoryItems: Array.isArray(data.inventoryItems) ? data.inventoryItems : [],
+    staffMembers: Array.isArray(data.staffMembers) ? data.staffMembers : [],
+    funeralDocuments: Array.isArray(data.funeralDocuments) ? data.funeralDocuments : [],
     profile: data.profile ?? {
       name: data.orders?.[0]?.userName || "Novo Curador",
       email: data.orders?.[0]?.userEmail || "curador@plataforma.com",

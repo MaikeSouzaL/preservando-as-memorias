@@ -174,21 +174,13 @@ export function PrivateShell({ children }: PrivateShellProps) {
           ))}
         </nav>
 
-        <div className="p-6 space-y-3">
+        <div className="p-6">
           <Link
             href="/memoriais/criar"
             className="flex w-full items-center justify-center rounded-full border border-tertiary/50 py-3 text-tertiary transition hover:bg-tertiary/5 hover:shadow-[0_0_15px_rgba(233,195,73,0.2)]"
           >
             + Novo Memorial
           </Link>
-          
-          <button
-            onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-red-500/20 py-3 text-red-400 transition hover:bg-red-500/5 hover:border-red-500/40 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-base">logout</span>
-            <span className="text-sm font-semibold tracking-wide">Sair da Conta</span>
-          </button>
         </div>
       </aside>
 

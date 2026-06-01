@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   const memorialIds = new Set(memorials.map((m) => m.id));
   const tributes = data.tributes.filter((t) => memorialIds.has(t.memorialId));
   const candles = data.candles.filter((c) => memorialIds.has(c.memorialId));
-  const qrCodes = data.qrCodes.filter((qr) => memorialIds.has(qr.memorialId));
+  const qrCodes = data.qrCodes.filter((qr) => qr.memorialId && memorialIds.has(qr.memorialId));
 
   const totalMemorials = memorials.length;
   const totalTributes = tributes.length;
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <Link
-                        href={`/memorial?memorial=${memorial.id}`}
+                        href={`/memorial-publico?memorial=${memorial.id}`}
                         target="_blank"
                         className="rounded-full border border-tertiary/50 px-4 py-2 text-sm text-tertiary transition hover:bg-tertiary/5"
                       >
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
                         </Link>
                         {featuredQrCode && (
                           <a
-                            href={`/memorial?memorial=${memorial.id}`}
+                            href={`/memorial-publico?memorial=${memorial.id}`}
                             target="_blank"
                             className="p-2 text-on-surface-variant transition hover:text-tertiary"
                           >
@@ -202,7 +202,7 @@ export default async function DashboardPage() {
               </div>
               <h4 className="mb-4 font-h3 text-[1.2rem] text-on-surface">{featuredMemorial.name}</h4>
               <a
-                href={`/memorial?memorial=${featuredMemorial.id}`}
+                href={`/memorial-publico?memorial=${featuredMemorial.id}`}
                 target="_blank"
                 className="flex w-full items-center justify-center gap-2 rounded-full border border-tertiary/50 py-3 text-tertiary transition hover:bg-tertiary/5"
               >

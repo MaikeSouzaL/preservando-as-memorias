@@ -49,7 +49,7 @@ export default async function DescobrirMemoriaisPage() {
       ) : (
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {memorials.map((memorial) => {
-            const publicPath = `/memorial?memorial=${memorial.id}`;
+            const publicPath = `/memorial-publico?memorial=${memorial.id}`;
             const tributeCount = data.tributes.filter((tribute) => tribute.memorialId === memorial.id && tribute.status === "aprovada").length;
 
             return (

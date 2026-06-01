@@ -86,33 +86,47 @@ export async function PATCH(request: Request, context: MemorialRouteContext) {
       const now = new Date().toISOString();
       const birthDate = asString(body.birthDate);
       const deathDate = asString(body.deathDate);
-      const gallery = parseLines(body.galleryUrls).slice(0, 8).map((line, itemIndex) => {
-        const [titlePart, urlPart] = line.includes("|") ? line.split("|") : [`Foto ${itemIndex + 1}`, line];
+      const gallery = Array.isArray(body.gallery)
+        ? body.gallery.slice(0, 12).map((item: { id?: string; title?: string; url: string }, index: number) => ({
+            id: item.id || `gal_${id}_${index}_${Date.now().toString(36)}`,
+            title: (item.title || `Foto ${index + 1}`).trim(),
+            url: item.url.trim(),
+          }))
+        : parseLines(body.galleryUrls).slice(0, 12).map((line, itemIndex) => {
+            const [titlePart, urlPart] = line.includes("|") ? line.split("|") : [`Foto ${itemIndex + 1}`, line];
 
-        return {
-          id: current.gallery[itemIndex]?.id ?? `gal_${id}_${itemIndex}_${Date.now().toString(36)}`,
-          title: titlePart.trim() || `Foto ${itemIndex + 1}`,
-          url: (urlPart ?? line).trim(),
-        };
-      });
+            return {
+              id: current.gallery[itemIndex]?.id ?? `gal_${id}_${itemIndex}_${Date.now().toString(36)}`,
+              title: titlePart.trim() || `Foto ${itemIndex + 1}`,
+              url: (urlPart ?? line).trim(),
+            };
+          });
 
       const timelineYear = asString(body.timelineYear);
       const timelineTitle = asString(body.timelineTitle);
       const timelineDescription = asString(body.timelineDescription);
       const timelineImageUrl = asString(body.timelineImageUrl) || asString(body.imageUrl) || "/images/hero-bg.png";
-      const timelineEvents =
-        timelineYear || timelineTitle || timelineDescription
-          ? [
-              {
-                id: current.timelineEvents[0]?.id ?? `tle_${id}_${Date.now().toString(36)}`,
-                year: timelineYear || (birthDate ? String(new Date(birthDate).getFullYear()) : "Memória"),
-                title: timelineTitle || "Uma lembrança especial",
-                description: timelineDescription || biography.slice(0, 180),
-                longStory: timelineDescription || biography,
-                imageUrl: timelineImageUrl,
-              },
-            ]
-          : [];
+      const timelineEvents = Array.isArray(body.timelineEvents)
+        ? body.timelineEvents.map((event: { id?: string; year?: string; title?: string; description?: string; imageUrl?: string }, index: number) => ({
+            id: event.id || `tle_${id}_${index}_${Date.now().toString(36)}`,
+            year: asString(event.year) || "Memória",
+            title: asString(event.title) || "Momento marcante",
+            description: asString(event.description),
+            longStory: asString(event.description),
+            imageUrl: asString(event.imageUrl) || "/images/hero-bg.png",
+          }))
+        : (timelineYear || timelineTitle || timelineDescription
+            ? [
+                {
+                  id: current.timelineEvents[0]?.id ?? `tle_${id}_${Date.now().toString(36)}`,
+                  year: timelineYear || (birthDate ? String(new Date(birthDate).getFullYear()) : "Memória"),
+                  title: timelineTitle || "Uma lembrança especial",
+                  description: timelineDescription || biography.slice(0, 180),
+                  longStory: timelineDescription || biography,
+                  imageUrl: timelineImageUrl,
+                },
+              ]
+            : []);
 
       const memorial = {
         ...current,
@@ -125,6 +139,7 @@ export async function PATCH(request: Request, context: MemorialRouteContext) {
         biography,
         imageUrl: asString(body.imageUrl) || "/images/hero-bg.png",
         audioUrl: asString(body.audioUrl) || undefined,
+        videoUrl: asString(body.videoUrl) || undefined,
         gallery,
         timelineEvents,
         updatedAt: now,
@@ -137,7 +152,7 @@ export async function PATCH(request: Request, context: MemorialRouteContext) {
         qrCode = {
           id: `qr_${id}_${Date.now().toString(36)}`,
           memorialId: id,
-          publicPath: `/memorial?memorial=${id}`,
+          publicPath: `/memorial-publico?memorial=${id}`,
           scans: 0,
           status: "ativo" as const,
           createdAt: now,

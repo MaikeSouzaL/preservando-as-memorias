@@ -107,9 +107,17 @@ export default function LandingPage() {
             <a href="#faq" className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">Duvidas</a>
           </nav>
 
-          <Link href="/memorial?from=landing" className="rounded-full border border-[#e9c349]/30 bg-[#e9c349]/5 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/15 sm:px-5 sm:text-xs sm:tracking-widest">
-            Ver demo
-          </Link>
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
+            <Link href="/login" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs">
+              Entrar
+            </Link>
+            <Link href="/cadastro" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs hidden sm:inline">
+              Cadastrar
+            </Link>
+            <Link href="/memorial?from=landing" className="rounded-full border border-[#e9c349]/30 bg-[#e9c349]/5 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/15 sm:px-5 sm:text-xs sm:tracking-widest">
+              Ver demo
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -214,7 +222,7 @@ export default function LandingPage() {
                   Ao aproximar qualquer smartphone da placa, o QR revela um santuario onde familiares podem navegar pela cronologia de vida, ouvir mensagens e acender velas virtuais.
                 </p>
                 <div className="pt-2">
-                  <Link href="/splash" className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:text-white">
+                  <Link href="/memorial?from=landing" className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:text-white">
                     Explorar memorial demonstrativo
                     <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
                   </Link>

@@ -11,6 +11,7 @@ export interface IMemorial extends Document {
   biography: string;
   imageUrl: string;
   audioUrl?: string;
+  videoUrl?: string;
   status: "ativo" | "rascunho";
   visits: number;
   gallery: Array<{ id: string; title: string; url: string }>;
@@ -37,6 +38,7 @@ const MemorialSchema = new Schema<IMemorial>({
   biography: { type: String, required: true },
   imageUrl: { type: String, required: true },
   audioUrl: { type: String },
+  videoUrl: { type: String },
   status: { type: String, enum: ["ativo", "rascunho"], default: "ativo" },
   visits: { type: Number, default: 0 },
   gallery: [{

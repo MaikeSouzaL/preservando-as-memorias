@@ -4,6 +4,12 @@
 
 import { useCallback, useEffect, useState, useRef, type CSSProperties } from "react";
 import { database, Memorial, Candle, TimelineEvent } from "@/src/mock-db/database";
+
+interface ExtendedMemorial extends Memorial {
+  audioUrl?: string;
+  nickname?: string;
+  city?: string;
+}
 import Link from "next/link";
 import SuccessModal from "@/src/components/success-modal";
 import { Howl } from "howler";
@@ -32,7 +38,7 @@ function fallbackGallery(memorial: Memorial | null): GalleryPhoto[] {
 }
 
 export default function TransicaoQrPage() {
-  const [memorial, setMemorial] = useState<Memorial | null>(null);
+  const [memorial, setMemorial] = useState<ExtendedMemorial | null>(null);
   const [showMemorial, setShowMemorial] = useState(false);
   const [showBackButton, setShowBackButton] = useState(false);
 
@@ -100,28 +106,7 @@ export default function TransicaoQrPage() {
     }
   }, []);
 
-  const registerVisit = useCallback(async (memorialId: string) => {
-    const storageKey = `memorial_visit_registered_${memorialId}`;
 
-    if (window.sessionStorage.getItem(storageKey)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/memorials/${encodeURIComponent(memorialId)}/visit`, {
-        method: "POST",
-      });
-      const payload = await response.json();
-
-      if (response.ok && typeof payload.visits === "number") {
-        window.sessionStorage.setItem(storageKey, "true");
-        setHeartsCount(payload.visits);
-        setMemorial((current) => (current?.id === memorialId ? { ...current, visits: payload.visits } : current));
-      }
-    } catch {
-      // A visita não deve impedir a exibição do memorial.
-    }
-  }, []);
 
   // Scroll opacity controller for floating sound button (only mobile)
   useEffect(() => {
@@ -149,91 +134,27 @@ export default function TransicaoQrPage() {
         setShowBackButton(fromLanding);
       }, 0);
 
-      const memorialId = params.get("memorial");
-
       // Usamos setTimeout para desvincular as atualizações do ciclo síncrono de renderização,
       // evitando alertas de cascading renders do React
       const loadTimer = window.setTimeout(() => {
-        if (memorialId) {
-          // Tentamos carregar os dados reais do memorial através da nossa API dinâmica focada
-          fetch(`/api/memorials/${encodeURIComponent(memorialId)}`)
-            .then((response) => response.json())
-            .then((payload) => {
-              if (payload.memorial) {
-                const m = payload.memorial;
-                const normalized: Memorial = {
-                  id: m.id,
-                  name: m.name,
-                  years: payload.years || [m.birthDate, m.deathDate]
-                    .filter(Boolean)
-                    .map((date: unknown) => new Date(date as string).getFullYear())
-                    .join(" - "),
-                  epitaph: m.epitaph || "Memória preservada com carinho.",
-                  imageUrl: m.imageUrl || "/images/hero-bg.png",
-                  visits: m.visits ?? 0,
-                  tributes: 0,
-                  candles: 0,
-                  status: m.status ?? "ativo",
-                  createdAt: m.createdAt,
-                };
+        // Carregamos João Henrique como DEMONSTRAÇÃO exclusiva
+        const demoFound = database.memorials.find((m) => m.id === "default") || database.memorials[0];
+        const normalized: ExtendedMemorial = {
+          ...demoFound,
+          nickname: "Joãozinho",
+          city: "São Paulo - SP",
+          audioUrl: undefined
+        };
+        setMemorial(normalized);
+        setHeartsCount(demoFound.visits);
+        setBiographyParagraphs(defaultBiography(demoFound.name));
+        setTimelineList(database.timelineEvents.filter((event) => event.memorialId === demoFound.id));
+        setGalleryList(fallbackGallery(demoFound));
+        loadInteractions(demoFound.id);
 
-                setMemorial(normalized);
-                setHeartsCount(normalized.visits);
-                setBiographyParagraphs(
-                  m.biography
-                    ? m.biography.split(/\n{2,}/).map((item: string) => item.trim()).filter(Boolean)
-                    : defaultBiography(normalized.name)
-                );
-                setTimelineList(Array.isArray(m.timelineEvents) ? m.timelineEvents : []);
-                setGalleryList(
-                  Array.isArray(m.gallery) && m.gallery.length > 0
-                    ? m.gallery.map((item: { title: string; url: string }) => ({ title: item.title, src: item.url }))
-                    : fallbackGallery(normalized)
-                );
-                loadInteractions(normalized.id);
-                registerVisit(normalized.id);
-
-                // Revela após 1.5s (uma transição super solene e premium)
-                setTimeout(() => {
-                  setShowMemorial(true);
-                }, 1500);
-              }
-            })
-            .catch(() => {
-              // Em caso de falha de conexão, tentamos o fallback no mock estático local
-              const found = database.memorials.find((m) => m.id === memorialId);
-              if (found) {
-                setMemorial(found);
-                setHeartsCount(found.visits);
-                setBiographyParagraphs(defaultBiography(found.name));
-                setTimelineList(database.timelineEvents.filter((event) => event.memorialId === found.id));
-                const dbGallery = database.gallery.filter((item) => item.memorialId === found.id);
-                setGalleryList(
-                  dbGallery.length > 0
-                    ? dbGallery.map((item) => ({ title: item.title, src: item.url }))
-                    : fallbackGallery(found)
-                );
-                loadInteractions(found.id);
-
-                setTimeout(() => {
-                  setShowMemorial(true);
-                }, 1500);
-              }
-            });
-        } else {
-          // Sem ?memorial=... -> carregamos João Henrique como DEMONSTRAÇÃO
-          const demoFound = database.memorials.find((m) => m.id === "default") || database.memorials[0];
-          setMemorial(demoFound);
-          setHeartsCount(demoFound.visits);
-          setBiographyParagraphs(defaultBiography(demoFound.name));
-          setTimelineList(database.timelineEvents.filter((event) => event.memorialId === demoFound.id));
-          setGalleryList(fallbackGallery(demoFound));
-          loadInteractions(demoFound.id);
-
-          setTimeout(() => {
-            setShowMemorial(true);
-          }, 1500);
-        }
+        setTimeout(() => {
+          setShowMemorial(true);
+        }, 1500);
       }, 0);
 
       return () => {
@@ -241,7 +162,7 @@ export default function TransicaoQrPage() {
         window.clearTimeout(loadTimer);
       };
     }
-  }, [loadInteractions, registerVisit]);
+  }, [loadInteractions]);
 
   const soundRef = useRef<Howl | null>(null);
   const matchSoundRef = useRef<Howl | null>(null);
@@ -303,6 +224,34 @@ export default function TransicaoQrPage() {
       }
     }
   }, [isBgMuted]);
+
+  // Dynamically switch background audio to the custom audioUrl if loaded
+  useEffect(() => {
+    if (memorial && memorial.audioUrl) {
+      const customUrl = memorial.audioUrl;
+      if (soundRef.current) {
+        soundRef.current.unload();
+      }
+      soundRef.current = new Howl({
+        src: [customUrl],
+        loop: true,
+        volume: 0.6,
+        html5: true,
+        onloaderror: (id, err) => {
+          console.error("Erro ao carregar áudio do memorial:", err);
+        },
+        onplayerror: (id, err) => {
+          console.error("Erro ao tocar áudio do memorial:", err);
+          soundRef.current?.once('unlock', function() {
+            if (!isBgMutedRef.current) soundRef.current?.play();
+          });
+        }
+      });
+      if (!isBgMuted) {
+        soundRef.current.play();
+      }
+    }
+  }, [memorial, isBgMuted]);
 
   const revealMemorial = useCallback(() => {
     setShowMemorial(true);
@@ -374,9 +323,10 @@ export default function TransicaoQrPage() {
 
     // Rolar a tela
     setTimeout(() => {
-      document.getElementById('tributes')?.scrollIntoView({ behavior: 'smooth' });
+      const altar = document.getElementById('candle-altar');
+      if (altar) altar.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
-  };
+    };
 
   const handleSendFlower = () => {
     setFlowersCount((prev) => prev + 1);
@@ -717,6 +667,12 @@ export default function TransicaoQrPage() {
       ) : (
         /* STAGE 2: Seamlessly Faded Public Memorial Page */
         <>
+          {/* Floating Gold Demo Badge */}
+          <div className="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#e9c349]/10 border border-[#e9c349]/30 text-[#e9c349] px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest flex items-center gap-1.5 z-40 shadow-xl backdrop-blur-md">
+            <span className="material-symbols-outlined text-sm animate-pulse text-[#e9c349]">science</span>
+            Modo de Demonstração
+          </div>
+
           <div className="animate-fade-in">
           {/* TopAppBar */}
           <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300">
@@ -764,12 +720,23 @@ export default function TransicaoQrPage() {
                 />
               </div>
 
-              <h1 className="font-h1 text-[clamp(2.5rem,6vw,4rem)] font-light leading-[1.1] text-[#e5e2e1] mb-2 text-glow animate-fade-in" style={{ animationDelay: '600ms', animationFillMode: 'both' }}>
+              <h1 className="font-h1 text-[clamp(2.5rem,6vw,4rem)] font-light leading-[1.1] text-[#e5e2e1] mb-1 text-glow animate-fade-in" style={{ animationDelay: '600ms', animationFillMode: 'both' }}>
                 {memorial.name}
               </h1>
-              <p className="font-body-md text-sm md:text-md tracking-[0.2em] text-[#e9c349] uppercase mb-8 animate-fade-in" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
+              {memorial.nickname && (
+                <p className="font-body-md text-lg italic text-[#e9c349]/90 font-medium mb-3 font-serif animate-fade-in" style={{ animationDelay: '800ms', animationFillMode: 'both' }}>
+                  &quot;{memorial.nickname}&quot;
+                </p>
+              )}
+              <p className="font-body-md text-sm md:text-md tracking-[0.2em] text-[#e9c349] uppercase mb-4 animate-fade-in" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
                 {memorial.years}
               </p>
+              {memorial.city && (
+                <div className="flex items-center gap-1.5 justify-center text-xs tracking-wider text-[#c4c7c7] uppercase mb-8 font-semibold animate-fade-in" style={{ animationDelay: '1200ms', animationFillMode: 'both' }}>
+                  <span className="material-symbols-outlined text-xs text-[#e9c349]">location_on</span>
+                  <span>{memorial.city}</span>
+                </div>
+              )}
 
               {/* Quick Interactive Actions */}
               <div className="flex flex-col sm:flex-row gap-4 mb-6 w-full max-w-2xl justify-center animate-fade-in" style={{ animationDelay: '1400ms', animationFillMode: 'both' }}>
@@ -1223,7 +1190,7 @@ export default function TransicaoQrPage() {
               </p>
               
               {/* O Altar (Prateleiras Escalonadas) */}
-              <div className="relative w-full max-w-5xl mx-auto pt-16 pb-8 px-4 sm:px-8 border-b-8 border-[#2a1f11] bg-gradient-to-t from-[#1a1208]/90 to-transparent rounded-t-xl shadow-[0_15px_40px_rgba(0,0,0,0.9)] overflow-hidden">
+              <div id="candle-altar" className="relative w-full max-w-5xl mx-auto pt-16 pb-8 px-4 sm:px-8 border-b-8 border-[#2a1f11] bg-gradient-to-t from-[#1a1208]/90 to-transparent rounded-t-xl shadow-[0_15px_40px_rgba(0,0,0,0.9)] overflow-hidden">
                 {/* Brilho Dinâmico de Fundo */}
                 <div 
                   className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(233,195,73,0.18)_0%,transparent_70%)] blur-2xl pointer-events-none transition-opacity duration-1000 z-0"

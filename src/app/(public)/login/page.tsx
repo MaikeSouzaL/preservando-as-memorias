@@ -110,6 +110,15 @@ export default function LoginPage() {
 
         <article className="animate-[fade-rise_800ms_ease-out_200ms_forwards] opacity-0">
           <div className="relative mx-auto flex w-full max-w-md flex-col gap-gutter overflow-hidden rounded-2xl border border-tertiary/10 bg-[#0a192f66] p-[clamp(1.5rem,4vw,4rem)] backdrop-blur-[20px]">
+            {/* Voltar à página principal */}
+            <Link
+              href="/"
+              className="absolute left-6 top-6 flex h-8 w-8 items-center justify-center rounded-full border border-tertiary/20 bg-[#0d1010]/40 text-tertiary transition hover:bg-[#e9c349] hover:text-[#0d1010] shadow-md active:scale-95 group z-10"
+              title="Voltar à página principal"
+            >
+              <span className="material-symbols-outlined text-sm font-bold transition-transform group-hover:-translate-x-0.5">arrow_back</span>
+            </Link>
+
             <div className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-tertiary/5 blur-[100px]" />
 
             <div className="flex flex-col items-center gap-base text-center">

@@ -137,9 +137,9 @@ export default function MemoriaisListaPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-4">
+               <div className="flex items-center justify-between gap-4">
                 <Link
-                  href={`/memorial?memorial=${memorial.id}`}
+                  href={`/memorial-publico?memorial=${memorial.id}`}
                   target="_blank"
                   className="rounded-full border border-tertiary/50 px-4 py-2 text-xs font-semibold text-tertiary transition hover:bg-tertiary/5"
                 >
@@ -154,7 +154,7 @@ export default function MemoriaisListaPage() {
                     <span className="material-symbols-outlined text-[1.2rem]">edit</span>
                   </Link>
                   <a
-                    href={`/memorial?memorial=${memorial.id}`}
+                    href={`/memorial-publico?memorial=${memorial.id}`}
                     target="_blank"
                     title="Visualizar Memorial & QR Code"
                     className="p-2 rounded-full hover:bg-tertiary/10 text-on-surface-variant transition hover:text-tertiary"
@@ -164,7 +164,7 @@ export default function MemoriaisListaPage() {
                   <button
                     title="Compartilhar"
                     onClick={() => {
-                      navigator.clipboard.writeText(`${window.location.origin}/memorial?memorial=${memorial.id}`);
+                      navigator.clipboard.writeText(`${window.location.origin}/memorial-publico?memorial=${memorial.id}`);
                       alert("Link do memorial copiado para a área de transferência!");
                     }}
                     className="p-2 rounded-full hover:bg-tertiary/10 text-on-surface-variant transition hover:text-tertiary"

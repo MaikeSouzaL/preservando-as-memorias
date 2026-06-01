@@ -19,6 +19,7 @@ type AdminMenuItem = {
 const adminItems: AdminMenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
   { label: "Comercial", icon: "payments", href: "/admin/comercial" },
+  { label: "Ofertas Funerárias", icon: "local_offer", href: "/admin/ofertas" },
   { label: "Usuários", icon: "group", href: "/admin/usuarios" },
   { label: "Memoriais", icon: "favorite", href: "/admin/memoriais" },
   { label: "Homenagens", icon: "card_giftcard", href: "/admin/homenagens" },

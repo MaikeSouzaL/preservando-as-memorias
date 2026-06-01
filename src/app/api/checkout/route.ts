@@ -29,8 +29,22 @@ export async function POST(request: Request) {
     const planId = asString(body.planId);
     const discountCode = asString(body.discountCode);
     const paymentMethod = asString(body.paymentMethod) as PaymentMethod;
+    
+    // Novos campos para ofertas de funerárias
+    const offerLinkId = asString(body.offerLinkId);
+    const memorialId = asString(body.memorialId);
+    const source = asString(body.source) as "plan" | "funeral_home_offer" | "funeral_home" | "";
+    const payerType = asString(body.payerType) as "funeral_home" | "family" | "";
 
-    if (!userName || !userEmail || !customerDocument || !customerPhone || !planId) {
+    // Validação: se é oferta de funerária, precisa de offerLinkId e memorialId
+    if ((source === "funeral_home_offer" || source === "funeral_home") && !memorialId) {
+      return NextResponse.json(
+        { error: "Para ofertas de funerárias, offerLinkId e memorialId são obrigatórios." },
+        { status: 400 }
+      );
+    }
+
+    if (!userName || !userEmail || !customerDocument || !customerPhone || (!planId && !offerLinkId)) {
       return NextResponse.json(
         { error: "Nome, e-mail, CPF, telefone e plano são obrigatórios." },
         { status: 400 }
@@ -61,7 +75,7 @@ export async function POST(request: Request) {
     // ========================================================================
     if (gateway === "stripe") {
       try {
-        // Exemplo de integração usando o Stripe SDK (necessita `npm install stripe`):
+        // Exemplo de integração utilizando o Stripe SDK (necessita `npm install stripe`):
         // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
         // const customer = await stripe.customers.create({ name: userName, email: userEmail });
         // const paymentIntent = await stripe.paymentIntents.create({
@@ -143,31 +157,71 @@ export async function POST(request: Request) {
 
     // Gravação centralizada no arquivo de banco de dados
     const order = await updatePlatformData((data) => {
-      const plan = data.config.plans.find((item) => item.id === planId && item.active);
+      let priceCents: number;
+      let actualPlanId: string;
 
-      if (!plan) {
-        throw new Error("Plano indisponível.");
+      // Se é oferta de funerária, buscar o preço da oferta
+      if ((source === "funeral_home_offer" || source === "funeral_home") && offerLinkId) {
+        const offer = data.offerLinks.find((o) => o.id === offerLinkId);
+        if (!offer) {
+          throw new Error("Oferta não encontrada.");
+        }
+        priceCents = offer.priceCents;
+        actualPlanId = "funeral_home_offer";
+      } else {
+        const plan = data.config.plans.find((item) => item.id === planId && item.active);
+        if (!plan) {
+          throw new Error("Plano indisponível.");
+        }
+        priceCents = plan.priceCents;
+        actualPlanId = planId;
       }
 
-      const totals = calculateOrderTotals(plan.priceCents, data.config.ownerCommissionPercent, discountCode);
+      const totals = calculateOrderTotals(priceCents, data.config.ownerCommissionPercent, discountCode);
+      const isPaid = gateway === "sandbox";
+
+      // Lookup funeralHomeId from the memorial if applicable
+      let funeralHomeId: string | undefined;
+      if (memorialId) {
+        const memorial = data.memorials.find((m) => m.id === memorialId);
+        funeralHomeId = memorial?.funeralHomeId;
+      }
+      
       const nextOrder = {
         id: `ord_${Date.now().toString(36)}`,
         userName,
         userEmail,
         customerDocument,
         customerPhone,
-        planId,
+        planId: actualPlanId,
         paymentMethod,
         discountCode: discountCode || undefined,
         discountCents: totals.discountCents,
         grossAmountCents: totals.grossAmountCents,
         platformCommissionCents: totals.platformCommissionCents,
         operatorAmountCents: totals.operatorAmountCents,
-        status: gateway === "sandbox" ? ("paid" as const) : ("pending" as const), // No sandbox aprova automático, nos reais aguarda webhook
+        status: isPaid ? ("paid" as const) : ("pending" as const),
+        source: source || ("plan" as const),
+        offerLinkId: offerLinkId || undefined,
+        funeralHomeId,
+        draftMemorialId: memorialId || undefined,
+        payerType: payerType || undefined,
         createdAt: new Date().toISOString(),
       };
 
       data.orders.unshift(nextOrder);
+
+      // Se é memorial de funerária e pagamento foi confirmado, liberar o memorial
+      if ((source === "funeral_home_offer" || source === "funeral_home") && memorialId && isPaid) {
+        const memorial = data.memorials.find((m) => m.id === memorialId);
+        if (memorial) {
+          memorial.status = "ativo";
+          memorial.paymentStatus = "paid";
+          memorial.qrUnlocked = true;
+          memorial.updatedAt = new Date().toISOString();
+        }
+      }
+
       return nextOrder;
     });
 

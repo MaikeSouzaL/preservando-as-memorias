@@ -37,7 +37,7 @@ export default async function QrPublicoPage({ searchParams }: QrPublicoPageProps
     );
   }
 
-  const publicPath = `/memorial?memorial=${memorial.id}`;
+  const publicPath = `/memorial-publico?memorial=${memorial.id}`;
   const publicLink = publicPath;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(publicLink)}`;
 

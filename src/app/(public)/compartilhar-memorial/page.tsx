@@ -35,7 +35,7 @@ export default function CompartilharMemorialPage() {
 
   const link = useMemo(() => {
     if (!memorial || typeof window === "undefined") return "";
-    return `${window.location.origin}/memorial?memorial=${memorial.id}`;
+    return `${window.location.origin}/memorial-publico?memorial=${memorial.id}`;
   }, [memorial]);
 
   async function copyLink() {
@@ -132,7 +132,7 @@ export default function CompartilharMemorialPage() {
         <Link href={`/qr-publico?memorial=${memorial.id}`} className="rounded-full border border-tertiary/50 px-5 py-2 text-tertiary transition hover:bg-tertiary/10">
           Ver QR público
         </Link>
-        <Link href={`/memorial?memorial=${memorial.id}`} className="rounded-full border border-outline-variant/60 px-5 py-2 text-on-surface-variant transition hover:border-tertiary/50 hover:text-tertiary">
+        <Link href={`/memorial-publico?memorial=${memorial.id}`} className="rounded-full border border-outline-variant/60 px-5 py-2 text-on-surface-variant transition hover:border-tertiary/50 hover:text-tertiary">
           Voltar ao memorial
         </Link>
       </div>
