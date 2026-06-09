@@ -24,6 +24,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      {session.needsPassword && <PasswordBanner />}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-h2 text-[clamp(1.75rem,3.5vw,2.25rem)] tracking-[-0.01em]">
@@ -158,6 +159,30 @@ export default async function DashboardPage() {
           </Link>
         </div>
       )}
+    </div>
+  );
+}
+
+function PasswordBanner() {
+  return (
+    <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-[#e9c349]/20 bg-[#e9c349]/5 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e9c349]/10">
+          <span className="material-symbols-outlined text-[#e9c349]">lock_open</span>
+        </div>
+        <div>
+          <h3 className="font-semibold text-on-surface">Defina sua senha de acesso</h3>
+          <p className="mt-0.5 text-sm text-on-surface-variant">
+            Crie uma senha para entrar no dashboard sem precisar preencher o formulário novamente.
+          </p>
+        </div>
+      </div>
+      <Link
+        href="/definir-senha"
+        className="shrink-0 rounded-full bg-[#e9c349] px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-[#101414] transition hover:bg-[#ffe088]"
+      >
+        Criar senha
+      </Link>
     </div>
   );
 }

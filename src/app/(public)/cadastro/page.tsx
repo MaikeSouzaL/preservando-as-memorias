@@ -3,11 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function CadastroPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +54,7 @@ export default function CadastroPage() {
       if (payload.session?.isAdmin === true) {
         router.push("/admin/dashboard");
       } else {
-        router.push("/dashboard");
+        router.push(next);
       }
     } catch {
       setErrorMsg("Ocorreu um erro ao criar a conta. Tente novamente.");
@@ -193,7 +195,7 @@ export default function CadastroPage() {
                   localStorage.setItem("has_logged_in", "true");
                   const useRealAuth = process.env.NEXT_PUBLIC_HAS_GOOGLE_AUTH === "true";
                   if (useRealAuth) {
-                    signIn("google", { callbackUrl: "/dashboard" });
+                    signIn("google", { callbackUrl: next });
                   } else {
                     window.location.href = "/dashboard";
                   }

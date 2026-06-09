@@ -3,11 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/dashboard";
   const [email, setEmail] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("remembered_email") || "";
@@ -59,7 +61,7 @@ export default function LoginPage() {
       if (isUserAdmin) {
         router.push("/admin/dashboard");
       } else {
-        router.push("/dashboard");
+        router.push(next);
       }
     } catch {
       setErrorMsg("Não foi possível entrar agora. Tente novamente.");
@@ -190,7 +192,7 @@ export default function LoginPage() {
                   localStorage.setItem("has_logged_in", "true");
                   const useRealAuth = process.env.NEXT_PUBLIC_HAS_GOOGLE_AUTH === "true";
                   if (useRealAuth) {
-                    signIn("google", { callbackUrl: "/dashboard" });
+                    signIn("google", { callbackUrl: next });
                   } else {
                     // Modo de desenvolvimento: realiza um bypass seguro e amigável direcionando ao dashboard
                     window.location.href = "/dashboard";

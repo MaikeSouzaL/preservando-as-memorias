@@ -139,7 +139,7 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/splash" className="rounded-full bg-[#e9c349] px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#0d1010] transition hover:bg-[#ffe088] hover:shadow-[0_0_30px_rgba(233,195,73,0.3)]">
+              <Link href="/criar-memorial" className="rounded-full bg-[#e9c349] px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#0d1010] transition hover:bg-[#ffe088] hover:shadow-[0_0_30px_rgba(233,195,73,0.3)]">
                 Criar memorial
               </Link>
               <a href="#simulator" className="rounded-full border border-[#e9c349]/20 bg-white/5 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e0e3e2] transition hover:border-[#e9c349]/40 hover:bg-white/10">

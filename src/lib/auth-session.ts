@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 export type AuthSession = {
   email: string;
   isAdmin: boolean;
+  needsPassword?: boolean;
 };
 
 export function serializeAuthSession(session: AuthSession) {
