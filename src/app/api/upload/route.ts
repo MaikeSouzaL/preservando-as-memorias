@@ -9,8 +9,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/m4a", "audio/x-m4a"];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES];
+const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 
 export async function POST(request: Request) {
   try {
@@ -43,12 +45,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, url: dataUrl });
     }
 
+    const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: "preservando-memorias", resource_type: "image" }, (err, result) => {
-          if (err || !result) return reject(err ?? new Error("Upload falhou"));
-          resolve(result);
-        })
+        .upload_stream(
+          { folder: "preservando-memorias", resource_type: isAudio ? "video" : "image" },
+          (err, result) => {
+            if (err || !result) return reject(err ?? new Error("Upload falhou"));
+            resolve(result);
+          }
+        )
         .end(buffer);
     });
 

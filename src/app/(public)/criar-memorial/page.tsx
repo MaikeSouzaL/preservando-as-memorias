@@ -235,7 +235,18 @@ export default function CriarMemorialPage() {
           )}
 
           {step === 6 && (
-            <StepAudio audioUrl={form.audioUrl} onChange={(v) => set("audioUrl", v)} />
+            <StepAudio
+              audioUrl={form.audioUrl}
+              uploading={uploading}
+              onUpload={async (file) => {
+                setUploading(true);
+                const url = await uploadImage(file);
+                setUploading(false);
+                if (url) set("audioUrl", url);
+                else setError("Não foi possível enviar o áudio.");
+              }}
+              onRemove={() => set("audioUrl", "")}
+            />
           )}
 
           {step === 7 && (
@@ -507,19 +518,63 @@ function StepTimeline({
   );
 }
 
-function StepAudio({ audioUrl, onChange }: { audioUrl: string; onChange: (v: string) => void }) {
+function StepAudio({
+  audioUrl,
+  uploading,
+  onUpload,
+  onRemove,
+}: {
+  audioUrl: string;
+  uploading: boolean;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+
   return (
     <StepWrapper title="Áudio" subtitle="Voz, música preferida ou mensagem para tocar no memorial. Etapa opcional.">
-      <Field
-        label="Link do áudio (SoundCloud, Google Drive, etc.)"
-        type="url"
-        value={audioUrl}
-        onChange={onChange}
-        placeholder="https://..."
+      {audioUrl ? (
+        <div className="flex flex-col gap-3">
+          <audio controls src={audioUrl} className="w-full rounded-lg" />
+          <button
+            type="button"
+            onClick={onRemove}
+            className="self-start text-xs text-[#c4c7c7]/40 transition hover:text-red-400"
+          >
+            Remover áudio
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => ref.current?.click()}
+          disabled={uploading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[#e9c349]/20 py-10 text-sm text-[#c4c7c7]/60 transition hover:border-[#e9c349]/40 hover:text-[#e9c349] disabled:opacity-50"
+        >
+          {uploading ? (
+            <>
+              <span className="material-symbols-outlined animate-spin text-xl">progress_activity</span>
+              Enviando...
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined text-2xl">audio_file</span>
+              <span>
+                Selecionar arquivo de áudio
+                <span className="mt-1 block text-[0.65rem] text-[#c4c7c7]/40">MP3, WAV, AAC, M4A — máx. 20 MB</span>
+              </span>
+            </>
+          )}
+        </button>
+      )}
+      <input
+        ref={ref}
+        type="file"
+        accept="audio/*"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }}
       />
-      <p className="mt-3 text-xs text-[#c4c7c7]/40">
-        Deixe em branco para pular esta etapa.
-      </p>
+      <p className="mt-3 text-xs text-[#c4c7c7]/40">Deixe sem arquivo para pular esta etapa.</p>
     </StepWrapper>
   );
 }
