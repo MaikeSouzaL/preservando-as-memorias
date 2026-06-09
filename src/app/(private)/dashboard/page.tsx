@@ -18,7 +18,7 @@ async function generateQr(url: string): Promise<string> {
 export default async function DashboardPage() {
   const session = await getAuthSession();
   if (!session) redirect("/login");
-  if (session.needsPassword) redirect("/definir-senha");
+  if (session.needsPassword) redirect("/definir-senha?source=memorial");
 
   const data = await readPlatformData();
   const memorials = data.memorials.filter(

@@ -10,10 +10,8 @@ type PrivateShellProps = {
 };
 
 const menuItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/memoriais/lista", label: "Memoriais", icon: "auto_stories" },
+  { href: "/dashboard", label: "Meus Memoriais", icon: "auto_stories" },
   { href: "/homenagens", label: "Homenagens", icon: "volunteer_activism" },
-  { href: "/assinaturas", label: "Assinaturas", icon: "subscriptions" },
   { href: "/configuracoes", label: "Configurações", icon: "settings" },
 ];
 
@@ -176,7 +174,7 @@ export function PrivateShell({ children }: PrivateShellProps) {
 
         <div className="p-6">
           <Link
-            href="/memoriais/criar"
+            href="/criar-memorial"
             className="flex w-full items-center justify-center rounded-full border border-tertiary/50 py-3 text-tertiary transition hover:bg-tertiary/5 hover:shadow-[0_0_15px_rgba(233,195,73,0.2)]"
           >
             + Novo Memorial

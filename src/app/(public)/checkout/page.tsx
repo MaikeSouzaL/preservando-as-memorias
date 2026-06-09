@@ -48,7 +48,20 @@ function CheckoutContent() {
   const [error, setError] = useState("");
   const [order, setOrder] = useState<CheckoutOrder | null>(null);
 
+  const prefillEmail = searchParams.get("email") ?? "";
+  const prefillName = searchParams.get("name") ?? "";
   const isMemorialMode = Boolean(memorialId && (payerType === "family" || payerType === "funeral_home"));
+
+  useEffect(() => {
+    if (prefillEmail || prefillName) {
+      setFormData((prev) => ({
+        ...prev,
+        email: prefillEmail || prev.email,
+        name: prefillName || prev.name,
+      }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetch("/api/platform-config")

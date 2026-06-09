@@ -107,7 +107,7 @@ export default function CriarMemorialPage() {
       });
       const payload = await res.json();
       if (!res.ok) { setError(payload.error ?? "Não foi possível criar o memorial."); return; }
-      router.push(`/checkout?memorialId=${payload.memorialId}&payerType=family`);
+      router.push(`/checkout?memorialId=${payload.memorialId}&payerType=family&email=${encodeURIComponent(form.email)}&name=${encodeURIComponent(form.familyName)}`);
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
