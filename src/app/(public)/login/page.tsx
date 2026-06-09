@@ -239,18 +239,30 @@ function InputWithIcon({
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
+  const [show, setShow] = useState(false);
+  const isPassword = type === "password";
+
   return (
     <label className="group relative block">
       <span className="material-symbols-outlined pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-on-surface-variant transition group-focus-within:text-tertiary">
         {icon}
       </span>
       <input
-        type={type}
+        type={isPassword && show ? "text" : type}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full border-0 border-b border-on-surface/40 bg-transparent py-3 pl-10 text-on-surface placeholder:text-on-surface-variant/50 focus:border-tertiary focus:outline-none focus:ring-0 text-sm"
+        className="w-full border-0 border-b border-on-surface/40 bg-transparent py-3 pl-10 pr-8 text-on-surface placeholder:text-on-surface-variant/50 focus:border-tertiary focus:outline-none focus:ring-0 text-sm"
       />
+      {isPassword && (
+        <button
+          type="button"
+          onClick={() => setShow((s) => !s)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant transition hover:text-tertiary"
+        >
+          <span className="material-symbols-outlined text-base">{show ? "visibility_off" : "visibility"}</span>
+        </button>
+      )}
     </label>
   );
 }
