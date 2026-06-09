@@ -111,9 +111,6 @@ export default function LandingPage() {
             <Link href="/login" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs">
               Entrar
             </Link>
-            <Link href="/cadastro" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs hidden sm:inline">
-              Cadastrar
-            </Link>
             <Link href="/funeraria/login" className="rounded-full border border-[#e9c349]/40 bg-[#e9c349]/10 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/25 hover:border-[#e9c349] sm:px-4 sm:text-xs sm:tracking-widest flex items-center gap-1.5 font-bold">
               <span className="material-symbols-outlined text-xs sm:text-sm">business</span>
               Área da Funerária

@@ -55,8 +55,29 @@ export async function POST(request: Request) {
     const baseId = `mem_${Date.now().toString(36)}`;
     const id = `${baseId}_${Math.random().toString(36).slice(2, 6)}`;
 
-    const gallery: { id: string; title: string; url: string }[] = [];
-    const timelineEvents: { id: string; year: string; title: string; description: string; longStory: string; imageUrl: string }[] = [];
+    const rawGallery: { title: string; url: string }[] = Array.isArray(body.gallery)
+      ? (body.gallery as { title: string; url: string }[]).filter((g) => g?.url)
+      : [];
+    const gallery = rawGallery.map((g, i) => ({
+      id: `gal_${baseId}_${i}`,
+      title: asString(g.title) || `Foto ${i + 1}`,
+      url: asString(g.url),
+    }));
+
+    const rawTimeline: { year: string; title: string; description: string; longStory: string; imageUrl: string }[] =
+      Array.isArray(body.timelineEvents)
+        ? (body.timelineEvents as { year: string; title: string; description: string; longStory: string; imageUrl: string }[]).filter(
+            (t) => t?.year && t?.title
+          )
+        : [];
+    const timelineEvents = rawTimeline.map((t, i) => ({
+      id: `tl_${baseId}_${i}`,
+      year: asString(t.year),
+      title: asString(t.title),
+      description: asString(t.description),
+      longStory: asString(t.longStory),
+      imageUrl: asString(t.imageUrl),
+    }));
 
     const memorial = {
       id,
@@ -69,6 +90,7 @@ export async function POST(request: Request) {
       epitaph: asString(body.epitaph) || "Uma história preservada com carinho.",
       biography: asString(body.biography) || "",
       imageUrl: asString(body.imageUrl) || "/images/hero-bg.png",
+      audioUrl: asString(body.audioUrl) || undefined,
       gallery,
       timelineEvents,
       status: "pending_payment" as const,
