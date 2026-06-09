@@ -1,17 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { getAuthSession } from "@/src/lib/auth-session";
 import { readPlatformData } from "@/src/lib/platform-data";
+import { MemorialCard } from "@/src/components/private/memorial-card";
 
 export const dynamic = "force-dynamic";
-
-const statusLabel: Record<string, { text: string; color: string }> = {
-  ativo: { text: "Publicado", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20" },
-  pending_payment: { text: "Aguardando pagamento", color: "text-[#e9c349] bg-[#e9c349]/10 border-[#e9c349]/20" },
-  rascunho: { text: "Rascunho", color: "text-outline bg-outline/10 border-outline/20" },
-};
 
 async function generateQr(url: string): Promise<string> {
   return QRCode.toDataURL(url, {
@@ -33,14 +27,12 @@ export default async function DashboardPage() {
 
   const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
 
-  // Gera QR code para cada memorial ativo
   const qrMap: Record<string, string> = {};
   await Promise.all(
     memorials
       .filter((m) => m.status === "ativo")
       .map(async (m) => {
-        const fullUrl = `${baseUrl}/memorial-publico?memorial=${m.id}`;
-        qrMap[m.id] = await generateQr(fullUrl);
+        qrMap[m.id] = await generateQr(`${baseUrl}/memorial-publico?memorial=${m.id}`);
       })
   );
 
@@ -58,7 +50,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link
-          href="/memoriais/criar"
+          href="/criar-memorial"
           className="inline-flex items-center gap-2 rounded-full bg-tertiary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-[#101414] transition hover:bg-tertiary/80"
         >
           <span className="material-symbols-outlined text-sm">add</span>
@@ -76,7 +68,7 @@ export default async function DashboardPage() {
             Crie seu primeiro memorial digital e preserve as memórias de quem você ama.
           </p>
           <Link
-            href="/memoriais/criar"
+            href="/criar-memorial"
             className="rounded-full bg-tertiary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-[#101414] transition hover:bg-tertiary/80"
           >
             Criar primeiro memorial
@@ -85,94 +77,28 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {memorials.map((memorial) => {
-            const status = statusLabel[memorial.status] ?? statusLabel.rascunho;
             const deathYear = memorial.deathDate ? new Date(memorial.deathDate).getFullYear() : null;
             const birthYear = memorial.birthDate ? new Date(memorial.birthDate).getFullYear() : null;
             const years = birthYear || deathYear ? `${birthYear ?? "?"} – ${deathYear ?? "?"}` : null;
-            const publicUrl = `/memorial-publico?memorial=${memorial.id}`;
-            const qrDataUrl = qrMap[memorial.id];
 
             return (
-              <article
+              <MemorialCard
                 key={memorial.id}
-                className="flex flex-col overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f] transition duration-300 hover:-translate-y-0.5 hover:border-tertiary/20"
-              >
-                {/* Foto */}
-                <div className="relative h-44 shrink-0">
-                  <Image
-                    src={memorial.imageUrl || "/images/hero-bg.png"}
-                    alt={memorial.name}
-                    fill
-                    className="object-cover grayscale-[20%]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <h3 className="font-semibold text-white line-clamp-1">{memorial.name}</h3>
-                    {years && <p className="text-xs text-white/60">{years}</p>}
-                  </div>
-                </div>
-
-                <div className="flex flex-1 flex-col gap-4 p-4">
-                  <span className={`self-start rounded-full border px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${status.color}`}>
-                    {status.text}
-                  </span>
-
-                  {/* QR Code — só para memoriais ativos */}
-                  {qrDataUrl && (
-                    <div className="flex flex-col items-center gap-3 rounded-xl border border-tertiary/10 bg-[#060e1a] p-4">
-                      <p className="text-[0.65rem] uppercase tracking-[0.15em] text-outline">QR Code do memorial</p>
-                      <div className="rounded-lg bg-white p-2">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={qrDataUrl} alt={`QR Code — ${memorial.name}`} width={160} height={160} />
-                      </div>
-                      <a
-                        href={qrDataUrl}
-                        download={`qrcode-${memorial.name.toLowerCase().replace(/\s+/g, "-")}.png`}
-                        className="flex items-center gap-1.5 text-xs text-tertiary transition hover:text-tertiary/70"
-                      >
-                        <span className="material-symbols-outlined text-sm">download</span>
-                        Baixar QR Code
-                      </a>
-                    </div>
-                  )}
-
-                  {/* Ações */}
-                  <div className="mt-auto flex gap-2">
-                    {memorial.status === "ativo" ? (
-                      <Link
-                        href={publicUrl}
-                        target="_blank"
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-tertiary/30 py-2 text-xs font-medium text-tertiary transition hover:bg-tertiary/5"
-                      >
-                        <span className="material-symbols-outlined text-sm">visibility</span>
-                        Ver memorial
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/checkout?memorialId=${memorial.id}&payerType=family`}
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-tertiary py-2 text-xs font-semibold uppercase tracking-wider text-[#101414] transition hover:bg-tertiary/80"
-                      >
-                        <span className="material-symbols-outlined text-sm">payment</span>
-                        Pagar para publicar
-                      </Link>
-                    )}
-
-                    <Link
-                      href={`/memoriais/criar?edit=${memorial.id}`}
-                      title="Editar memorial"
-                      className="flex items-center justify-center rounded-lg border border-outline-variant/30 px-3 py-2 text-outline transition hover:text-on-surface"
-                    >
-                      <span className="material-symbols-outlined text-sm">edit</span>
-                    </Link>
-                  </div>
-                </div>
-              </article>
+                id={memorial.id}
+                name={memorial.name}
+                years={years}
+                imageUrl={memorial.imageUrl || "/images/hero-bg.png"}
+                status={memorial.status as "ativo" | "pending_payment" | "rascunho"}
+                publicUrl={`/memorial-publico?memorial=${memorial.id}`}
+                editUrl={`/memoriais/criar?edit=${memorial.id}`}
+                qrDataUrl={qrMap[memorial.id] ?? null}
+              />
             );
           })}
 
           <Link
-            href="/memoriais/criar"
-            className="flex min-h-[240px] flex-col items-center justify-center rounded-xl border border-dashed border-tertiary/20 transition hover:bg-tertiary/5"
+            href="/criar-memorial"
+            className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-tertiary/20 transition hover:bg-tertiary/5"
           >
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-tertiary/10">
               <span className="material-symbols-outlined text-xl text-tertiary">add</span>
