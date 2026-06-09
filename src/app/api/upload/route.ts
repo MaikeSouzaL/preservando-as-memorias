@@ -31,6 +31,18 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
+    // Fallback para desenvolvimento: retorna base64 quando Cloudinary não está configurado
+    const cloudinaryConfigured =
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudinaryConfigured) {
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:${file.type};base64,${base64}`;
+      return NextResponse.json({ success: true, url: dataUrl });
+    }
+
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream({ folder: "preservando-memorias", resource_type: "image" }, (err, result) => {
