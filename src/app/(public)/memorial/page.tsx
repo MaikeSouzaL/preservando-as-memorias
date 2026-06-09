@@ -677,7 +677,7 @@ export default function TransicaoQrPage() {
           {/* TopAppBar */}
           <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
-              <img src="/imagens/logo.png" alt="Logo Preservando a Memória" className="h-30 md:h-12 w-auto object-contain drop-shadow-md md:scale-[1.8] md:origin-left md:mr-6" />
+              <img src="/imagens/logo.png" alt="Logo Preservando Memórias" className="h-30 md:h-12 w-auto object-contain drop-shadow-md md:scale-[1.8] md:origin-left md:mr-6" />
               <div className="font-h3 text-xl md:text-2xl text-[#e9c349] tracking-widest uppercase text-center md:text-left leading-tight">Preservando Memórias</div>
               <Link
                 href="/landing"
@@ -1369,12 +1369,12 @@ export default function TransicaoQrPage() {
 
           {/* Footer */}
           <footer className="bg-[#0b0f0f] border-t border-[#e9c349]/10 py-16 px-8 md:px-16 text-center animate-fade-in" style={{ animationDelay: '5000ms', animationFillMode: 'both' }}>
-            <div className="font-h3 text-2xl text-[#e9c349] mb-4">Preservando a Memória</div>
+            <div className="font-h3 text-2xl text-[#e9c349] mb-4">Preservando Memórias</div>
             <p className="font-body-md text-sm text-[#c4c7c7]/70 italic mb-8 max-w-sm mx-auto">
               &quot;Preservando histórias através do tempo.&quot;
             </p>
             <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-[1200px] mx-auto gap-6 border-t border-white/5 pt-8 text-xs text-[#c4c7c7]/50">
-              <p>© 2026 Preservando a Memória. Todos os direitos reservados.</p>
+              <p>© 2026 Preservando Memórias. Todos os direitos reservados.</p>
               <div className="flex gap-6 flex-wrap justify-center">
                 <Link href="/faq" className="hover:text-[#e9c349] transition">FAQ</Link>
                 <Link href="/sobre" className="hover:text-[#e9c349] transition">Sobre Nós</Link>

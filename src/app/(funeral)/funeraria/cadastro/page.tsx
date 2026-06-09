@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
-export default function FunerariaCadastroPage() {
+function CadastroContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPendente = searchParams.get("status") === "pendente";
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -47,24 +49,37 @@ export default function FunerariaCadastroPage() {
         throw new Error(payload.error || "Erro ao cadastrar.");
       }
 
-      // Auto-login after register
-      const loginResponse = await fetch("/api/funeral-auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.password }),
-      });
-
-      if (loginResponse.ok) {
-        router.push("/funeraria/dashboard");
-      } else {
-        router.push("/funeraria/login");
-      }
+      router.push("/funeraria/cadastro?status=pendente");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isPendente) {
+    return (
+      <div className="relative min-h-screen bg-gradient-to-b from-[#0a192f] to-[#0b0f0f] flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#e9c349]/10 border border-[#e9c349]/20 mb-6">
+            <span className="material-symbols-outlined text-4xl text-[#e9c349]">hourglass_top</span>
+          </div>
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e9c349] mb-2">Cadastro enviado</p>
+          <h1 className="text-3xl font-light text-white mb-4">Aguardando aprovação</h1>
+          <p className="text-[#c4c7c7] text-sm leading-relaxed mb-8">
+            Seu cadastro foi recebido com sucesso. O administrador da plataforma será notificado e
+            liberará seu acesso em breve. Você receberá confirmação por e-mail.
+          </p>
+          <Link
+            href="/funeraria/login"
+            className="inline-block rounded-xl border border-[#e9c349]/30 px-8 py-3 text-sm font-semibold text-[#e9c349] transition hover:bg-[#e9c349]/10"
+          >
+            Ir para o login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#0a192f] to-[#0b0f0f] py-16 px-4 overflow-hidden">
@@ -228,10 +243,10 @@ export default function FunerariaCadastroPage() {
                   type="password"
                   name="password"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                   className="w-full rounded-xl border border-white/15 bg-black/30 pl-10 pr-4 py-3 text-sm text-white placeholder:text-[#c4c7c7]/40 focus:border-[#e9c349] focus:outline-none transition-all duration-300"
                 />
               </div>
@@ -247,7 +262,7 @@ export default function FunerariaCadastroPage() {
                   type="password"
                   name="confirmPassword"
                   required
-                  minLength={6}
+                  minLength={8}
                   value={form.confirmPassword}
                   onChange={handleChange}
                   placeholder="Repita a senha"
@@ -283,5 +298,17 @@ export default function FunerariaCadastroPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FunerariaCadastroPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#0a192f]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e9c349] border-t-transparent" />
+      </div>
+    }>
+      <CadastroContent />
+    </Suspense>
   );
 }

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { serializeAuthSession } from "@/src/lib/auth-session";
 import { hashPassword } from "@/src/lib/password";
 import { connectToDatabase } from "@/src/lib/mongodb";
 import { Curator } from "@/src/models/Curator";
+import { checkRateLimit } from "@/src/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,10 @@ function publicProfile(profile: any) {
   return safeProfile;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const limited = await checkRateLimit(request, "rl:register", { limit: 5, windowSecs: 60 * 60 });
+  if (limited) return limited;
+
   try {
     const body = await request.json();
     const name = asString(body.name);
@@ -41,7 +45,6 @@ export async function POST(request: Request) {
     }
 
     // 3. Cria o novo curador no MongoDB
-    const isAdmin = email.includes("admin");
     const hashedPassword = hashPassword(password);
     const newCurator = await Curator.create({
       name,
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
       language: "pt-BR",
       timezone: "GMT-3",
       globalAudio: true,
-      isAdmin,
+      isAdmin: false,
       password: hashedPassword,
     });
 
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
 
     const session = {
       email: profile.email,
-      isAdmin: profile.isAdmin === true,
+      isAdmin: false,
     };
     const response = NextResponse.json({ profile: publicProfile(profile), session }, { status: 201 });
 

@@ -77,7 +77,7 @@ export default async function AdminDashboardPage() {
 
   // Mapear usuários reais baseados nos últimos pedidos/curadores
   const recentUsers = data.orders.slice(0, 4).map((order) => {
-    const planName = data.config.plans.find(p => p.id === order.planId)?.name || "BÁSICO";
+    const planName = data.config.plans?.find(p => p.id === order.planId)?.name || "MEMORIAL";
     return {
       name: order.userName,
       email: order.userEmail,

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PlanosPage() {
   const data = await readPlatformData();
-  const plans = data.config.plans.filter((plan) => plan.active);
+  const plans = (data.config.plans ?? []).filter((plan) => plan.active);
 
   return (
     <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col px-gutter py-12">

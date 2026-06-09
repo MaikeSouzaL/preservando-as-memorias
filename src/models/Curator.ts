@@ -15,6 +15,8 @@ export interface ICurator extends Document {
   isAdmin?: boolean;
   avatarUrl?: string;
   password?: string;
+  resetPasswordTokenHash?: string;
+  resetPasswordExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,7 +35,9 @@ const CuratorSchema = new Schema<ICurator>({
   globalAudio: { type: Boolean, default: true },
   isAdmin: { type: Boolean, default: false },
   avatarUrl: { type: String },
-  password: { type: String }
+  password: { type: String },
+  resetPasswordTokenHash: { type: String, index: true },
+  resetPasswordExpires: { type: Date },
 }, { timestamps: true });
 
 export const Curator = models.Curator || model<ICurator>("Curator", CuratorSchema);

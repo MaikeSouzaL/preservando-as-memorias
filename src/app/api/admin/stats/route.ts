@@ -12,11 +12,23 @@ export async function GET() {
     }
 
     const data = await readPlatformData();
-    // Sino amarelo ativa quando houver novas compras (orders) ou novos memoriais ativos
-    const hasNotifications = data.orders.length > 0;
-    
+
+    const pendingFuneralHomes = data.funeralHomes
+      .filter((fh) => fh.approvalStatus === "pending")
+      .map((fh) => ({
+        id: fh.id,
+        name: fh.name,
+        email: fh.email,
+        contactName: fh.contactName,
+        city: fh.city,
+        state: fh.state,
+        createdAt: fh.createdAt,
+      }));
+
     return NextResponse.json({
-      hasNotifications,
+      hasNotifications: pendingFuneralHomes.length > 0,
+      pendingFuneralHomes,
+      pendingCount: pendingFuneralHomes.length,
       ordersCount: data.orders.length,
       memorialsCount: data.memorials.length,
     });

@@ -311,62 +311,69 @@ export default function CriarMemorialPage() {
   };
 
   if (saved) {
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(publicUrl)}`;
+    if (isEditing) {
+      return (
+        <main className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 py-16 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-tertiary/10">
+            <span className="material-symbols-outlined text-3xl text-tertiary">check_circle</span>
+          </div>
+          <div>
+            <p className="mb-1 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Atualizado com sucesso</p>
+            <h1 className="font-h2 text-[clamp(1.75rem,4vw,2.5rem)] font-light text-on-surface">
+              {saved.memorial.name}
+            </h1>
+            <p className="mt-2 text-on-surface-variant">As alterações foram salvas no memorial.</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href={saved.qrCode.publicPath}
+              target="_blank"
+              className="rounded-full bg-tertiary px-6 py-3 text-sm font-semibold text-on-tertiary"
+            >
+              Ver memorial público
+            </Link>
+            <Link
+              href="/dashboard"
+              className="rounded-full border border-tertiary/50 px-6 py-3 text-sm text-tertiary"
+            >
+              Ir para o dashboard
+            </Link>
+          </div>
+        </main>
+      );
+    }
 
     return (
-      <main className="mx-auto flex w-full max-w-4xl flex-col gap-8">
-        <header>
-          <p className="mb-2 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">
-            {isEditing ? "Memorial atualizado" : "Memorial criado"}
+      <main className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 py-16 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#e9c349]/10">
+          <span className="material-symbols-outlined text-3xl text-[#e9c349]">auto_stories</span>
+        </div>
+        <div>
+          <p className="mb-1 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Memorial salvo</p>
+          <h1 className="font-h2 text-[clamp(1.75rem,4vw,2.5rem)] font-light text-on-surface">
+            {saved.memorial.name}
+          </h1>
+          <p className="mt-3 max-w-md text-on-surface-variant">
+            O memorial está pronto! Faça o pagamento para publicar a página e gerar o QR Code.
           </p>
-          <h1 className="font-h2 text-[clamp(2rem,4vw,3rem)] font-light text-on-surface">{saved.memorial.name}</h1>
-          <p className="mt-2 text-on-surface-variant">
-            O memorial está publicado. Use o QR Code abaixo na placa ou lápide para abrir a página pública.
+        </div>
+        <div className="w-full rounded-xl border border-tertiary/15 bg-[#0a192f]/60 p-6 text-left">
+          <p className="mb-1 text-xs uppercase tracking-widest text-outline">Próximo passo</p>
+          <h2 className="mb-2 font-semibold text-on-surface">Publicar memorial</h2>
+          <p className="mb-4 text-sm text-on-surface-variant">
+            Após o pagamento, a página pública e o QR Code ficam disponíveis imediatamente.
           </p>
-        </header>
-
-        <section className="grid gap-6 rounded-xl border border-tertiary/15 bg-[#0a192f]/60 p-6 md:grid-cols-[260px_1fr]">
-          <div className="rounded-xl bg-white p-4">
-            <Image
-              src={qrImageUrl}
-              alt={`QR Code de ${saved.memorial.name}`}
-              width={260}
-              height={260}
-              className="h-full w-full object-contain"
-            />
-          </div>
-
-          <div className="flex flex-col justify-between gap-6">
-            <div>
-              <p className="text-sm uppercase tracking-[0.14em] text-on-surface-variant">Link público</p>
-              <p className="mt-2 break-all text-lg text-tertiary">{publicUrl}</p>
-              <p className="mt-4 text-on-surface-variant">{saved.memorial.epitaph}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link href={saved.qrCode.publicPath} className="rounded-full bg-tertiary px-5 py-3 text-sm font-semibold text-on-tertiary">
-                Abrir memorial
-              </Link>
-              <button
-                type="button"
-                onClick={() => downloadFramedQRCode(saved.memorial.name, saved.memorial.epitaph, qrImageUrl)}
-                className="rounded-full bg-yellow-600/10 border border-yellow-500/30 px-5 py-3 text-sm font-semibold text-yellow-400 hover:bg-yellow-600/20 shadow-lg hover:shadow-yellow-500/10 cursor-pointer"
-              >
-                Baixar Placa para Lápide
-              </button>
-              <Link href="/memoriais/lista" className="rounded-full border border-tertiary/50 px-5 py-3 text-sm text-tertiary">
-                Ver meus memoriais
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(publicUrl)}
-                className="rounded-full border border-outline-variant px-5 py-3 text-sm text-on-surface-variant cursor-pointer"
-              >
-                Copiar link
-              </button>
-            </div>
-          </div>
-        </section>
+          <a
+            href={`/checkout?memorialId=${saved.memorial.id}&payerType=family`}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-tertiary py-3 text-sm font-semibold text-on-tertiary transition hover:bg-tertiary/80"
+          >
+            <span className="material-symbols-outlined text-sm">payment</span>
+            Pagar para publicar
+          </a>
+        </div>
+        <Link href="/dashboard" className="text-sm text-outline hover:text-on-surface-variant">
+          Fazer isso depois
+        </Link>
       </main>
     );
   }

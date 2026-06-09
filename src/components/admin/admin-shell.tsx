@@ -19,7 +19,7 @@ type AdminMenuItem = {
 const adminItems: AdminMenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
   { label: "Comercial", icon: "payments", href: "/admin/comercial" },
-  { label: "Ofertas Funerárias", icon: "local_offer", href: "/admin/ofertas" },
+  { label: "Funerárias", icon: "store", href: "/admin/funerarias" },
   { label: "Usuários", icon: "group", href: "/admin/usuarios" },
   { label: "Memoriais", icon: "favorite", href: "/admin/memoriais" },
   { label: "Homenagens", icon: "card_giftcard", href: "/admin/homenagens" },
@@ -33,7 +33,12 @@ export function AdminShell({ children }: AdminShellProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [pendingFuneralHomes, setPendingFuneralHomes] = useState<{
+    id: string; name: string; email: string; contactName: string; city?: string; state?: string; createdAt: string;
+  }[]>([]);
   const [saving, setSaving] = useState(false);
+  const [approving, setApproving] = useState<string | null>(null);
 
   // Estados do perfil e formulário do Admin
   const [profile, setProfile] = useState<{
@@ -93,6 +98,7 @@ export function AdminShell({ children }: AdminShellProps) {
         const dataStats = await resStats.json();
         if (active) {
           setHasNotifications(dataStats.hasNotifications === true);
+          setPendingFuneralHomes(dataStats.pendingFuneralHomes ?? []);
         }
       } catch {}
     }
@@ -130,6 +136,25 @@ export function AdminShell({ children }: AdminShellProps) {
     setSaving(false);
   };
 
+  const handleApproval = async (id: string, action: "approve" | "reject") => {
+    setApproving(id);
+    try {
+      const res = await fetch(`/api/admin/funeral-homes/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (res.ok) {
+        const remaining = pendingFuneralHomes.filter((fh) => fh.id !== id);
+        setPendingFuneralHomes(remaining);
+        setHasNotifications(remaining.length > 0);
+        if (remaining.length === 0) setNotifOpen(false);
+      }
+    } finally {
+      setApproving(null);
+    }
+  };
+
   const handleLogout = async () => {
     localStorage.removeItem("has_logged_in");
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
@@ -155,7 +180,7 @@ export function AdminShell({ children }: AdminShellProps) {
               />
               <div>
                 <h1 className="font-h3 text-lg leading-tight text-on-surface">Admin Master</h1>
-                <p className="text-[0.75rem] uppercase tracking-[0.15em] text-outline">Preservando a Memória</p>
+                <p className="text-[0.75rem] uppercase tracking-[0.15em] text-outline">Preservando  Memórias</p>
               </div>
               <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden" aria-label="Fechar menu">
                 <span className="material-symbols-outlined text-on-surface-variant">close</span>
@@ -230,12 +255,74 @@ export function AdminShell({ children }: AdminShellProps) {
                 />
               </div>
 
-              <button className="relative text-on-surface-variant transition hover:text-tertiary" aria-label="Notificações">
-                <span className="material-symbols-outlined">notifications</span>
-                {hasNotifications && (
-                  <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(233,195,73,0.8)] animate-pulse" />
+              <div className="relative">
+                <button
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  className="relative text-on-surface-variant transition hover:text-tertiary"
+                  aria-label="Notificações"
+                >
+                  <span className="material-symbols-outlined">notifications</span>
+                  {hasNotifications && (
+                    <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(233,195,73,0.8)] animate-pulse" />
+                  )}
+                </button>
+
+                {notifOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                    <div className="absolute right-0 top-10 z-50 w-80 rounded-xl border border-outline-variant bg-[#0b162a]/95 shadow-2xl backdrop-blur-xl">
+                      <div className="flex items-center justify-between border-b border-outline-variant/30 px-4 py-3">
+                        <p className="text-sm font-semibold text-on-surface">Aprovações pendentes</p>
+                        {pendingFuneralHomes.length > 0 && (
+                          <span className="rounded-full bg-tertiary/15 px-2 py-0.5 text-xs font-bold text-tertiary">
+                            {pendingFuneralHomes.length}
+                          </span>
+                        )}
+                      </div>
+
+                      {pendingFuneralHomes.length === 0 ? (
+                        <div className="px-4 py-6 text-center">
+                          <span className="material-symbols-outlined text-3xl text-on-surface-variant">check_circle</span>
+                          <p className="mt-2 text-sm text-on-surface-variant">Sem pendências no momento.</p>
+                        </div>
+                      ) : (
+                        <ul className="max-h-96 divide-y divide-outline-variant/20 overflow-y-auto">
+                          {pendingFuneralHomes.map((fh) => (
+                            <li key={fh.id} className="px-4 py-3">
+                              <div className="mb-2">
+                                <p className="font-medium text-on-surface text-sm">{fh.name}</p>
+                                <p className="text-xs text-on-surface-variant">{fh.contactName} · {fh.email}</p>
+                                {fh.city && (
+                                  <p className="text-xs text-on-surface-variant">{fh.city}{fh.state ? `, ${fh.state}` : ""}</p>
+                                )}
+                                <p className="mt-0.5 text-[0.65rem] text-outline">
+                                  {new Date(fh.createdAt).toLocaleDateString("pt-BR")}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  disabled={approving === fh.id}
+                                  onClick={() => handleApproval(fh.id, "approve")}
+                                  className="flex-1 rounded-lg bg-green-600/20 border border-green-500/30 py-1.5 text-xs font-semibold text-green-300 transition hover:bg-green-600/30 disabled:opacity-50"
+                                >
+                                  {approving === fh.id ? "..." : "Aprovar"}
+                                </button>
+                                <button
+                                  disabled={approving === fh.id}
+                                  onClick={() => handleApproval(fh.id, "reject")}
+                                  className="flex-1 rounded-lg bg-red-600/10 border border-red-500/20 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-600/20 disabled:opacity-50"
+                                >
+                                  {approving === fh.id ? "..." : "Rejeitar"}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </>
                 )}
-              </button>
+              </div>
 
               <div className="relative">
                 <button

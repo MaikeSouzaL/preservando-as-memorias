@@ -13,13 +13,14 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const plans = config.plans ?? [];
   const selectedPlan = useMemo(
-    () => config.plans.find((plan) => plan.id === selectedPlanId) ?? config.plans[0],
-    [config.plans, selectedPlanId]
+    () => plans.find((plan) => plan.id === selectedPlanId) ?? plans[0],
+    [plans, selectedPlanId]
   );
 
-  const projectedCommission = Math.round((selectedPlan.priceCents * config.ownerCommissionPercent) / 100);
-  const operatorRevenue = selectedPlan.priceCents - projectedCommission;
+  const projectedCommission = selectedPlan ? Math.round((selectedPlan.priceCents * config.ownerCommissionPercent) / 100) : 0;
+  const operatorRevenue = selectedPlan ? selectedPlan.priceCents - projectedCommission : 0;
 
   async function savePlan(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,6 +54,14 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
     setMessage("Configuração comercial salva.");
   }
 
+  if (!selectedPlan) {
+    return (
+      <div className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6 text-on-surface-variant text-sm">
+        Nenhum plano configurado. Use o painel de preços acima.
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
       <section className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6">
@@ -62,7 +71,7 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2">
-          {config.plans.map((plan) => (
+          {plans.map((plan) => (
             <button
               key={plan.id}
               type="button"
@@ -81,8 +90,8 @@ export function CommercialSettingsPanel({ initialConfig }: CommercialSettingsPan
         <PlanForm
           key={selectedPlan.id}
           plan={selectedPlan}
-          plans={config.plans}
-          defaultPlanId={config.defaultPlanId}
+          plans={plans}
+          defaultPlanId={config.defaultPlanId ?? ""}
           saving={saving}
           onSubmit={savePlan}
         />

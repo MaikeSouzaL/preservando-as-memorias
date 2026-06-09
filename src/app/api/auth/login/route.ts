@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { serializeAuthSession } from "@/src/lib/auth-session";
 import { hashPassword, verifyPassword } from "@/src/lib/password";
 import { connectToDatabase } from "@/src/lib/mongodb";
 import { Curator } from "@/src/models/Curator";
+import { checkRateLimit } from "@/src/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,10 @@ function publicProfile(profile: any) {
   return safeProfile;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const limited = await checkRateLimit(request, "rl:login", { limit: 5, windowSecs: 15 * 60 });
+  if (limited) return limited;
+
   try {
     const body = await request.json();
     const email = asString(body.email).toLowerCase();

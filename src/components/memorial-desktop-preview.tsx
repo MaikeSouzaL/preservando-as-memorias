@@ -322,7 +322,7 @@ export default function MemorialDesktopPreview({ isOpen, onClose, data }: Memori
             <header className="sticky top-16 left-0 w-full z-[99] bg-[#0b0f0f]/80 backdrop-blur-xl border-b border-[#e9c349]/10 py-4 flex justify-between items-center px-8 md:px-16 shadow-md">
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/imagens/logo.png" alt="Logo Preservando a Memória" className="h-10 w-auto object-contain drop-shadow-md scale-[1.5] origin-left mr-4" />
+                <img src="/imagens/logo.png" alt="Logo Preservando Memórias" className="h-10 w-auto object-contain drop-shadow-md scale-[1.5] origin-left mr-4" />
                 <span className="font-serif text-lg text-[#e9c349] tracking-widest uppercase block">Preservando Memórias</span>
               </div>
               <nav className="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-[#c4c7c7]">
@@ -736,7 +736,7 @@ export default function MemorialDesktopPreview({ isOpen, onClose, data }: Memori
             {/* Footer */}
             <footer className="bg-[#0b0f0f] border-t border-[#e9c349]/10 py-16 text-center">
               <span className="font-serif text-xl text-[#e9c349] tracking-widest uppercase block mb-2">PRESERVANDO AS MEMÓRIAS</span>
-              <p className="text-xs text-[#c4c7c7]/50">© 2026 Preservando a Memória. Todos os direitos reservados.</p>
+              <p className="text-xs text-[#c4c7c7]/50">© 2026 Preservando Memórias. Todos os direitos reservados.</p>
             </footer>
           </div>
         )}

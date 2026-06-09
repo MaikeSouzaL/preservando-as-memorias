@@ -19,7 +19,7 @@ export default async function AssinaturasPage() {
     (memorial) => memorial.id !== "default" && (session.isAdmin || memorial.ownerId.toLowerCase().trim() === session.email)
   );
 
-  const activePlans = config.plans.filter((p) => p.active);
+  const activePlans = (config.plans ?? []).filter((p) => p.active);
 
   // Determinar a assinatura ativa simulando com base nas ordens pagas reais ou no primeiro plano ativo
   const lastPaidOrder = [...orders].filter((o) => o.status === "paid").pop();

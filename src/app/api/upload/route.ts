@@ -1,8 +1,16 @@
+import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 
 export const dynamic = "force-dynamic";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export async function POST(request: Request) {
   try {
@@ -13,24 +21,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
     }
 
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: "Tipo de arquivo não permitido." }, { status: 400 });
+    }
+
+    if (file.size > MAX_SIZE_BYTES) {
+      return NextResponse.json({ error: "Arquivo muito grande. Máximo 10 MB." }, { status: 400 });
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    
-    // Caminho da pasta public/uploads na raiz do projeto
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
 
-    // Nome único para evitar conflitos
-    const ext = path.extname(file.name) || ".png";
-    const baseName = path.basename(file.name, ext).replace(/[^a-zA-Z0-9]/g, "_");
-    const fileName = `${baseName}_${Date.now()}${ext}`;
-    const filePath = path.join(uploadDir, fileName);
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({ folder: "preservando-memorias", resource_type: "image" }, (err, result) => {
+          if (err || !result) return reject(err ?? new Error("Upload falhou"));
+          resolve(result);
+        })
+        .end(buffer);
+    });
 
-    // Escrever o arquivo fisicamente em disco
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${fileName}`;
-
-    return NextResponse.json({ success: true, url: fileUrl });
+    return NextResponse.json({ success: true, url: result.secure_url });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     return NextResponse.json({ error: msg }, { status: 500 });

@@ -209,7 +209,7 @@ export function PrivateShell({ children }: PrivateShellProps) {
                   height={32}
                   className="h-8 w-8 object-contain drop-shadow-[0_2px_8px_rgba(233,195,73,0.3)] hover:scale-105 transition duration-300"
                 />
-                <span className="hidden font-h3 text-sm text-tertiary font-bold sm:block">Preservando a Memória</span>
+                <span className="hidden font-h3 text-sm text-tertiary font-bold sm:block">Preservando Memórias</span>
               </Link>
               <div className="hidden items-center md:flex">
                 <span className="material-symbols-outlined mr-3 text-on-surface-variant">search</span>

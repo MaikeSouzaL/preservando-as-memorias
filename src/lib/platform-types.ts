@@ -11,11 +11,34 @@ export type PlatformPlan = {
   features: string[];
 };
 
+export type FuneralPlan = {
+  id: string;
+  name: string;
+  description: string;
+  cycle: BillingCycle;
+  priceCents: number;
+  active: boolean;
+  features: string[];
+  modules: {
+    memorials: boolean;
+    schedules: boolean;
+    services: boolean;
+    documents: boolean;
+    inventory: boolean;
+    staff: boolean;
+  };
+};
+
 export type PlatformConfig = {
   ownerCommissionPercent: number;
-  defaultPlanId: string;
-  plans: PlatformPlan[];
+  familyMemorialPriceCents: number;
+  funeralHomeMemorialPriceCents: number;
   candlePriceCents: number;
+  // Legacy plan fields kept for DB backward compatibility
+  defaultPlanId?: string;
+  plans?: PlatformPlan[];
+  defaultFuneralPlanId?: string;
+  funeralPlans?: FuneralPlan[];
 };
 
 export type PaymentMethod = "pix" | "card" | "boleto";

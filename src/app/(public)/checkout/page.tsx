@@ -35,8 +35,12 @@ const emptyForm = {
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
+  const memorialId = searchParams.get("memorialId") ?? "";
+  const payerType = searchParams.get("payerType") as "family" | "funeral_home" | null;
   const requestedPlan = searchParams.get("plan") ?? "";
+
   const [config, setConfig] = useState<PlatformConfig | null>(null);
+  const [memorialName, setMemorialName] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("pix");
   const [formData, setFormData] = useState(emptyForm);
   const [discountCode, setDiscountCode] = useState("");
@@ -44,18 +48,41 @@ function CheckoutContent() {
   const [error, setError] = useState("");
   const [order, setOrder] = useState<CheckoutOrder | null>(null);
 
+  const isMemorialMode = Boolean(memorialId && (payerType === "family" || payerType === "funeral_home"));
+
   useEffect(() => {
     fetch("/api/platform-config")
-      .then((response) => response.json())
-      .then((payload) => setConfig(payload.config))
-      .catch(() => setError("Não foi possível carregar os planos agora."));
+      .then((r) => r.json())
+      .then((p) => setConfig(p.config))
+      .catch(() => setError("Não foi possível carregar os preços agora."));
   }, []);
 
-  const activePlans = useMemo(() => config?.plans.filter((plan) => plan.active) ?? [], [config]);
-  const selectedPlan = useMemo(() => {
-    if (!config) return null;
-    const normalizedRequest = requestedPlan.toLowerCase();
+  useEffect(() => {
+    if (!isMemorialMode || !memorialId) return;
+    fetch(`/api/memorials/${memorialId}`)
+      .then((r) => r.json())
+      .then((p) => { if (p.memorial?.name) setMemorialName(p.memorial.name); })
+      .catch(() => undefined);
+  }, [isMemorialMode, memorialId]);
 
+  // Memorial mode pricing
+  const memorialPriceCents = useMemo(() => {
+    if (!config || !isMemorialMode) return 0;
+    return payerType === "family"
+      ? config.familyMemorialPriceCents
+      : config.funeralHomeMemorialPriceCents;
+  }, [config, isMemorialMode, payerType]);
+
+  const memorialTotals = useMemo(() => {
+    if (!isMemorialMode || !config) return null;
+    return calculateOrderTotals(memorialPriceCents, config.ownerCommissionPercent);
+  }, [isMemorialMode, config, memorialPriceCents]);
+
+  // Plan mode (legacy)
+  const activePlans = useMemo(() => config?.plans?.filter((plan) => plan.active) ?? [], [config]);
+  const selectedPlan = useMemo(() => {
+    if (!config || isMemorialMode) return null;
+    const normalizedRequest = requestedPlan.toLowerCase();
     return (
       activePlans.find((plan) => plan.id === requestedPlan) ??
       activePlans.find((plan) => plan.name.toLowerCase() === normalizedRequest) ??
@@ -63,7 +90,7 @@ function CheckoutContent() {
       activePlans[0] ??
       null
     );
-  }, [activePlans, config, requestedPlan]);
+  }, [activePlans, config, isMemorialMode, requestedPlan]);
 
   const previewTotals = useMemo(() => {
     if (!selectedPlan || !config) return null;
@@ -77,40 +104,53 @@ function CheckoutContent() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selectedPlan) return;
-
     setIsSubmitting(true);
     setError("");
+
+    const body = isMemorialMode
+      ? { ...formData, memorialId, payerType, paymentMethod }
+      : { ...formData, planId: selectedPlan?.id, paymentMethod, discountCode };
+
+    if (!isMemorialMode && !selectedPlan) {
+      setError("Plano não disponível.");
+      setIsSubmitting(false);
+      return;
+    }
 
     const response = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...formData,
-        planId: selectedPlan.id,
-        paymentMethod,
-        discountCode,
-      }),
+      body: JSON.stringify(body),
     });
 
     const payload = await response.json();
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Não foi possível confirmar a assinatura.");
+      setError(payload.error ?? "Não foi possível confirmar o pagamento.");
+      return;
+    }
+
+    if (payload.checkoutUrl) {
+      window.location.href = payload.checkoutUrl;
       return;
     }
 
     setOrder(payload.order);
   }
 
-  if (!config || !selectedPlan || !previewTotals) {
-    return <CheckoutLoading message={error || "Carregando planos..."} />;
+  if (!config || (isMemorialMode ? !memorialTotals : (!selectedPlan || !previewTotals))) {
+    return <CheckoutLoading message={error || "Carregando..."} />;
   }
 
   if (order) {
-    return <CheckoutSuccess order={order} plan={selectedPlan} />;
+    if (isMemorialMode) {
+      return <MemorialCheckoutSuccess order={order} memorialName={memorialName || "memorial"} memorialId={memorialId} payerType={payerType!} />;
+    }
+    return <CheckoutSuccess order={order} plan={selectedPlan!} />;
   }
+
+  const activeTotals = isMemorialMode ? memorialTotals! : previewTotals!;
 
   return (
     <div className="relative min-h-screen bg-[#101414] text-[#e0e3e2] selection:bg-[#e9c349]/20 selection:text-[#e9c349]">
@@ -121,15 +161,25 @@ function CheckoutContent() {
 
       <main className="relative z-10 mx-auto w-full max-w-container-max px-gutter py-28">
         <header className="mb-12">
-          <Link href="/planos" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#e9c349] hover:underline">
-            <span className="material-symbols-outlined text-sm">arrow_back</span> Voltar para planos
+          <Link
+            href={isMemorialMode ? "/dashboard" : "/planos"}
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#e9c349] hover:underline"
+          >
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            {isMemorialMode ? "Voltar ao dashboard" : "Voltar para planos"}
           </Link>
           <h1 className="mt-4 font-h1 text-[clamp(2.2rem,5vw,3.5rem)] font-light leading-[1.1] text-[#e5e2e1]">
-            Finalize sua <span className="italic text-[#e9c349]">assinatura</span>
+            {isMemorialMode ? (
+              <>Publicar <span className="italic text-[#e9c349]">memorial</span></>
+            ) : (
+              <>Finalize sua <span className="italic text-[#e9c349]">assinatura</span></>
+            )}
           </h1>
-          <p className="mt-2 text-[#c4c7c7]">
-            O pedido será registrado no painel administrativo e a comissão de {config.ownerCommissionPercent}% será calculada automaticamente.
-          </p>
+          {isMemorialMode && memorialName && (
+            <p className="mt-2 text-[#c4c7c7]">
+              Memorial de <strong className="text-white">{memorialName}</strong> — pagamento único para publicar.
+            </p>
+          )}
         </header>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
@@ -137,9 +187,8 @@ function CheckoutContent() {
             <section className="rounded-xl border border-white/5 bg-[#1c2020]/40 p-6 backdrop-blur-md">
               <h2 className="mb-6 flex items-center gap-3 font-h3 text-xl text-[#e5e2e1]">
                 <span className="material-symbols-outlined text-[#e9c349]">person</span>
-                1. Dados do cliente
+                1. Seus dados
               </h2>
-
               <div className="grid gap-6 md:grid-cols-2">
                 <TextInput label="Nome completo" name="name" value={formData.name} onChange={handleInputChange} placeholder="Ex: João da Silva" />
                 <TextInput label="E-mail" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="Ex: joao@email.com" />
@@ -160,29 +209,27 @@ function CheckoutContent() {
                 <PaymentButton current={paymentMethod} value="boleto" label="Boleto" icon="receipt" onClick={setPaymentMethod} />
               </div>
 
-              {paymentMethod === "pix" ? (
+              {paymentMethod === "pix" && (
                 <PaymentInfo icon="qr_code_2" title="Pagamento instantâneo com Pix">
-                  O QR Code de pagamento será gerado pelo gateway real na próxima etapa de integração. Neste MVP, o pedido é registrado como pago para validar o fluxo.
+                  O QR Code de pagamento será gerado pelo gateway na próxima etapa.
                 </PaymentInfo>
-              ) : null}
-
-              {paymentMethod === "card" ? (
+              )}
+              {paymentMethod === "card" && (
                 <div className="grid gap-6 md:grid-cols-2">
                   <TextInput label="Número do cartão" name="cardNumber" value={formData.cardNumber} onChange={handleInputChange} placeholder="0000 0000 0000 0000" required />
                   <TextInput label="Nome do titular" name="cardName" value={formData.cardName} onChange={handleInputChange} placeholder="JOÃO H S ALMEIDA" required />
                   <TextInput label="Validade" name="cardExpiry" value={formData.cardExpiry} onChange={handleInputChange} placeholder="MM/AA" required />
                   <TextInput label="Código CVC" name="cardCvc" value={formData.cardCvc} onChange={handleInputChange} placeholder="123" required />
                 </div>
-              ) : null}
-
-              {paymentMethod === "boleto" ? (
+              )}
+              {paymentMethod === "boleto" && (
                 <PaymentInfo icon="barcode" title="Pagamento por boleto">
-                  O boleto real será emitido pelo gateway. Por enquanto, a confirmação registra o pedido para o painel comercial.
+                  O boleto será emitido pelo gateway de pagamento.
                 </PaymentInfo>
-              ) : null}
+              )}
             </section>
 
-            {error ? <p className="rounded-lg border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p> : null}
+            {error && <p className="rounded-lg border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
 
             <button
               type="submit"
@@ -190,21 +237,78 @@ function CheckoutContent() {
               className="relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-[#e9c349] py-4 text-center text-xs font-semibold uppercase tracking-widest text-[#1c1b1b] transition-all hover:bg-[#ffe088] disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-sm">{isSubmitting ? "hourglass_top" : "lock"}</span>
-              {isSubmitting ? "Registrando pagamento..." : `Confirmar assinatura - ${centsToBRL(previewTotals.grossAmountCents)}`}
+              {isSubmitting
+                ? "Processando..."
+                : `${isMemorialMode ? "Publicar memorial" : "Confirmar assinatura"} — ${centsToBRL(activeTotals.grossAmountCents)}`}
             </button>
           </form>
 
           <aside className="space-y-6 lg:col-span-5">
-            <OrderSummary
-              plan={selectedPlan}
-              discountCode={discountCode}
-              setDiscountCode={setDiscountCode}
-              totals={previewTotals}
-              commissionPercent={config.ownerCommissionPercent}
-            />
+            {isMemorialMode ? (
+              <MemorialOrderSummary
+                memorialName={memorialName}
+                payerType={payerType!}
+                priceCents={memorialPriceCents}
+                totals={memorialTotals!}
+                commissionPercent={config.ownerCommissionPercent}
+              />
+            ) : (
+              <OrderSummary
+                plan={selectedPlan!}
+                discountCode={discountCode}
+                setDiscountCode={setDiscountCode}
+                totals={previewTotals!}
+                commissionPercent={config.ownerCommissionPercent}
+              />
+            )}
           </aside>
         </div>
       </main>
+    </div>
+  );
+}
+
+function MemorialCheckoutSuccess({
+  order,
+  memorialName,
+  memorialId,
+  payerType,
+}: {
+  order: CheckoutOrder;
+  memorialName: string;
+  memorialId: string;
+  payerType: "family" | "funeral_home";
+}) {
+  const dashboardUrl = payerType === "family" ? "/dashboard" : "/funeraria/dashboard";
+  const memorialUrl = `/memorial-publico?memorial=${memorialId}`;
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center bg-[#101414] px-4 py-20 text-[#e0e3e2]">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <Image src="/images/hero-bg.png" alt="" fill className="object-cover opacity-20 blur-[4px]" />
+        <div className="absolute inset-0 bg-[#101414]/90 backdrop-blur-xl" />
+      </div>
+      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-[#e9c349]/20 bg-[#1c2020]/80 p-8 text-center shadow-2xl backdrop-blur-md">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#e9c349]/10 text-[#e9c349]">
+          <span className="material-symbols-outlined text-4xl">check_circle</span>
+        </div>
+        <h1 className="font-h2 text-3xl font-light text-[#e5e2e1]">Memorial publicado!</h1>
+        <p className="mt-4 text-[#c4c7c7]">
+          O memorial de <strong className="text-white">{memorialName}</strong> está agora disponível publicamente com QR Code.
+        </p>
+        <div className="my-6 grid gap-3 rounded-lg border border-white/5 bg-[#0b0f0f]/40 p-4 text-left text-sm">
+          <SummaryLine label="Total pago" value={centsToBRL(order.grossAmountCents)} strong />
+          <SummaryLine label="Pedido" value={order.id} />
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link href={memorialUrl} target="_blank" className="block w-full rounded-full bg-[#e9c349] py-3 text-center text-xs font-semibold uppercase tracking-widest text-[#1c1b1b] transition hover:bg-[#ffe088]">
+            Ver memorial público
+          </Link>
+          <Link href={dashboardUrl} className="block w-full rounded-full border border-[#e9c349]/30 py-3 text-center text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:bg-[#e9c349]/5">
+            Ir para o dashboard
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -299,6 +403,38 @@ function OrderSummary({
         <SummaryLine label="Total" value={centsToBRL(totals.grossAmountCents)} strong />
         <SummaryLine label={`Comissão ${commissionPercent}%`} value={centsToBRL(totals.platformCommissionCents)} />
         <SummaryLine label="Repasse ao operador" value={centsToBRL(totals.operatorAmountCents)} />
+      </div>
+    </div>
+  );
+}
+
+function MemorialOrderSummary({
+  memorialName,
+  payerType,
+  priceCents,
+  totals,
+  commissionPercent,
+}: {
+  memorialName: string;
+  payerType: "family" | "funeral_home";
+  priceCents: number;
+  totals: ReturnType<typeof calculateOrderTotals>;
+  commissionPercent: number;
+}) {
+  return (
+    <div className="rounded-xl border border-[#e9c349]/15 bg-[#1c2020]/70 p-6 shadow-xl backdrop-blur-md">
+      <h2 className="mb-4 font-h3 text-xl text-[#e5e2e1]">Resumo da compra</h2>
+      <div className="border-b border-white/5 pb-4">
+        <p className="text-xs uppercase tracking-wider text-[#c4c7c7]/50">Memorial</p>
+        <h3 className="mt-2 font-h3 text-lg text-[#e9c349]">{memorialName || "Memorial Digital"}</h3>
+        <p className="mt-1 text-sm text-[#c4c7c7]/80">
+          {payerType === "family" ? "Família" : "Funerária"} — pagamento único
+        </p>
+      </div>
+      <div className="mt-5 space-y-3">
+        <SummaryLine label="Valor" value={centsToBRL(priceCents)} />
+        <SummaryLine label="Total" value={centsToBRL(totals.grossAmountCents)} strong />
+        <SummaryLine label={`Taxa do sistema ${commissionPercent}%`} value={centsToBRL(totals.platformCommissionCents)} />
       </div>
     </div>
   );

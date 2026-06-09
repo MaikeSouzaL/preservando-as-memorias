@@ -161,7 +161,7 @@ export default function NovoMemorialPage() {
 
       setCreatedName(payload.memorial.name);
       setPaymentLink(
-        `/checkout?memorialId=${payload.memorial.id}&source=funeral_home_offer&payerType=funeral_home`
+        `/checkout?memorialId=${payload.memorial.id}&payerType=funeral_home`
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar memorial.");

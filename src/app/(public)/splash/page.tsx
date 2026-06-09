@@ -73,7 +73,7 @@ export default function SplashPage() {
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(233,195,73,0.15)_0%,transparent_70%)] blur-xl" />
             <Image
               src="/imagens/logo.png"
-              alt="Logo Preservando a Memória"
+              alt="Logo Preservando Memórias"
               width={240}
               height={240}
               priority

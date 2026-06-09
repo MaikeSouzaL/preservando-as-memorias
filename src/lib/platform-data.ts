@@ -95,7 +95,7 @@ export type PlatformOrder = {
   platformCommissionCents: number;
   operatorAmountCents: number;
   status: "paid" | "pending";
-  source?: "plan" | "funeral_home_offer" | "funeral_home";
+  source?: "plan" | "funeral_home_offer" | "funeral_home" | "family";
   offerLinkId?: string;
   funeralHomeId?: string;
   draftMemorialId?: string;
@@ -116,6 +116,8 @@ export type FuneralHome = {
   address?: string;
   passwordHash: string;
   isActive: boolean;
+  approvalStatus: "pending" | "approved" | "rejected";
+  stripeAccountId?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -236,8 +238,20 @@ export type CuratorProfile = {
   passwordHash?: string;
 };
 
+export type AdminBankData = {
+  holderName: string;
+  bankName: string;
+  agency: string;
+  account: string;
+  accountType: "corrente" | "poupança";
+  cpfCnpj: string;
+  pixKey?: string;
+};
+
 export type PlatformData = {
   config: PlatformConfig;
+  adminBankDataEncrypted?: string;
+  platformAdminEmail?: string;
   memorials: ManagedMemorial[];
   qrCodes: ManagedQrCode[];
   tributes: ManagedTribute[];
@@ -259,40 +273,9 @@ let writeQueue: Promise<unknown> = Promise.resolve();
 
 const defaultConfig: PlatformConfig = {
   ownerCommissionPercent: 15,
-  defaultPlanId: "essencial",
+  familyMemorialPriceCents: 9900,
+  funeralHomeMemorialPriceCents: 4900,
   candlePriceCents: 100,
-  plans: [
-    {
-      id: "essencial",
-      name: "Memória Essencial",
-      description: "Um memorial público com QR Code para a lápide.",
-      cycle: "monthly",
-      priceCents: 2990,
-      active: true,
-      memorialLimit: 1,
-      features: ["1 memorial", "QR Code público", "Galeria de fotos"],
-    },
-    {
-      id: "familia",
-      name: "Família Eterna",
-      description: "Mais memoriais e recursos para preservar histórias familiares.",
-      cycle: "annual",
-      priceCents: 49900,
-      active: true,
-      memorialLimit: null,
-      features: ["Memoriais ilimitados", "Áudios e histórias", "Homenagens públicas"],
-    },
-    {
-      id: "unico",
-      name: "Memorial Vitalício",
-      description: "Pagamento único para manter um memorial ativo.",
-      cycle: "one_time",
-      priceCents: 99700,
-      active: true,
-      memorialLimit: 1,
-      features: ["Pagamento único", "QR Code permanente", "Suporte de ativação"],
-    },
-  ],
 };
 
 const defaultData: PlatformData = {
@@ -329,10 +312,18 @@ const defaultData: PlatformData = {
 function normalizePlatformData(data: Partial<PlatformData>): PlatformData {
   const normalized: PlatformData = {
     config: {
-      ...defaultConfig,
-      ...(data.config ?? {}),
-      plans: data.config?.plans?.length ? data.config.plans : defaultConfig.plans,
+      ownerCommissionPercent: data.config?.ownerCommissionPercent ?? defaultConfig.ownerCommissionPercent,
+      familyMemorialPriceCents: data.config?.familyMemorialPriceCents ?? defaultConfig.familyMemorialPriceCents,
+      funeralHomeMemorialPriceCents: data.config?.funeralHomeMemorialPriceCents ?? defaultConfig.funeralHomeMemorialPriceCents,
+      candlePriceCents: data.config?.candlePriceCents ?? defaultConfig.candlePriceCents,
+      // Preserve legacy plan fields if present in DB
+      defaultPlanId: data.config?.defaultPlanId,
+      plans: data.config?.plans,
+      defaultFuneralPlanId: data.config?.defaultFuneralPlanId,
+      funeralPlans: data.config?.funeralPlans,
     },
+    adminBankDataEncrypted: data.adminBankDataEncrypted,
+    platformAdminEmail: data.platformAdminEmail,
     memorials: Array.isArray(data.memorials) ? data.memorials : [],
     qrCodes: Array.isArray(data.qrCodes) ? data.qrCodes : [],
     tributes: Array.isArray(data.tributes) ? data.tributes : [],

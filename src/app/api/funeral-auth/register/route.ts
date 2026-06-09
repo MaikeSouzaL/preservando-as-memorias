@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { updatePlatformData } from "@/src/lib/platform-data";
-import { hashPassword } from "@/src/lib/hash";
+import { hashPassword } from "@/src/lib/password";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +27,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: "A senha deve ter pelo menos 6 caracteres." },
+        { error: "A senha deve ter pelo menos 8 caracteres." },
         { status: 400 }
       );
     }
@@ -67,7 +67,8 @@ export async function POST(request: Request) {
         city: city || undefined,
         state: state || undefined,
         passwordHash: hashPassword(password),
-        isActive: true,
+        isActive: false,
+        approvalStatus: "pending" as const,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -76,7 +77,10 @@ export async function POST(request: Request) {
       return newFuneralHome;
     });
 
-    return NextResponse.json({ funeralHome: { ...funeralHome, passwordHash: undefined } }, { status: 201 });
+    return NextResponse.json({
+      funeralHome: { ...funeralHome, passwordHash: undefined },
+      message: "Cadastro realizado! Aguarde a aprovação do administrador para acessar o sistema.",
+    }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao cadastrar funeraria.";
     return NextResponse.json({ error: message }, { status: 400 });

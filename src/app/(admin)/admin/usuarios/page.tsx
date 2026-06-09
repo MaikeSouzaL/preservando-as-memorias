@@ -7,7 +7,7 @@ export default async function AdminUsersPage() {
 
   // Mapeia curadores a partir de suas ordens registradas
   const users = data.orders.map((order) => {
-    const planName = data.config.plans.find((p) => p.id === order.planId)?.name || "Básico";
+    const planName = data.config.plans?.find((p) => p.id === order.planId)?.name || order.planId || "Memorial";
     return {
       id: order.id,
       name: order.userName,

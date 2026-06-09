@@ -3,10 +3,10 @@ import "./globals.css";
 import { PwaRegister } from "./pwa-register";
 
 export const metadata: Metadata = {
-  title: "Preservando a Memória",
+  title: "Preservando  Memórias",
   description:
     "Memorial digital com QR Code para preservar memórias de entes queridos.",
-  applicationName: "Preservando a Memória",
+  applicationName: "Preservando  Memórias",
 };
 
 export default function RootLayout({
