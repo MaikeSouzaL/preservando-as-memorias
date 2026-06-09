@@ -11,7 +11,6 @@ export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformCon
   const [funeralPrice, setFuneralPrice] = useState(
     (initialConfig.funeralHomeMemorialPriceCents / 100).toFixed(2)
   );
-  const [commission, setCommission] = useState(String(initialConfig.ownerCommissionPercent));
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
 
@@ -26,7 +25,6 @@ export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformCon
           target: "prices",
           familyMemorialPriceCents: Math.round(parseFloat(familyPrice) * 100),
           funeralHomeMemorialPriceCents: Math.round(parseFloat(funeralPrice) * 100),
-          ownerCommissionPercent: parseFloat(commission),
         }),
       });
       const payload = await res.json();
@@ -49,7 +47,7 @@ export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformCon
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2">
         <PriceInput
           label="Preço para Família"
           hint={`Atual: ${centsToBRL(initialConfig.familyMemorialPriceCents)}`}
@@ -62,21 +60,6 @@ export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformCon
           value={funeralPrice}
           onChange={setFuneralPrice}
         />
-        <div className="flex flex-col gap-2">
-          <label className="text-xs uppercase tracking-[0.14em] text-outline">
-            Taxa do sistema (%)
-          </label>
-          <input
-            type="number"
-            min={0}
-            max={100}
-            step={1}
-            value={commission}
-            onChange={(e) => setCommission(e.target.value)}
-            className="rounded-lg border border-outline-variant/30 bg-[#0b0f0f] px-3 py-2.5 text-sm text-on-surface focus:border-tertiary focus:outline-none"
-          />
-          <p className="text-xs text-outline">Atual: {commission}%</p>
-        </div>
       </div>
 
       {message && (

@@ -675,6 +675,10 @@ export async function readPlatformData(): Promise<PlatformData> {
     familyMemorialPriceCents: cfg.family_memorial_price_cents ?? 9900,
     funeralHomeMemorialPriceCents: cfg.funeral_home_memorial_price_cents ?? 4900,
     candlePriceCents: cfg.candle_price_cents ?? 100,
+    plans: Array.isArray(cfg.plans) ? cfg.plans : [],
+    defaultPlanId: cfg.default_plan_id ?? undefined,
+    funeralPlans: Array.isArray(cfg.funeral_plans) ? cfg.funeral_plans : [],
+    defaultFuneralPlanId: cfg.default_funeral_plan_id ?? undefined,
   };
 
   const settingsMap = Object.fromEntries((settingsRows ?? []).map((r: any) => [r.key, r.value]));
@@ -871,6 +875,10 @@ async function persistChanges(original: PlatformData, updated: PlatformData): Pr
         family_memorial_price_cents: updated.config.familyMemorialPriceCents,
         funeral_home_memorial_price_cents: updated.config.funeralHomeMemorialPriceCents,
         candle_price_cents: updated.config.candlePriceCents,
+        plans: updated.config.plans ?? [],
+        default_plan_id: updated.config.defaultPlanId ?? null,
+        funeral_plans: updated.config.funeralPlans ?? [],
+        default_funeral_plan_id: updated.config.defaultFuneralPlanId ?? null,
       }).eq("id", 1)
     );
   }

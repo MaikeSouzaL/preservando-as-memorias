@@ -44,11 +44,13 @@ export async function POST(request: NextRequest) {
         timezone: profile?.timezone ?? "GMT-3",
         globalAudio: profile?.global_audio ?? true,
         isAdmin: profile?.is_admin ?? false,
+        isDevAdmin: profile?.is_dev_admin ?? false,
         avatarUrl: profile?.avatar_url ?? "",
       },
       session: {
         email: data.user.email,
         isAdmin: profile?.is_admin ?? false,
+        isDevAdmin: profile?.is_dev_admin ?? false,
         userId: data.user.id,
       },
     });

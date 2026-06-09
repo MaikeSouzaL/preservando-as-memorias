@@ -17,16 +17,16 @@ export default async function AdminCommercialPage() {
         <p className="mb-2 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Admin do sistema</p>
         <h1 className="font-h2 text-[clamp(2rem,4vw,3rem)] text-on-surface">Configuração comercial</h1>
         <p className="mt-2 max-w-2xl text-on-surface-variant">
-          Famílias e funerárias pagam à plataforma. O Stripe coleta 100%, distribui 85% ao administrador e
-          retém 15% como taxa do sistema.
+          Famílias e funerárias pagam à plataforma. O Stripe coleta 100%, distribui {100 - data.config.ownerCommissionPercent}% ao administrador e
+          retém {data.config.ownerCommissionPercent}% como taxa do sistema.
         </p>
       </header>
 
       <section className="grid gap-5 md:grid-cols-4">
         <Metric label="Pedidos pagos" value={paidOrders.length.toString()} />
         <Metric label="Receita bruta" value={formatBRL(grossRevenue)} />
-        <Metric label="Seu repasse (85%)" value={formatBRL(adminRepasse)} highlight />
-        <Metric label="Taxa do sistema (15%)" value={formatBRL(commissionRevenue)} />
+        <Metric label={`Seu repasse (${100 - data.config.ownerCommissionPercent}%)`} value={formatBRL(adminRepasse)} highlight />
+        <Metric label={`Taxa do sistema (${data.config.ownerCommissionPercent}%)`} value={formatBRL(commissionRevenue)} />
       </section>
 
       <BankDataPanel
@@ -54,8 +54,8 @@ export default async function AdminCommercialPage() {
                   <th className="pb-3 font-normal">Plano</th>
                   <th className="pb-3 font-normal">Pagamento</th>
                   <th className="pb-3 text-right font-normal">Total</th>
-                  <th className="pb-3 text-right font-normal">Taxa 15% (sistema)</th>
-                  <th className="pb-3 text-right font-normal">Repasse 85% (admin)</th>
+                  <th className="pb-3 text-right font-normal">Taxa {data.config.ownerCommissionPercent}% (sistema)</th>
+                  <th className="pb-3 text-right font-normal">Repasse {100 - data.config.ownerCommissionPercent}% (admin)</th>
                 </tr>
               </thead>
               <tbody>

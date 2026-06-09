@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { readPlatformData } from "@/src/lib/platform-data";
-import { getAuthSession } from "@/src/lib/auth-session";
-import { isDevAdmin, getDevAdminEmail } from "@/src/lib/dev-auth";
+import { requireDevAdminSession } from "@/src/lib/dev-auth";
 import { PlatformAdminPanel } from "@/src/components/dev/platform-admin-panel";
+import { CommissionConfigPanel } from "@/src/components/dev/commission-config-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -21,8 +21,8 @@ function formatDate(iso: string) {
 }
 
 export default async function DevPage() {
-  const session = await getAuthSession();
-  if (!session || !isDevAdmin(session.email)) redirect("/login");
+  const { session, response } = await requireDevAdminSession();
+  if (response) redirect("/login");
 
   const data = await readPlatformData();
   const paidOrders = data.orders.filter((o) => o.status === "paid");
@@ -55,7 +55,7 @@ export default async function DevPage() {
           >
             Painel Admin →
           </Link>
-          <span className="text-xs text-on-surface-variant">{getDevAdminEmail()}</span>
+          <span className="text-xs text-on-surface-variant">{session.email}</span>
         </div>
       </nav>
 
@@ -69,7 +69,7 @@ export default async function DevPage() {
             Painel de controle
           </h1>
           <p className="mt-2 text-on-surface-variant">
-            Você recebe <strong className="text-[#e9c349]">15%</strong> de todas as vendas. O operador da
+            Você recebe <strong className="text-[#e9c349]">{data.config.ownerCommissionPercent}%</strong> de todas as vendas. O operador da
             plataforma gerencia o restante.
           </p>
         </header>
@@ -79,12 +79,23 @@ export default async function DevPage() {
           <MetricCard label="Pedidos pagos" value={paidOrders.length.toString()} icon="receipt_long" />
           <MetricCard label="Receita bruta" value={brl(grossRevenue)} icon="payments" />
           <MetricCard
-            label="Meu repasse (15%)"
+            label={`Meu repasse (${data.config.ownerCommissionPercent}%)`}
             value={brl(systemCut)}
             icon="account_balance_wallet"
             highlight
           />
-          <MetricCard label="Repasse admin (85%)" value={brl(adminRepasse)} icon="send_money" />
+          <MetricCard label={`Repasse admin (${100 - data.config.ownerCommissionPercent}%)`} value={brl(adminRepasse)} icon="send_money" />
+        </section>
+
+        {/* Taxa do sistema */}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-xl font-medium text-on-surface">Taxa do sistema</h2>
+            <p className="text-sm text-on-surface-variant">
+              Somente você pode alterar o percentual cobrado de cada venda.
+            </p>
+          </div>
+          <CommissionConfigPanel initialCommission={data.config.ownerCommissionPercent} />
         </section>
 
         {/* Admin da plataforma */}
@@ -92,13 +103,14 @@ export default async function DevPage() {
           <div className="mb-4">
             <h2 className="text-xl font-medium text-on-surface">Administrador da plataforma</h2>
             <p className="text-sm text-on-surface-variant">
-              Designa quem tem acesso ao painel admin e recebe 85% das vendas.
+              Designa quem tem acesso ao painel admin e recebe {100 - data.config.ownerCommissionPercent}% das vendas.
             </p>
           </div>
           <PlatformAdminPanel
             grossRevenueCents={grossRevenue}
             systemCutCents={systemCut}
             adminRepasseCents={adminRepasse}
+            commissionPercent={data.config.ownerCommissionPercent}
           />
         </section>
 
@@ -121,8 +133,8 @@ export default async function DevPage() {
                     <th className="pb-3 font-normal">Pagamento</th>
                     <th className="pb-3 font-normal">Data</th>
                     <th className="pb-3 text-right font-normal">Total</th>
-                    <th className="pb-3 text-right font-normal text-[#e9c349]">Meu 15%</th>
-                    <th className="pb-3 text-right font-normal">Admin 85%</th>
+                    <th className="pb-3 text-right font-normal text-[#e9c349]">Meu {data.config.ownerCommissionPercent}%</th>
+                    <th className="pb-3 text-right font-normal">Admin {100 - data.config.ownerCommissionPercent}%</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant/20">

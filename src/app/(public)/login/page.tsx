@@ -64,9 +64,9 @@ function LoginContent() {
         return;
       }
 
-      const isUserAdmin = data.session?.isAdmin === true;
-
-      if (isUserAdmin) {
+      if (data.session?.isDevAdmin === true) {
+        router.push("/dev");
+      } else if (data.session?.isAdmin === true) {
         router.push("/admin/dashboard");
       } else {
         router.push(next);

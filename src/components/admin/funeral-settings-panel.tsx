@@ -243,7 +243,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
               <span className="text-[#e9c349]">− {centsToBRL(commission)}</span>
             </div>
             <div className="flex justify-between border-t border-outline-variant/30 pt-2">
-              <span className="font-medium text-on-surface">Seu repasse (85%)</span>
+              <span className="font-medium text-on-surface">Seu repasse ({100 - config.ownerCommissionPercent}%)</span>
               <span className="font-semibold text-on-surface">{centsToBRL(operatorRevenue)}</span>
             </div>
           </div>

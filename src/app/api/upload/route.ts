@@ -6,8 +6,10 @@ export const dynamic = "force-dynamic";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/m4a", "audio/x-m4a", "audio/mp4"];
-const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES];
-const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/x-msvideo"];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES, ...ALLOWED_VIDEO_TYPES];
+const MAX_IMAGE_AUDIO_SIZE = 20 * 1024 * 1024;  // 20 MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024;        // 100 MB
 
 export async function POST(request: Request) {
   try {
@@ -24,13 +26,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tipo de arquivo não permitido." }, { status: 400 });
     }
 
-    if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json({ error: "Arquivo muito grande. Máximo 20 MB." }, { status: 400 });
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+    const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
+    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_AUDIO_SIZE;
+
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: `Arquivo muito grande. Máximo ${isVideo ? "100" : "20"} MB.` },
+        { status: 400 }
+      );
     }
 
     const supabase = await createClientServer();
-    const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
-    const bucket = isAudio ? "memorial-audio" : "memorial-images";
+    const bucket = isAudio ? "memorial-audio" : isVideo ? "memorial-video" : "memorial-images";
     const ext = file.name.split(".").pop() ?? (isAudio ? "mp3" : "jpg");
     const userId = session?.userId ?? "anonymous";
     const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;

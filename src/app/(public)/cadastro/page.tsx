@@ -24,6 +24,7 @@ function CadastroContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [emailSent, setEmailSent] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,6 +58,12 @@ function CadastroContent() {
         return;
       }
 
+      if (payload.emailConfirmationRequired) {
+        setEmailSent(email.trim());
+        setIsRegistering(false);
+        return;
+      }
+
       localStorage.setItem("has_logged_in", "true");
 
       if (payload.session?.isAdmin === true) {
@@ -69,6 +76,38 @@ function CadastroContent() {
       setIsRegistering(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <main className="relative min-h-dvh overflow-hidden bg-background text-on-surface">
+        <div className="absolute inset-0 -z-20">
+          <Image src="/images/hero-bg.png" alt="" fill priority className="object-cover" />
+        </div>
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,20,20,0.9)_0%,rgba(16,20,20,0.7)_50%,rgba(16,20,20,0.9)_100%)]" />
+        <div className="flex min-h-dvh items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl border border-tertiary/10 bg-[#0a192f66] p-10 text-center backdrop-blur-[20px]">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-tertiary/10">
+              <span className="material-symbols-outlined text-3xl text-tertiary">mark_email_unread</span>
+            </div>
+            <h2 className="mb-2 text-2xl font-light text-on-surface">Confirme seu e-mail</h2>
+            <p className="mb-1 text-on-surface-variant">
+              Enviamos um link de confirmação para:
+            </p>
+            <p className="mb-6 font-semibold text-tertiary">{emailSent}</p>
+            <p className="mb-8 text-sm text-on-surface-variant">
+              Clique no link do e-mail para ativar sua conta e depois faça o login.
+            </p>
+            <Link
+              href="/login"
+              className="block w-full rounded-full border border-tertiary py-3 text-sm font-semibold text-tertiary transition hover:bg-tertiary/10"
+            >
+              Ir para o login
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-background text-on-surface">
