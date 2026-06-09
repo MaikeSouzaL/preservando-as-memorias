@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import QRCode from "qrcode";
 import { getAuthSession } from "@/src/lib/auth-session";
 import { readPlatformData } from "@/src/lib/platform-data";
 
@@ -12,6 +13,14 @@ const statusLabel: Record<string, { text: string; color: string }> = {
   rascunho: { text: "Rascunho", color: "text-outline bg-outline/10 border-outline/20" },
 };
 
+async function generateQr(url: string): Promise<string> {
+  return QRCode.toDataURL(url, {
+    width: 300,
+    margin: 2,
+    color: { dark: "#0b0f0f", light: "#ffffff" },
+  });
+}
+
 export default async function DashboardPage() {
   const session = await getAuthSession();
   if (!session) redirect("/login");
@@ -21,7 +30,19 @@ export default async function DashboardPage() {
   const memorials = data.memorials.filter(
     (m) => m.id !== "default" && (session.isAdmin || m.ownerId.toLowerCase().trim() === session.email)
   );
-  const qrCodes = data.qrCodes;
+
+  const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
+
+  // Gera QR code para cada memorial ativo
+  const qrMap: Record<string, string> = {};
+  await Promise.all(
+    memorials
+      .filter((m) => m.status === "ativo")
+      .map(async (m) => {
+        const fullUrl = `${baseUrl}/memorial-publico?memorial=${m.id}`;
+        qrMap[m.id] = await generateQr(fullUrl);
+      })
+  );
 
   return (
     <div>
@@ -64,25 +85,19 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {memorials.map((memorial) => {
-            const qr = qrCodes.find((q) => q.memorialId === memorial.id);
             const status = statusLabel[memorial.status] ?? statusLabel.rascunho;
-            const deathYear = memorial.deathDate
-              ? new Date(memorial.deathDate).getFullYear()
-              : null;
-            const birthYear = memorial.birthDate
-              ? new Date(memorial.birthDate).getFullYear()
-              : null;
-            const years =
-              birthYear || deathYear
-                ? `${birthYear ?? "?"} – ${deathYear ?? "?"}`
-                : null;
+            const deathYear = memorial.deathDate ? new Date(memorial.deathDate).getFullYear() : null;
+            const birthYear = memorial.birthDate ? new Date(memorial.birthDate).getFullYear() : null;
+            const years = birthYear || deathYear ? `${birthYear ?? "?"} – ${deathYear ?? "?"}` : null;
             const publicUrl = `/memorial-publico?memorial=${memorial.id}`;
+            const qrDataUrl = qrMap[memorial.id];
 
             return (
               <article
                 key={memorial.id}
                 className="flex flex-col overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f] transition duration-300 hover:-translate-y-0.5 hover:border-tertiary/20"
               >
+                {/* Foto */}
                 <div className="relative h-44 shrink-0">
                   <Image
                     src={memorial.imageUrl || "/images/hero-bg.png"}
@@ -98,12 +113,30 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                  <span
-                    className={`self-start rounded-full border px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${status.color}`}
-                  >
+                  <span className={`self-start rounded-full border px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${status.color}`}>
                     {status.text}
                   </span>
 
+                  {/* QR Code — só para memoriais ativos */}
+                  {qrDataUrl && (
+                    <div className="flex flex-col items-center gap-3 rounded-xl border border-tertiary/10 bg-[#060e1a] p-4">
+                      <p className="text-[0.65rem] uppercase tracking-[0.15em] text-outline">QR Code do memorial</p>
+                      <div className="rounded-lg bg-white p-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={qrDataUrl} alt={`QR Code — ${memorial.name}`} width={160} height={160} />
+                      </div>
+                      <a
+                        href={qrDataUrl}
+                        download={`qrcode-${memorial.name.toLowerCase().replace(/\s+/g, "-")}.png`}
+                        className="flex items-center gap-1.5 text-xs text-tertiary transition hover:text-tertiary/70"
+                      >
+                        <span className="material-symbols-outlined text-sm">download</span>
+                        Baixar QR Code
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Ações */}
                   <div className="mt-auto flex gap-2">
                     {memorial.status === "ativo" ? (
                       <Link
@@ -122,17 +155,6 @@ export default async function DashboardPage() {
                         <span className="material-symbols-outlined text-sm">payment</span>
                         Pagar para publicar
                       </Link>
-                    )}
-
-                    {qr && memorial.status === "ativo" && (
-                      <a
-                        href={publicUrl}
-                        target="_blank"
-                        title="QR Code do memorial"
-                        className="flex items-center justify-center rounded-lg border border-tertiary/30 px-3 py-2 text-tertiary transition hover:bg-tertiary/5"
-                      >
-                        <span className="material-symbols-outlined text-sm">qr_code_2</span>
-                      </a>
                     )}
 
                     <Link
@@ -162,4 +184,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
