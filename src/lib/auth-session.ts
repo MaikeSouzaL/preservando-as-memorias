@@ -1,60 +1,35 @@
-import { cookies } from "next/headers";
+import { createClientServer } from "@/src/lib/supabase";
 
 export type AuthSession = {
   email: string;
   isAdmin: boolean;
+  userId: string;
   needsPassword?: boolean;
 };
 
-export function serializeAuthSession(session: AuthSession) {
-  return JSON.stringify(session);
-}
-
-function parseAuthCookie(value: string): unknown {
-  const candidates = [value];
-  let decoded = value;
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      decoded = decodeURIComponent(decoded);
-      candidates.push(decoded);
-    } catch {
-      break;
-    }
-  }
-
-  for (const candidate of candidates) {
-    try {
-      return JSON.parse(candidate);
-    } catch {}
-  }
-
-  return null;
-}
-
 export async function getAuthSession(): Promise<AuthSession | null> {
-  const cookieStore = await cookies();
-  const authCookie = cookieStore.get("auth_user");
-
-  if (!authCookie?.value) {
-    return null;
-  }
-
   try {
-    const session = parseAuthCookie(authCookie.value);
-    const sessionRecord = session && typeof session === "object" ? (session as Record<string, unknown>) : null;
-    const rawEmail = sessionRecord?.email;
-    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+    const supabase = await createClientServer();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    if (!email) {
-      return null;
-    }
+    if (error || !user || !user.email) return null;
+
+    const { data: profile } = await supabase.from("profiles").select("is_admin").eq("id", user.id).single();
 
     return {
-      email,
-      isAdmin: sessionRecord?.isAdmin === true,
+      email: user.email.toLowerCase().trim(),
+      isAdmin: profile?.is_admin ?? false,
+      userId: user.id,
     };
   } catch {
     return null;
   }
+}
+
+/** @deprecated Session is now managed by Supabase — this helper is kept only for legacy cookie-clearing at logout. */
+export function serializeAuthSession(session: AuthSession) {
+  return JSON.stringify(session);
 }

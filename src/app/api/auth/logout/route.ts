@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
+import { createClientServer } from "@/src/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const response = NextResponse.json({ success: true });
-
-  response.cookies.set("auth_user", "", {
-    httpOnly: true,
-    path: "/",
-    maxAge: 0,
-    sameSite: "lax",
-  });
-
-  return response;
+  const supabase = await createClientServer();
+  await supabase.auth.signOut();
+  return NextResponse.json({ success: true });
 }

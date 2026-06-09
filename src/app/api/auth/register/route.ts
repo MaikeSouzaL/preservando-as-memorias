@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { serializeAuthSession } from "@/src/lib/auth-session";
-import { hashPassword } from "@/src/lib/password";
-import { connectToDatabase } from "@/src/lib/mongodb";
-import { Curator } from "@/src/models/Curator";
+import { createClientServer } from "@/src/lib/supabase";
 import { checkRateLimit } from "@/src/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
-
-function publicProfile(profile: any) {
-  const safeProfile = { ...profile };
-  delete safeProfile.password;
-  return safeProfile;
 }
 
 export async function POST(request: NextRequest) {
@@ -35,63 +26,54 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "A senha precisa ter pelo menos 8 caracteres." }, { status: 400 });
     }
 
-    // 1. Conecta ao MongoDB Atlas
-    await connectToDatabase();
+    const supabase = await createClientServer();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          name,
+        },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001"}/auth/callback`,
+      },
+    });
 
-    // 2. Verifica se o e-mail já existe
-    const existing = await Curator.findOne({ email });
-    if (existing) {
-      return NextResponse.json({ error: "Este e-mail já está cadastrado." }, { status: 400 });
+    if (error) {
+      if (error.message.toLowerCase().includes("already registered") || error.message.toLowerCase().includes("email")) {
+        return NextResponse.json({ error: "Este e-mail já está cadastrado." }, { status: 400 });
+      }
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // 3. Cria o novo curador no MongoDB
-    const hashedPassword = hashPassword(password);
-    const newCurator = await Curator.create({
-      name,
-      email,
-      bio: asString(body.bio) || `Guardião das memórias da família. Curadoria de lembranças criada por ${name}.`,
-      theme: "noturno",
-      privacy: "public",
-      notifyVelas: true,
-      notifyTributos: true,
-      multiFactorEnabled: false,
-      language: "pt-BR",
-      timezone: "GMT-3",
-      globalAudio: true,
-      isAdmin: false,
-      password: hashedPassword,
-    });
+    if (!data.user) {
+      return NextResponse.json({ error: "Não foi possível criar a conta agora." }, { status: 500 });
+    }
 
-    const profile = {
-      name: newCurator.name,
-      email: newCurator.email,
-      bio: newCurator.bio,
-      theme: newCurator.theme,
-      privacy: newCurator.privacy,
-      notifyVelas: newCurator.notifyVelas,
-      notifyTributos: newCurator.notifyTributos,
-      multiFactorEnabled: newCurator.multiFactorEnabled,
-      language: newCurator.language,
-      timezone: newCurator.timezone,
-      globalAudio: newCurator.globalAudio,
-      isAdmin: newCurator.isAdmin,
-      avatarUrl: newCurator.avatarUrl,
-    };
+    // Profile is auto-created by the DB trigger, but update name immediately
+    await supabase.from("profiles").upsert({ id: data.user.id, email, name }, { onConflict: "id" });
 
-    const session = {
-      email: profile.email,
-      isAdmin: false,
-    };
-    const response = NextResponse.json({ profile: publicProfile(profile), session }, { status: 201 });
-
-    response.cookies.set("auth_user", serializeAuthSession(session), {
-      httpOnly: true,
-      path: "/",
-      maxAge: 30 * 24 * 60 * 60,
-      sameSite: "lax",
-    });
-
-    return response;
+    return NextResponse.json(
+      {
+        profile: {
+          name,
+          email,
+          bio: `Guardião das memórias da família. Curadoria de lembranças criada por ${name}.`,
+          theme: "noturno",
+          privacy: "public",
+          notifyVelas: true,
+          notifyTributos: true,
+          multiFactorEnabled: false,
+          language: "pt-BR",
+          timezone: "GMT-3",
+          globalAudio: true,
+          isAdmin: false,
+        },
+        session: { email, isAdmin: false, userId: data.user.id },
+        emailConfirmationRequired: !data.session,
+      },
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error("Erro no cadastro:", err);
     return NextResponse.json({ error: "Não foi possível criar a conta agora." }, { status: 500 });

@@ -30,7 +30,7 @@ export async function GET() {
   const session = await getAuthSession();
 
   const memorials = session
-    ? data.memorials.filter((memorial) => memorial.id !== "default" && (session.isAdmin || memorial.ownerId.toLowerCase().trim() === session.email))
+    ? data.memorials.filter((memorial) => memorial.id !== "default" && (session.isAdmin || memorial.ownerId === session.userId))
     : data.memorials.filter((memorial) => memorial.id !== "default" && memorial.status === "ativo");
   const memorialIds = new Set(memorials.map((memorial) => memorial.id));
   const qrCodes = data.qrCodes.filter((qrCode) => qrCode.memorialId && memorialIds.has(qrCode.memorialId));
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const created = await updatePlatformData((data) => {
       const now = new Date().toISOString();
       const baseId = slugify(name) || "memorial";
-      const id = `mem_${baseId}_${Date.now().toString(36)}`;
+      const id = crypto.randomUUID();
       const birthDate = asString(body.birthDate);
       const deathDate = asString(body.deathDate);
       const years =
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
       const memorial = {
         id,
-        ownerId: session.email,
+        ownerId: session.userId,
         name,
         nickname: asString(body.nickname) || undefined,
         birthDate: birthDate || undefined,
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       };
 
       const qrCode = {
-        id: `qr_${baseId}_${Date.now().toString(36)}`,
+        id: crypto.randomUUID(),
         memorialId: id,
         publicPath: `/memorial-publico?memorial=${id}`,
         scans: 0,

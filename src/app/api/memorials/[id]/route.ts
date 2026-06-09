@@ -26,7 +26,7 @@ function buildYears(birthDate?: string, deathDate?: string) {
 }
 
 function canManageMemorial(session: Awaited<ReturnType<typeof getAuthSession>>, ownerId: string) {
-  return Boolean(session && (session.isAdmin || ownerId.toLowerCase().trim() === session.email));
+  return Boolean(session && (session.isAdmin || ownerId === session.userId));
 }
 
 export async function GET(_request: Request, context: MemorialRouteContext) {

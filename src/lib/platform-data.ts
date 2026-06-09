@@ -1,5 +1,8 @@
 export type { BillingCycle, PlatformConfig, PlatformPlan } from "@/src/lib/platform-types";
 import type { PlatformConfig } from "@/src/lib/platform-types";
+import { createAdminClient } from "@/src/lib/supabase";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type ManagedGalleryItem = {
   id: string;
@@ -18,7 +21,7 @@ export type ManagedTimelineEvent = {
 
 export type ManagedMemorial = {
   id: string;
-  ownerId: string;
+  ownerId: string; // Supabase user UUID
   name: string;
   nickname?: string;
   birthDate?: string;
@@ -28,6 +31,7 @@ export type ManagedMemorial = {
   biography: string;
   imageUrl: string;
   audioUrl?: string;
+  videoUrl?: string;
   gallery: ManagedGalleryItem[];
   timelineEvents: ManagedTimelineEvent[];
   status: "ativo" | "rascunho" | "pending_payment";
@@ -149,13 +153,13 @@ export type FuneralService = {
   familyContactPhone: string;
   familyContactEmail?: string;
   familyContactRelation: string;
-  serviceType: 'sepultamento' | 'cremacao' | 'translado' | 'preparacao';
+  serviceType: "sepultamento" | "cremacao" | "translado" | "preparacao";
   casketType?: string;
   additionalServices: string[];
   totalAmountCents: number;
   paidAmountCents: number;
-  paymentMethod?: 'pix' | 'card' | 'boleto' | 'cash' | 'installment';
-  status: 'em_andamento' | 'concluido' | 'cancelado';
+  paymentMethod?: "pix" | "card" | "boleto" | "cash" | "installment";
+  status: "em_andamento" | "concluido" | "cancelado";
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -166,11 +170,11 @@ export type FuneralSchedule = {
   funeralHomeId: string;
   serviceId?: string;
   deceasedName: string;
-  type: 'velorio' | 'cerimonia' | 'sepultamento' | 'cremacao' | 'translado';
+  type: "velorio" | "cerimonia" | "sepultamento" | "cremacao" | "translado";
   dateTime: string;
   location: string;
   address?: string;
-  status: 'agendado' | 'em_andamento' | 'concluido' | 'cancelado';
+  status: "agendado" | "em_andamento" | "concluido" | "cancelado";
   assignedStaff?: string[];
   notes?: string;
   createdAt: string;
@@ -180,14 +184,14 @@ export type InventoryItem = {
   id: string;
   funeralHomeId: string;
   name: string;
-  category: 'urna' | 'flores' | 'veu' | 'ornamento' | 'livro' | 'outros';
+  category: "urna" | "flores" | "veu" | "ornamento" | "livro" | "outros";
   description?: string;
   quantity: number;
   minQuantity: number;
   unitPriceCents: number;
   costPriceCents?: number;
   imageUrl?: string;
-  status: 'disponivel' | 'esgotado' | 'reservado';
+  status: "disponivel" | "esgotado" | "reservado";
   createdAt: string;
   updatedAt: string;
 };
@@ -196,11 +200,11 @@ export type StaffMember = {
   id: string;
   funeralHomeId: string;
   name: string;
-  role: 'tanatopraxista' | 'cerimonialista' | 'motorista' | 'atendente' | 'gerente' | 'outros';
+  role: "tanatopraxista" | "cerimonialista" | "motorista" | "atendente" | "gerente" | "outros";
   phone: string;
   email?: string;
   commissionPercent?: number;
-  schedule: 'manha' | 'tarde' | 'noite' | 'integral' | 'folga';
+  schedule: "manha" | "tarde" | "noite" | "integral" | "folga";
   isActive: boolean;
   createdAt: string;
 };
@@ -209,12 +213,12 @@ export type FuneralDocument = {
   id: string;
   funeralHomeId: string;
   serviceId?: string;
-  type: 'certidao_obito' | 'autorizacao_sepultamento' | 'autorizacao_cremacao' | 'alvara' | 'guia_translado' | 'outros';
+  type: "certidao_obito" | "autorizacao_sepultamento" | "autorizacao_cremacao" | "alvara" | "guia_translado" | "outros";
   documentNumber?: string;
   issuer?: string;
   issueDate: string;
   expiryDate?: string;
-  status: 'pendente' | 'emitido' | 'valido' | 'expirado';
+  status: "pendente" | "emitido" | "valido" | "expirado";
   fileUrl?: string;
   notes?: string;
   createdAt: string;
@@ -269,33 +273,417 @@ export type PlatformData = {
   complaints: ManagedComplaint[];
 };
 
-let writeQueue: Promise<unknown> = Promise.resolve();
+// ─── Row mappers (DB snake_case → TS camelCase) ───────────────────────────────
 
-const defaultConfig: PlatformConfig = {
-  ownerCommissionPercent: 15,
-  familyMemorialPriceCents: 9900,
-  funeralHomeMemorialPriceCents: 4900,
-  candlePriceCents: 100,
-};
+function mapMemorial(r: any): ManagedMemorial {
+  return {
+    id: r.id,
+    ownerId: r.owner_id,
+    name: r.name,
+    nickname: r.nickname ?? undefined,
+    birthDate: r.birth_date ?? undefined,
+    deathDate: r.death_date ?? undefined,
+    city: r.city ?? undefined,
+    epitaph: r.epitaph ?? "Uma história preservada com carinho.",
+    biography: r.biography ?? "",
+    imageUrl: r.image_url ?? "/images/hero-bg.png",
+    audioUrl: r.audio_url ?? undefined,
+    videoUrl: r.video_url ?? undefined,
+    gallery: Array.isArray(r.gallery) ? r.gallery : [],
+    timelineEvents: Array.isArray(r.timeline) ? r.timeline : [],
+    status: r.status ?? "rascunho",
+    paymentStatus: r.payment_status ?? "pending",
+    qrUnlocked: r.qr_unlocked ?? false,
+    source: r.source ?? "customer",
+    funeralHomeId: r.funeral_home_id ?? undefined,
+    offerLinkId: r.offer_link_id ?? undefined,
+    visits: r.visits ?? 0,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
 
-const defaultData: PlatformData = {
-  config: defaultConfig,
-  memorials: [],
-  qrCodes: [],
-  tributes: [],
-  candles: [],
-  orders: [],
-  funeralHomes: [],
-  offerLinks: [],
-  funeralServices: [],
-  funeralSchedules: [],
-  inventoryItems: [],
-  staffMembers: [],
-  funeralDocuments: [],
-  profile: {
+function toDbMemorial(m: ManagedMemorial) {
+  return {
+    id: m.id,
+    owner_id: m.ownerId,
+    name: m.name,
+    nickname: m.nickname ?? null,
+    birth_date: m.birthDate ?? null,
+    death_date: m.deathDate ?? null,
+    city: m.city ?? null,
+    epitaph: m.epitaph,
+    biography: m.biography,
+    image_url: m.imageUrl,
+    audio_url: m.audioUrl ?? null,
+    video_url: m.videoUrl ?? null,
+    gallery: m.gallery,
+    timeline: m.timelineEvents,
+    status: m.status,
+    payment_status: m.paymentStatus ?? "pending",
+    qr_unlocked: m.qrUnlocked ?? false,
+    source: m.source ?? "customer",
+    funeral_home_id: m.funeralHomeId ?? null,
+    offer_link_id: m.offerLinkId ?? null,
+    visits: m.visits ?? 0,
+  };
+}
+
+function mapQrCode(r: any): ManagedQrCode {
+  return {
+    id: r.id,
+    memorialId: r.memorial_id ?? undefined,
+    offerLinkId: r.offer_link_id ?? undefined,
+    publicPath: r.public_path,
+    scans: r.scans ?? 0,
+    status: r.status ?? "ativo",
+    kind: r.kind ?? "memorial",
+    createdAt: r.created_at,
+    lastScanAt: r.last_scan_at ?? undefined,
+  };
+}
+
+function toDbQrCode(q: ManagedQrCode) {
+  return {
+    id: q.id,
+    memorial_id: q.memorialId ?? null,
+    offer_link_id: q.offerLinkId ?? null,
+    public_path: q.publicPath,
+    scans: q.scans ?? 0,
+    status: q.status ?? "ativo",
+    kind: q.kind ?? "memorial",
+    last_scan_at: q.lastScanAt ?? null,
+  };
+}
+
+function mapTribute(r: any): ManagedTribute {
+  return {
+    id: r.id,
+    memorialId: r.memorial_id,
+    author: r.author,
+    message: r.message,
+    createdAt: r.created_at,
+    status: r.status ?? "pendente",
+    tag: r.tag ?? undefined,
+    isPinned: r.is_pinned ?? false,
+  };
+}
+
+function toDbTribute(t: ManagedTribute) {
+  return {
+    id: t.id,
+    memorial_id: t.memorialId,
+    author: t.author,
+    message: t.message,
+    status: t.status ?? "pendente",
+    tag: t.tag ?? null,
+    is_pinned: t.isPinned ?? false,
+  };
+}
+
+function mapCandle(r: any): ManagedCandle {
+  return {
+    id: r.id,
+    memorialId: r.memorial_id,
+    name: r.name,
+    isEternal: r.is_eternal ?? false,
+    createdAt: r.created_at,
+  };
+}
+
+function toDbCandle(c: ManagedCandle) {
+  return {
+    id: c.id,
+    memorial_id: c.memorialId,
+    name: c.name,
+    is_eternal: c.isEternal ?? false,
+  };
+}
+
+function mapProfile(r: any): CuratorProfile {
+  return {
+    name: r.name ?? "",
+    email: r.email ?? "",
+    bio: r.bio ?? "",
+    theme: r.theme ?? "noturno",
+    privacy: r.privacy ?? "public",
+    notifyVelas: r.notify_velas ?? true,
+    notifyTributos: r.notify_tributos ?? true,
+    multiFactorEnabled: r.multi_factor_enabled ?? false,
+    language: r.language ?? "pt-BR",
+    timezone: r.timezone ?? "GMT-3",
+    globalAudio: r.global_audio ?? true,
+    isAdmin: r.is_admin ?? false,
+    avatarUrl: r.avatar_url ?? undefined,
+  };
+}
+
+function mapOrder(r: any): PlatformOrder {
+  return {
+    id: r.id,
+    userName: r.user_name ?? "",
+    userEmail: r.email,
+    customerDocument: r.customer_document ?? "",
+    customerPhone: r.customer_phone ?? "",
+    planId: r.plan_id ?? r.plan ?? "",
+    paymentMethod: r.payment_method ?? "pix",
+    discountCode: r.discount_code ?? undefined,
+    discountCents: r.discount_cents ?? 0,
+    grossAmountCents: r.gross_amount_cents ?? r.amount ?? 0,
+    platformCommissionCents: r.platform_commission_cents ?? 0,
+    operatorAmountCents: r.operator_amount_cents ?? 0,
+    status: r.status === "paid" ? "paid" : "pending",
+    source: r.source ?? undefined,
+    offerLinkId: r.offer_link_id ?? undefined,
+    funeralHomeId: r.funeral_home_id ?? undefined,
+    draftMemorialId: r.draft_memorial_id ?? undefined,
+    payerType: r.payer_type ?? undefined,
+    createdAt: r.created_at,
+  };
+}
+
+function toDbOrder(o: PlatformOrder) {
+  return {
+    id: o.id,
+    user_id: null,
+    email: o.userEmail,
+    user_name: o.userName,
+    customer_document: o.customerDocument,
+    customer_phone: o.customerPhone,
+    plan: o.planId,
+    plan_id: o.planId,
+    payment_method: o.paymentMethod,
+    discount_code: o.discountCode ?? null,
+    discount_cents: o.discountCents ?? 0,
+    gross_amount_cents: o.grossAmountCents ?? 0,
+    amount: o.grossAmountCents ?? 0,
+    platform_commission_cents: o.platformCommissionCents ?? 0,
+    operator_amount_cents: o.operatorAmountCents ?? 0,
+    status: o.status ?? "pending",
+    source: o.source ?? null,
+    offer_link_id: o.offerLinkId ?? null,
+    funeral_home_id: o.funeralHomeId ?? null,
+    draft_memorial_id: o.draftMemorialId ?? null,
+    payer_type: o.payerType ?? null,
+  };
+}
+
+function mapFuneralHome(r: any): FuneralHome {
+  return {
+    id: r.id,
+    name: r.name,
+    slug: r.slug ?? r.id,
+    contactName: r.contact_name ?? "",
+    email: r.email,
+    phone: r.phone ?? "",
+    cnpj: r.cnpj ?? undefined,
+    city: r.city ?? undefined,
+    state: r.state ?? undefined,
+    address: r.address ?? undefined,
+    passwordHash: r.password_hash ?? "",
+    isActive: r.is_active ?? true,
+    approvalStatus: r.approval_status ?? "pending",
+    stripeAccountId: r.stripe_account_id ?? undefined,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+function mapOfferLink(r: any): FuneralHomeOfferLink {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id ?? undefined,
+    title: r.title,
+    slug: r.slug,
+    description: r.description ?? "",
+    cycle: r.cycle ?? "one_time",
+    priceCents: r.price_cents ?? 0,
+    status: r.status ?? "active",
+    accessCount: r.access_count ?? 0,
+    conversionCount: r.conversion_count ?? 0,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+function mapFuneralService(r: any): FuneralService {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id,
+    deceasedName: r.deceased_name,
+    deceasedBirthDate: r.deceased_birth_date ?? undefined,
+    deceasedDeathDate: r.deceased_death_date,
+    deceasedCauseOfDeath: r.deceased_cause_of_death ?? undefined,
+    deceasedDocumentNumber: r.deceased_document_number ?? undefined,
+    familyContactName: r.family_contact_name,
+    familyContactPhone: r.family_contact_phone,
+    familyContactEmail: r.family_contact_email ?? undefined,
+    familyContactRelation: r.family_contact_relation,
+    serviceType: r.service_type,
+    casketType: r.casket_type ?? undefined,
+    additionalServices: Array.isArray(r.additional_services) ? r.additional_services : [],
+    totalAmountCents: r.total_amount_cents ?? 0,
+    paidAmountCents: r.paid_amount_cents ?? 0,
+    paymentMethod: r.payment_method ?? undefined,
+    status: r.status ?? "em_andamento",
+    notes: r.notes ?? undefined,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+function mapFuneralSchedule(r: any): FuneralSchedule {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id,
+    serviceId: r.service_id ?? undefined,
+    deceasedName: r.deceased_name,
+    type: r.type,
+    dateTime: r.date_time,
+    location: r.location,
+    address: r.address ?? undefined,
+    status: r.status ?? "agendado",
+    assignedStaff: Array.isArray(r.assigned_staff) ? r.assigned_staff : [],
+    notes: r.notes ?? undefined,
+    createdAt: r.created_at,
+  };
+}
+
+function mapInventoryItem(r: any): InventoryItem {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id,
+    name: r.name,
+    category: r.category,
+    description: r.description ?? undefined,
+    quantity: r.quantity ?? 0,
+    minQuantity: r.min_quantity ?? 0,
+    unitPriceCents: r.unit_price_cents ?? 0,
+    costPriceCents: r.cost_price_cents ?? undefined,
+    imageUrl: r.image_url ?? undefined,
+    status: r.status ?? "disponivel",
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+function mapStaffMember(r: any): StaffMember {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id,
+    name: r.name,
+    role: r.role,
+    phone: r.phone,
+    email: r.email ?? undefined,
+    commissionPercent: r.commission_percent ?? undefined,
+    schedule: r.schedule ?? "manha",
+    isActive: r.is_active ?? true,
+    createdAt: r.created_at,
+  };
+}
+
+function mapFuneralDocument(r: any): FuneralDocument {
+  return {
+    id: r.id,
+    funeralHomeId: r.funeral_home_id,
+    serviceId: r.service_id ?? undefined,
+    type: r.type,
+    documentNumber: r.document_number ?? undefined,
+    issuer: r.issuer ?? undefined,
+    issueDate: r.issue_date,
+    expiryDate: r.expiry_date ?? undefined,
+    status: r.status ?? "pendente",
+    fileUrl: r.file_url ?? undefined,
+    notes: r.notes ?? undefined,
+    createdAt: r.created_at,
+  };
+}
+
+function mapComplaint(r: any): ManagedComplaint {
+  return {
+    id: r.id,
+    target: r.target,
+    reason: r.reason,
+    reporter: r.reporter,
+    status: r.status ?? "Pendente",
+    createdAt: r.created_at,
+  };
+}
+
+// ─── Diff utilities ───────────────────────────────────────────────────────────
+
+function diffItems<T extends { id: string }>(
+  original: T[],
+  updated: T[]
+): { added: T[]; modified: T[]; deleted: string[] } {
+  const origMap = new Map(original.map((i) => [i.id, i]));
+  const updMap = new Map(updated.map((i) => [i.id, i]));
+  return {
+    added: updated.filter((i) => !origMap.has(i.id)),
+    modified: updated.filter((i) => {
+      const o = origMap.get(i.id);
+      return o && JSON.stringify(o) !== JSON.stringify(i);
+    }),
+    deleted: original.filter((i) => !updMap.has(i.id)).map((i) => i.id),
+  };
+}
+
+// ─── Read ─────────────────────────────────────────────────────────────────────
+
+export async function readPlatformData(): Promise<PlatformData> {
+  const supabase = await createAdminClient();
+
+  const [
+    { data: memorialsRows = [] },
+    { data: qrCodesRows = [] },
+    { data: tributesRows = [] },
+    { data: candlesRows = [] },
+    { data: ordersRows = [] },
+    { data: profilesRows = [] },
+    { data: funeralHomesRows = [] },
+    { data: offerLinksRows = [] },
+    { data: funeralServicesRows = [] },
+    { data: funeralSchedulesRows = [] },
+    { data: inventoryItemsRows = [] },
+    { data: staffMembersRows = [] },
+    { data: funeralDocumentsRows = [] },
+    { data: complaintsRows = [] },
+    { data: configRows = [] },
+    { data: settingsRows = [] },
+  ] = await Promise.all([
+    supabase.from("memorials").select("*").order("created_at", { ascending: false }),
+    supabase.from("qr_codes").select("*"),
+    supabase.from("tributes").select("*").order("created_at", { ascending: false }),
+    supabase.from("candles").select("*").order("created_at", { ascending: false }),
+    supabase.from("orders").select("*").order("created_at", { ascending: false }),
+    supabase.from("profiles").select("*"),
+    supabase.from("funeral_homes").select("*"),
+    supabase.from("funeral_home_offer_links").select("*"),
+    supabase.from("funeral_services").select("*"),
+    supabase.from("funeral_schedules").select("*"),
+    supabase.from("inventory_items").select("*"),
+    supabase.from("staff_members").select("*"),
+    supabase.from("funeral_documents").select("*"),
+    supabase.from("complaints").select("*"),
+    supabase.from("platform_config").select("*").eq("id", 1),
+    supabase.from("platform_settings").select("*"),
+  ]);
+
+  const cfg = configRows?.[0] ?? {};
+  const config: PlatformConfig = {
+    ownerCommissionPercent: cfg.owner_commission_percent ?? 15,
+    familyMemorialPriceCents: cfg.family_memorial_price_cents ?? 9900,
+    funeralHomeMemorialPriceCents: cfg.funeral_home_memorial_price_cents ?? 4900,
+    candlePriceCents: cfg.candle_price_cents ?? 100,
+  };
+
+  const settingsMap = Object.fromEntries((settingsRows ?? []).map((r: any) => [r.key, r.value]));
+
+  const profiles = (profilesRows ?? []).map(mapProfile);
+  const defaultProfile: CuratorProfile = profiles[0] ?? {
     name: "Novo Curador",
     email: "curador@plataforma.com",
-    bio: "Guardião das memórias da família. Curadoria de lembranças.",
+    bio: "Guardião das memórias da família.",
     theme: "noturno",
     privacy: "public",
     notifyVelas: true,
@@ -304,116 +692,210 @@ const defaultData: PlatformData = {
     language: "pt-BR",
     timezone: "GMT-3",
     globalAudio: true,
-  },
-  profiles: [],
-  complaints: [],
-};
-
-function normalizePlatformData(data: Partial<PlatformData>): PlatformData {
-  const normalized: PlatformData = {
-    config: {
-      ownerCommissionPercent: data.config?.ownerCommissionPercent ?? defaultConfig.ownerCommissionPercent,
-      familyMemorialPriceCents: data.config?.familyMemorialPriceCents ?? defaultConfig.familyMemorialPriceCents,
-      funeralHomeMemorialPriceCents: data.config?.funeralHomeMemorialPriceCents ?? defaultConfig.funeralHomeMemorialPriceCents,
-      candlePriceCents: data.config?.candlePriceCents ?? defaultConfig.candlePriceCents,
-      // Preserve legacy plan fields if present in DB
-      defaultPlanId: data.config?.defaultPlanId,
-      plans: data.config?.plans,
-      defaultFuneralPlanId: data.config?.defaultFuneralPlanId,
-      funeralPlans: data.config?.funeralPlans,
-    },
-    adminBankDataEncrypted: data.adminBankDataEncrypted,
-    platformAdminEmail: data.platformAdminEmail,
-    memorials: Array.isArray(data.memorials) ? data.memorials : [],
-    qrCodes: Array.isArray(data.qrCodes) ? data.qrCodes : [],
-    tributes: Array.isArray(data.tributes) ? data.tributes : [],
-    candles: Array.isArray(data.candles) ? data.candles : [],
-    orders: data.orders ?? [],
-    funeralHomes: Array.isArray(data.funeralHomes) ? data.funeralHomes : [],
-    offerLinks: Array.isArray(data.offerLinks) ? data.offerLinks : [],
-    funeralServices: Array.isArray(data.funeralServices) ? data.funeralServices : [],
-    funeralSchedules: Array.isArray(data.funeralSchedules) ? data.funeralSchedules : [],
-    inventoryItems: Array.isArray(data.inventoryItems) ? data.inventoryItems : [],
-    staffMembers: Array.isArray(data.staffMembers) ? data.staffMembers : [],
-    funeralDocuments: Array.isArray(data.funeralDocuments) ? data.funeralDocuments : [],
-    profile: data.profile ?? {
-      name: data.orders?.[0]?.userName || "Novo Curador",
-      email: data.orders?.[0]?.userEmail || "curador@plataforma.com",
-      bio: "Guardião das memórias da família. Curadoria de lembranças.",
-      theme: "noturno",
-      privacy: "public",
-      notifyVelas: true,
-      notifyTributos: true,
-      multiFactorEnabled: false,
-      language: "pt-BR",
-      timezone: "GMT-3",
-      globalAudio: true,
-    },
-    profiles: Array.isArray(data.profiles) ? data.profiles : [],
-    complaints: Array.isArray(data.complaints) ? data.complaints : [],
   };
 
-  // Se data.profile existir e data.profiles estiver vazio, inicializa com o profile global
-  if (normalized.profile && normalized.profiles.length === 0) {
-    normalized.profiles.push(normalized.profile);
-  }
-
-  normalized.memorials = normalized.memorials.map((memorial) => ({
-    ...memorial,
-    gallery: memorial.gallery ?? [],
-    timelineEvents: memorial.timelineEvents ?? [],
-  }));
-
-  return normalized;
+  return {
+    config,
+    adminBankDataEncrypted: settingsMap["adminBankDataEncrypted"],
+    platformAdminEmail: settingsMap["platformAdminEmail"],
+    memorials: (memorialsRows ?? []).map(mapMemorial),
+    qrCodes: (qrCodesRows ?? []).map(mapQrCode),
+    tributes: (tributesRows ?? []).map(mapTribute),
+    candles: (candlesRows ?? []).map(mapCandle),
+    orders: (ordersRows ?? []).map(mapOrder),
+    profiles,
+    profile: defaultProfile,
+    funeralHomes: (funeralHomesRows ?? []).map(mapFuneralHome),
+    offerLinks: (offerLinksRows ?? []).map(mapOfferLink),
+    funeralServices: (funeralServicesRows ?? []).map(mapFuneralService),
+    funeralSchedules: (funeralSchedulesRows ?? []).map(mapFuneralSchedule),
+    inventoryItems: (inventoryItemsRows ?? []).map(mapInventoryItem),
+    staffMembers: (staffMembersRows ?? []).map(mapStaffMember),
+    funeralDocuments: (funeralDocumentsRows ?? []).map(mapFuneralDocument),
+    complaints: (complaintsRows ?? []).map(mapComplaint),
+  };
 }
 
-import { connectToDatabase } from "@/src/lib/mongodb";
-import mongoose from "mongoose";
+// ─── Persist changes ──────────────────────────────────────────────────────────
 
-// Schema e Model Mongoose do PlatformStore
-const PlatformStoreSchema = new mongoose.Schema({
-  key: { type: String, default: "global_store", unique: true },
-  data: { type: mongoose.Schema.Types.Mixed, required: true }
-}, { timestamps: true });
+async function persistChanges(original: PlatformData, updated: PlatformData): Promise<void> {
+  const supabase = await createAdminClient();
+  const ops: PromiseLike<any>[] = [];
 
-const PlatformStore = mongoose.models.PlatformStore || mongoose.model("PlatformStore", PlatformStoreSchema);
+  // ── Memorials ──
+  const mDiff = diffItems(original.memorials, updated.memorials);
+  if (mDiff.added.length > 0) ops.push(supabase.from("memorials").insert(mDiff.added.map(toDbMemorial)));
+  for (const m of mDiff.modified) ops.push(supabase.from("memorials").update(toDbMemorial(m)).eq("id", m.id));
+  if (mDiff.deleted.length > 0) ops.push(supabase.from("memorials").delete().in("id", mDiff.deleted));
 
-export async function readPlatformData(): Promise<PlatformData> {
-  try {
-    await connectToDatabase();
-    const doc = await PlatformStore.findOne({ key: "global_store" });
-    if (!doc) {
-      const newDoc = await PlatformStore.create({ key: "global_store", data: defaultData });
-      return normalizePlatformData(newDoc.data as Partial<PlatformData>);
-    }
-    return normalizePlatformData(doc.data as Partial<PlatformData>);
-  } catch (err) {
-    console.warn("MongoDB indisponível ou em fase de build, usando dados locais temporários:", err);
-    return normalizePlatformData(defaultData as Partial<PlatformData>);
-  }
-}
+  // ── QR Codes ──
+  const qDiff = diffItems(original.qrCodes, updated.qrCodes);
+  if (qDiff.added.length > 0) ops.push(supabase.from("qr_codes").insert(qDiff.added.map(toDbQrCode)));
+  for (const q of qDiff.modified) ops.push(supabase.from("qr_codes").update(toDbQrCode(q)).eq("id", q.id));
+  if (qDiff.deleted.length > 0) ops.push(supabase.from("qr_codes").delete().in("id", qDiff.deleted));
 
-export async function writePlatformData(data: PlatformData) {
-  try {
-    await connectToDatabase();
-    await PlatformStore.findOneAndUpdate(
-      { key: "global_store" },
-      { data },
-      { upsert: true, new: true }
+  // ── Tributes ──
+  const tDiff = diffItems(original.tributes, updated.tributes);
+  if (tDiff.added.length > 0) ops.push(supabase.from("tributes").insert(tDiff.added.map(toDbTribute)));
+  for (const t of tDiff.modified) ops.push(supabase.from("tributes").update(toDbTribute(t)).eq("id", t.id));
+  if (tDiff.deleted.length > 0) ops.push(supabase.from("tributes").delete().in("id", tDiff.deleted));
+
+  // ── Candles ──
+  const cDiff = diffItems(original.candles, updated.candles);
+  if (cDiff.added.length > 0) ops.push(supabase.from("candles").insert(cDiff.added.map(toDbCandle)));
+  if (cDiff.deleted.length > 0) ops.push(supabase.from("candles").delete().in("id", cDiff.deleted));
+
+  // ── Orders ──
+  const oDiff = diffItems(original.orders, updated.orders);
+  if (oDiff.added.length > 0) ops.push(supabase.from("orders").insert(oDiff.added.map(toDbOrder)));
+  for (const o of oDiff.modified) ops.push(supabase.from("orders").update(toDbOrder(o)).eq("id", o.id));
+
+  // ── Profiles ──
+  const pDiff = diffItems(
+    original.profiles.map((p) => ({ ...p, id: p.email })),
+    updated.profiles.map((p) => ({ ...p, id: p.email }))
+  );
+  for (const p of pDiff.modified) {
+    ops.push(
+      supabase
+        .from("profiles")
+        .update({
+          name: p.name,
+          bio: p.bio,
+          theme: p.theme,
+          privacy: p.privacy,
+          notify_velas: p.notifyVelas,
+          notify_tributos: p.notifyTributos,
+          multi_factor_enabled: p.multiFactorEnabled,
+          language: p.language,
+          timezone: p.timezone,
+          global_audio: p.globalAudio,
+          is_admin: p.isAdmin ?? false,
+          avatar_url: p.avatarUrl ?? null,
+        })
+        .eq("email", p.email)
     );
-  } catch (err) {
-    console.error("Erro ao salvar dados no MongoDB, dados não foram gravados:", err);
+  }
+
+  // ── Funeral Homes ──
+  const fhDiff = diffItems(original.funeralHomes, updated.funeralHomes);
+  if (fhDiff.added.length > 0) {
+    ops.push(
+      supabase.from("funeral_homes").insert(
+        fhDiff.added.map((fh) => ({
+          id: fh.id,
+          name: fh.name,
+          slug: fh.slug,
+          contact_name: fh.contactName,
+          email: fh.email,
+          phone: fh.phone,
+          cnpj: fh.cnpj ?? null,
+          city: fh.city ?? null,
+          state: fh.state ?? null,
+          address: fh.address ?? null,
+          password_hash: fh.passwordHash,
+          is_active: fh.isActive,
+          approval_status: fh.approvalStatus,
+          stripe_account_id: fh.stripeAccountId ?? null,
+        }))
+      )
+    );
+  }
+  for (const fh of fhDiff.modified) {
+    ops.push(
+      supabase
+        .from("funeral_homes")
+        .update({
+          name: fh.name,
+          slug: fh.slug,
+          contact_name: fh.contactName,
+          email: fh.email,
+          phone: fh.phone,
+          cnpj: fh.cnpj ?? null,
+          city: fh.city ?? null,
+          state: fh.state ?? null,
+          address: fh.address ?? null,
+          is_active: fh.isActive,
+          approval_status: fh.approvalStatus,
+          stripe_account_id: fh.stripeAccountId ?? null,
+        })
+        .eq("id", fh.id)
+    );
+  }
+
+  // ── Offer Links ──
+  const olDiff = diffItems(original.offerLinks, updated.offerLinks);
+  if (olDiff.added.length > 0) {
+    ops.push(
+      supabase.from("funeral_home_offer_links").insert(
+        olDiff.added.map((ol) => ({
+          id: ol.id,
+          funeral_home_id: ol.funeralHomeId ?? null,
+          title: ol.title,
+          slug: ol.slug,
+          description: ol.description,
+          cycle: ol.cycle,
+          price_cents: ol.priceCents,
+          status: ol.status,
+          access_count: ol.accessCount,
+          conversion_count: ol.conversionCount,
+        }))
+      )
+    );
+  }
+
+  // ── Complaints ──
+  const cpDiff = diffItems(original.complaints, updated.complaints);
+  if (cpDiff.added.length > 0) {
+    ops.push(
+      supabase.from("complaints").insert(
+        cpDiff.added.map((c) => ({
+          id: c.id,
+          target: c.target,
+          reason: c.reason,
+          reporter: c.reporter,
+          status: c.status,
+        }))
+      )
+    );
+  }
+  for (const c of cpDiff.modified) {
+    ops.push(supabase.from("complaints").update({ status: c.status }).eq("id", c.id));
+  }
+
+  // ── Platform config ──
+  if (JSON.stringify(original.config) !== JSON.stringify(updated.config)) {
+    ops.push(
+      supabase.from("platform_config").update({
+        owner_commission_percent: updated.config.ownerCommissionPercent,
+        family_memorial_price_cents: updated.config.familyMemorialPriceCents,
+        funeral_home_memorial_price_cents: updated.config.funeralHomeMemorialPriceCents,
+        candle_price_cents: updated.config.candlePriceCents,
+      }).eq("id", 1)
+    );
+  }
+
+  // ── Platform settings (admin bank data, etc.) ──
+  if (original.adminBankDataEncrypted !== updated.adminBankDataEncrypted && updated.adminBankDataEncrypted) {
+    ops.push(
+      supabase.from("platform_settings").upsert({ key: "adminBankDataEncrypted", value: updated.adminBankDataEncrypted })
+    );
+  }
+
+  if (ops.length > 0) {
+    await Promise.all(ops);
   }
 }
 
-export async function updatePlatformData<T>(updater: (data: PlatformData) => T | Promise<T>) {
-  const operation = writeQueue.then(async () => {
-    const data = await readPlatformData();
-    const result = await updater(data);
-    await writePlatformData(data);
-    return result;
-  });
+// ─── updatePlatformData ───────────────────────────────────────────────────────
 
-  writeQueue = operation.catch(() => undefined);
-  return operation;
+export async function updatePlatformData<T>(callback: (data: PlatformData) => T | Promise<T>): Promise<T> {
+  const original = await readPlatformData();
+  const copy: PlatformData = JSON.parse(JSON.stringify(original));
+
+  const result = await Promise.resolve(callback(copy));
+
+  await persistChanges(original, copy);
+
+  return result;
 }

@@ -1,35 +1,28 @@
 import { NextResponse } from "next/server";
-import { updatePlatformData, type CuratorProfile } from "@/src/lib/platform-data";
-import { getAuthSession, serializeAuthSession } from "@/src/lib/auth-session";
-import { hashPassword } from "@/src/lib/password";
+import { getAuthSession } from "@/src/lib/auth-session";
+import { createClientServer } from "@/src/lib/supabase";
 
 export const dynamic = "force-dynamic";
-
-function publicProfile(profile: CuratorProfile) {
-  const safeProfile: Omit<CuratorProfile, "password" | "passwordHash"> & Partial<Pick<CuratorProfile, "password" | "passwordHash">> = { ...profile };
-  delete safeProfile.password;
-  delete safeProfile.passwordHash;
-  return safeProfile;
-}
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function defaultProfile(email: string, name = "Novo Curador"): CuratorProfile {
+function toPublicProfile(row: any) {
   return {
-    name,
-    email,
-    bio: "Guardião das memórias da família. Curadoria emocional de histórias e lembranças.",
-    theme: "noturno",
-    privacy: "public",
-    notifyVelas: true,
-    notifyTributos: true,
-    multiFactorEnabled: false,
-    language: "pt-BR",
-    timezone: "GMT-3",
-    globalAudio: true,
-    isAdmin: email.includes("admin"),
+    name: row.name ?? "",
+    email: row.email ?? "",
+    bio: row.bio ?? "",
+    theme: row.theme ?? "noturno",
+    privacy: row.privacy ?? "public",
+    notifyVelas: row.notify_velas ?? true,
+    notifyTributos: row.notify_tributos ?? true,
+    multiFactorEnabled: row.multi_factor_enabled ?? false,
+    language: row.language ?? "pt-BR",
+    timezone: row.timezone ?? "GMT-3",
+    globalAudio: row.global_audio ?? true,
+    isAdmin: row.is_admin ?? false,
+    avatarUrl: row.avatar_url ?? "",
   };
 }
 
@@ -40,97 +33,55 @@ export async function GET() {
     return NextResponse.json({ error: "Sessão obrigatória." }, { status: 401 });
   }
 
-  const profile = await updatePlatformData((data) => {
-    const found = data.profiles.find((item) => item.email.toLowerCase().trim() === session.email);
+  const supabase = await createClientServer();
+  const { data: profile, error } = await supabase.from("profiles").select("*").eq("id", session.userId).single();
 
-    if (found) {
-      return found;
-    }
+  if (error || !profile) {
+    return NextResponse.json({ error: "Perfil não encontrado." }, { status: 404 });
+  }
 
-    const next = data.profile.email.toLowerCase().trim() === session.email ? data.profile : defaultProfile(session.email);
-    data.profiles.push(next);
-
-    if (data.profile.email.toLowerCase().trim() === session.email) {
-      data.profile = next;
-    }
-
-    return next;
-  });
-
-  return NextResponse.json({ profile: publicProfile(profile) });
+  return NextResponse.json({ profile: toPublicProfile(profile) });
 }
 
 export async function PATCH(request: Request) {
-  try {
-    const session = await getAuthSession();
+  const session = await getAuthSession();
 
-    if (!session) {
-      return NextResponse.json({ error: "Sessão obrigatória." }, { status: 401 });
+  if (!session) {
+    return NextResponse.json({ error: "Sessão obrigatória." }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const supabase = await createClientServer();
+
+    const updates: Record<string, any> = {};
+    if (typeof body.name === "string") updates.name = asString(body.name);
+    if (typeof body.bio === "string") updates.bio = body.bio;
+    if (typeof body.theme === "string") updates.theme = body.theme;
+    if (body.privacy === "public" || body.privacy === "protected" || body.privacy === "private") updates.privacy = body.privacy;
+    if (typeof body.notifyVelas === "boolean") updates.notify_velas = body.notifyVelas;
+    if (typeof body.notifyTributos === "boolean") updates.notify_tributos = body.notifyTributos;
+    if (typeof body.multiFactorEnabled === "boolean") updates.multi_factor_enabled = body.multiFactorEnabled;
+    if (typeof body.language === "string") updates.language = body.language;
+    if (typeof body.timezone === "string") updates.timezone = body.timezone;
+    if (typeof body.globalAudio === "boolean") updates.global_audio = body.globalAudio;
+    if (typeof body.avatarUrl === "string") updates.avatar_url = body.avatarUrl.trim();
+
+    const { data: updated, error } = await supabase
+      .from("profiles")
+      .update(updates)
+      .eq("id", session.userId)
+      .select("*")
+      .single();
+
+    if (error || !updated) {
+      return NextResponse.json({ error: "Não foi possível atualizar o perfil." }, { status: 500 });
     }
 
-    const body = await request.json();
-    const currentEmail = session.email;
-    const nextEmail = asString(body.email).toLowerCase() || currentEmail;
-
-    const updatedProfile = await updatePlatformData((data) => {
-      const index = data.profiles.findIndex((p) => p.email.toLowerCase().trim() === currentEmail);
-      const current: CuratorProfile =
-        index !== -1
-          ? data.profiles[index]
-          : data.profile.email.toLowerCase().trim() === currentEmail
-            ? data.profile
-            : defaultProfile(currentEmail, asString(body.name) || "Novo Curador");
-
-      const next: CuratorProfile = {
-        ...current,
-        name: asString(body.name) || current.name,
-        email: nextEmail,
-        bio: typeof body.bio === "string" ? body.bio : current.bio,
-        theme: typeof body.theme === "string" ? body.theme : current.theme,
-        privacy: body.privacy === "public" || body.privacy === "protected" || body.privacy === "private" ? body.privacy : current.privacy,
-        notifyVelas: typeof body.notifyVelas === "boolean" ? body.notifyVelas : current.notifyVelas,
-        notifyTributos: typeof body.notifyTributos === "boolean" ? body.notifyTributos : current.notifyTributos,
-        multiFactorEnabled: typeof body.multiFactorEnabled === "boolean" ? body.multiFactorEnabled : current.multiFactorEnabled,
-        language: typeof body.language === "string" ? body.language : current.language,
-        timezone: typeof body.timezone === "string" ? body.timezone : current.timezone,
-        globalAudio: typeof body.globalAudio === "boolean" ? body.globalAudio : current.globalAudio,
-        isAdmin: session.isAdmin ? (typeof body.isAdmin === "boolean" ? body.isAdmin : current.isAdmin) : current.isAdmin,
-        avatarUrl: typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : current.avatarUrl,
-        password: undefined,
-        passwordHash: asString(body.password) ? hashPassword(asString(body.password)) : current.passwordHash,
-      };
-
-      if (index !== -1) {
-        data.profiles[index] = next;
-      } else {
-        data.profiles.push(next);
-      }
-
-      if (data.profile.email.toLowerCase().trim() === currentEmail || data.profile.email.toLowerCase().trim() === nextEmail) {
-        data.profile = next;
-      }
-
-      data.memorials = data.memorials.map((memorial) =>
-        memorial.ownerId.toLowerCase().trim() === currentEmail ? { ...memorial, ownerId: nextEmail } : memorial
-      );
-
-      return next;
+    return NextResponse.json({
+      profile: toPublicProfile(updated),
+      session: { email: session.email, isAdmin: session.isAdmin, userId: session.userId },
     });
-
-    const nextSession = {
-      email: updatedProfile.email,
-      isAdmin: updatedProfile.isAdmin === true,
-    };
-    const response = NextResponse.json({ profile: publicProfile(updatedProfile), session: nextSession });
-
-    response.cookies.set("auth_user", serializeAuthSession(nextSession), {
-      httpOnly: true,
-      path: "/",
-      maxAge: 30 * 24 * 60 * 60,
-      sameSite: "lax",
-    });
-
-    return response;
   } catch {
     return NextResponse.json({ error: "Erro desconhecido" }, { status: 400 });
   }

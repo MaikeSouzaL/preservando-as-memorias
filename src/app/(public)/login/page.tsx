@@ -2,11 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { createClientBrowser } from "@/src/lib/supabase-browser";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/dashboard";
@@ -188,15 +196,15 @@ export default function LoginPage() {
             <div className="w-full">
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   localStorage.setItem("has_logged_in", "true");
-                  const useRealAuth = process.env.NEXT_PUBLIC_HAS_GOOGLE_AUTH === "true";
-                  if (useRealAuth) {
-                    signIn("google", { callbackUrl: next });
-                  } else {
-                    // Modo de desenvolvimento: realiza um bypass seguro e amigável direcionando ao dashboard
-                    window.location.href = "/dashboard";
-                  }
+                  const supabase = createClientBrowser();
+                  await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+                    },
+                  });
                 }}
                 className="group flex w-full items-center justify-center rounded-lg border border-outline-variant/30 py-3 text-on-surface transition hover:bg-surface-container-high cursor-pointer"
               >

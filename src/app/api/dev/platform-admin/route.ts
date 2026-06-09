@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireDevAdminSession } from "@/src/lib/dev-auth";
 import { readPlatformData, updatePlatformData } from "@/src/lib/platform-data";
-import { connectToDatabase } from "@/src/lib/mongodb";
-import { Curator } from "@/src/models/Curator";
+import { createAdminClient } from "@/src/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +16,11 @@ export async function GET() {
     return NextResponse.json({ admin: null });
   }
 
-  await connectToDatabase();
-  const curator = await Curator.findOne({ email }).lean();
+  const supabase = await createAdminClient();
+  const { data: profile } = await supabase.from("profiles").select("name, email, created_at").eq("email", email).single();
 
   return NextResponse.json({
-    admin: curator
-      ? { email: curator.email, name: curator.name, createdAt: curator.createdAt }
-      : { email, name: null, createdAt: null },
+    admin: profile ? { email: profile.email, name: profile.name, createdAt: profile.created_at } : { email, name: null, createdAt: null },
   });
 }
 
@@ -38,10 +35,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Informe um e-mail válido." }, { status: 400 });
   }
 
-  await connectToDatabase();
+  const supabase = await createAdminClient();
+  const { data: newProfile } = await supabase.from("profiles").select("*").eq("email", newEmail).single();
 
-  const newAdminCurator = await Curator.findOne({ email: newEmail });
-  if (!newAdminCurator) {
+  if (!newProfile) {
     return NextResponse.json(
       { error: "Nenhum usuário cadastrado com esse e-mail. O operador precisa criar conta antes." },
       { status: 404 }
@@ -51,19 +48,16 @@ export async function PATCH(request: Request) {
   const data = await readPlatformData();
   const previousEmail = data.platformAdminEmail;
 
-  // Revoke isAdmin from previous admin
   if (previousEmail && previousEmail !== newEmail) {
-    await Curator.updateOne({ email: previousEmail }, { isAdmin: false });
+    await supabase.from("profiles").update({ is_admin: false }).eq("email", previousEmail);
   }
 
-  // Grant isAdmin to new admin
-  await Curator.updateOne({ email: newEmail }, { isAdmin: true });
-
+  await supabase.from("profiles").update({ is_admin: true }).eq("email", newEmail);
   await updatePlatformData((d) => { d.platformAdminEmail = newEmail; });
 
   return NextResponse.json({
     success: true,
-    admin: { email: newAdminCurator.email, name: newAdminCurator.name },
+    admin: { email: newProfile.email, name: newProfile.name },
   });
 }
 
@@ -73,8 +67,8 @@ export async function DELETE() {
 
   const data = await readPlatformData();
   if (data.platformAdminEmail) {
-    await connectToDatabase();
-    await Curator.updateOne({ email: data.platformAdminEmail }, { isAdmin: false });
+    const supabase = await createAdminClient();
+    await supabase.from("profiles").update({ is_admin: false }).eq("email", data.platformAdminEmail);
     await updatePlatformData((d) => { d.platformAdminEmail = undefined; });
   }
 

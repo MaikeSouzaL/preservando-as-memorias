@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { serializeAuthSession } from "@/src/lib/auth-session";
-import { connectToDatabase } from "@/src/lib/mongodb";
-import { Curator } from "@/src/models/Curator";
 import { updatePlatformData } from "@/src/lib/platform-data";
+import { createAdminClient } from "@/src/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -24,54 +22,68 @@ export async function POST(request: Request) {
       );
     }
 
-    await connectToDatabase();
+    const supabase = await createAdminClient();
 
-    // Encontra ou cria a conta da família
-    let curator = await Curator.findOne({ email });
+    // Find or create the user
+    let userId: string;
     let needsPassword = false;
 
-    if (!curator) {
-      curator = await Curator.create({
-        name: familyName,
-        email,
-        bio: `Família de ${name}`,
-        theme: "noturno",
-        privacy: "public",
-        notifyVelas: true,
-        notifyTributos: true,
-        multiFactorEnabled: false,
-        language: "pt-BR",
-        timezone: "GMT-3",
-        globalAudio: true,
-        isAdmin: false,
-      });
-      needsPassword = true;
+    const { data: existingProfile } = await supabase.from("profiles").select("id").eq("email", email).single();
+
+    if (existingProfile) {
+      userId = existingProfile.id;
+      // Check if user has a password set via auth
+      needsPassword = false;
     } else {
-      needsPassword = !curator.password;
+      // Create a new Supabase auth user (passwordless — user will set password later)
+      const serviceKeySet = process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith("ADICIONE");
+
+      if (serviceKeySet) {
+        const { data: newUser, error: createError } = await (supabase as any).auth.admin.createUser({
+          email,
+          email_confirm: true,
+          user_metadata: { full_name: familyName, name: familyName },
+        });
+
+        if (createError || !newUser?.user) {
+          return NextResponse.json({ error: "Não foi possível criar a conta." }, { status: 500 });
+        }
+
+        userId = newUser.user.id;
+        needsPassword = true;
+      } else {
+        // Fallback: create profile manually (auth user will be created on first real login)
+        userId = crypto.randomUUID();
+        await supabase.from("profiles").insert({
+          id: userId,
+          email,
+          name: familyName,
+          is_admin: false,
+        });
+        needsPassword = true;
+      }
     }
 
-    // Cria o memorial como pending_payment
+    // Build memorial objects
+    const memorialId = crypto.randomUUID();
+    const qrId = crypto.randomUUID();
     const now = new Date().toISOString();
-    const baseId = `mem_${Date.now().toString(36)}`;
-    const id = `${baseId}_${Math.random().toString(36).slice(2, 6)}`;
 
     const rawGallery: { title: string; url: string }[] = Array.isArray(body.gallery)
       ? (body.gallery as { title: string; url: string }[]).filter((g) => g?.url)
       : [];
     const gallery = rawGallery.map((g, i) => ({
-      id: `gal_${baseId}_${i}`,
+      id: crypto.randomUUID(),
       title: asString(g.title) || `Foto ${i + 1}`,
       url: asString(g.url),
     }));
 
     const rawTimeline: { year: string; title: string; description: string; longStory: string; imageUrl: string }[] =
       Array.isArray(body.timelineEvents)
-        ? (body.timelineEvents as { year: string; title: string; description: string; longStory: string; imageUrl: string }[]).filter(
-            (t) => t?.year && t?.title
-          )
+        ? (body.timelineEvents as any[]).filter((t) => t?.year && t?.title)
         : [];
-    const timelineEvents = rawTimeline.map((t, i) => ({
-      id: `tl_${baseId}_${i}`,
+    const timelineEvents = rawTimeline.map((t) => ({
+      id: crypto.randomUUID(),
       year: asString(t.year),
       title: asString(t.title),
       description: asString(t.description),
@@ -80,8 +92,8 @@ export async function POST(request: Request) {
     }));
 
     const memorial = {
-      id,
-      ownerId: email,
+      id: memorialId,
+      ownerId: userId,
       name,
       nickname: asString(body.nickname) || undefined,
       birthDate: asString(body.birthDate) || undefined,
@@ -103,9 +115,9 @@ export async function POST(request: Request) {
     };
 
     const qrCode = {
-      id: `qr_${baseId}_${Date.now().toString(36)}`,
-      memorialId: id,
-      publicPath: `/memorial-publico?memorial=${id}`,
+      id: qrId,
+      memorialId,
+      publicPath: `/memorial-publico?memorial=${memorialId}`,
       scans: 0,
       status: "ativo" as const,
       kind: "memorial" as const,
@@ -117,22 +129,9 @@ export async function POST(request: Request) {
       data.qrCodes.unshift(qrCode);
     });
 
-    const session = { email, isAdmin: false, needsPassword };
-    const response = NextResponse.json({ memorialId: id }, { status: 201 });
-
-    response.cookies.set("auth_user", serializeAuthSession(session), {
-      httpOnly: true,
-      path: "/",
-      maxAge: 30 * 24 * 60 * 60,
-      sameSite: "lax",
-    });
-
-    return response;
+    return NextResponse.json({ memorialId, userId, needsPassword }, { status: 201 });
   } catch (err) {
     console.error("[memorial-publico]", err);
-    return NextResponse.json(
-      { error: "Não foi possível criar o memorial agora." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Não foi possível criar o memorial agora." }, { status: 500 });
   }
 }

@@ -1,21 +1,18 @@
-import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
+import { createClientServer } from "@/src/lib/supabase";
+import { getAuthSession } from "@/src/lib/auth-session";
 
 export const dynamic = "force-dynamic";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/m4a", "audio/x-m4a"];
+const ALLOWED_AUDIO_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/aac", "audio/m4a", "audio/x-m4a", "audio/mp4"];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES];
 const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB
 
 export async function POST(request: Request) {
   try {
+    const session = await getAuthSession();
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -28,37 +25,32 @@ export async function POST(request: Request) {
     }
 
     if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json({ error: "Arquivo muito grande. Máximo 10 MB." }, { status: 400 });
+      return NextResponse.json({ error: "Arquivo muito grande. Máximo 20 MB." }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Fallback para desenvolvimento: retorna base64 quando Cloudinary não está configurado
-    const cloudinaryConfigured =
-      process.env.CLOUDINARY_CLOUD_NAME &&
-      process.env.CLOUDINARY_API_KEY &&
-      process.env.CLOUDINARY_API_SECRET;
-
-    if (!cloudinaryConfigured) {
-      const base64 = buffer.toString("base64");
-      const dataUrl = `data:${file.type};base64,${base64}`;
-      return NextResponse.json({ success: true, url: dataUrl });
-    }
-
+    const supabase = await createClientServer();
     const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          { folder: "preservando-memorias", resource_type: isAudio ? "video" : "image" },
-          (err, result) => {
-            if (err || !result) return reject(err ?? new Error("Upload falhou"));
-            resolve(result);
-          }
-        )
-        .end(buffer);
-    });
+    const bucket = isAudio ? "memorial-audio" : "memorial-images";
+    const ext = file.name.split(".").pop() ?? (isAudio ? "mp3" : "jpg");
+    const userId = session?.userId ?? "anonymous";
+    const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-    return NextResponse.json({ success: true, url: result.secure_url });
+    const buffer = await file.arrayBuffer();
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, buffer, { contentType: file.type, upsert: false });
+
+    if (uploadError) {
+      console.error("Supabase Storage upload error:", uploadError);
+      // Fallback para base64 se o storage falhar (ex.: sem service role key)
+      const base64 = Buffer.from(buffer).toString("base64");
+      return NextResponse.json({ success: true, url: `data:${file.type};base64,${base64}` });
+    }
+
+    const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
+
+    return NextResponse.json({ success: true, url: publicUrlData.publicUrl });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     return NextResponse.json({ error: msg }, { status: 500 });
