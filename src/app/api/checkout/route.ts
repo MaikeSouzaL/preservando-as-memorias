@@ -66,7 +66,7 @@ export async function POST(request: Request) {
             ? data.config.familyMemorialPriceCents
             : data.config.funeralHomeMemorialPriceCents;
         actualPlanId = payerType === "family" ? "memorial_familia" : "memorial_funeraria";
-        productName = "Memorial Digital — Preservando as Memórias";
+        productName = "Memorial Digital — Preservando Memórias";
 
         if (payerType === "funeral_home" && memorialId) {
           const memorial = data.memorials.find((m) => m.id === memorialId);
@@ -173,7 +173,7 @@ export async function POST(request: Request) {
             price_data: {
               currency: "brl",
               product_data: {
-                name: (order as { _productName?: string })._productName ?? "Preservando as Memórias",
+                name: (order as { _productName?: string })._productName ?? "Preservando Memórias",
               },
               unit_amount: order.grossAmountCents,
             },

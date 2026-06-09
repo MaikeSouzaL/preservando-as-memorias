@@ -19,7 +19,7 @@ export default function TermosUsoPage() {
         <section>
           <h2 className="mb-3 font-h3 text-[1.4rem] text-on-surface">1. Aceitação dos Termos</h2>
           <p>
-            Ao acessar e utilizar a plataforma <strong className="text-tertiary">Preservando as Memórias</strong>, você concorda em cumprir e estar vinculado a estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá utilizar nossos serviços.
+            Ao acessar e utilizar a plataforma <strong className="text-tertiary">Preservando Memórias</strong>, você concorda em cumprir e estar vinculado a estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá utilizar nossos serviços.
           </p>
         </section>
 
@@ -63,7 +63,7 @@ export default function TermosUsoPage() {
         <section>
           <h2 className="mb-3 font-h3 text-[1.4rem] text-on-surface">6. Propriedade Intelectual</h2>
           <p>
-            Todo o design, código-fonte, marcas e elementos gráficos da plataforma Preservando as Memórias são de nossa propriedade exclusiva. Os textos, imagens e fotos inseridos nos memoriais pertencem aos respectivos curadores e autores que os publicaram.
+            Todo o design, código-fonte, marcas e elementos gráficos da plataforma Preservando Memórias são de nossa propriedade exclusiva. Os textos, imagens e fotos inseridos nos memoriais pertencem aos respectivos curadores e autores que os publicaram.
           </p>
         </section>
 

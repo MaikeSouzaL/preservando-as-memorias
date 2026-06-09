@@ -6,7 +6,7 @@ function getResend() {
   return new Resend(key);
 }
 
-const FROM = process.env.EMAIL_FROM ?? "Preservando as Memórias <noreply@preservandasmemorias.com.br>";
+const FROM = process.env.EMAIL_FROM ?? "Preservando Memórias <noreply@preservandasmemorias.com.br>";
 const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? "";
 
 function brl(cents: number) {
@@ -42,7 +42,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmailData) {
   await resend.emails.send({
     from: FROM,
     to: order.userEmail,
-    subject: `Pedido ${order.id} confirmado — Preservando as Memórias`,
+    subject: `Pedido ${order.id} confirmado — Preservando Memórias`,
     html: `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -83,7 +83,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmailData) {
     </div>
 
     <p style="margin-top:32px;font-size:11px;color:rgba(196,199,199,0.4);text-align:center">
-      Preservando as Memórias · Este é um email automático, não responda.
+      Preservando Memórias · Este é um email automático, não responda.
     </p>
   </div>
 </body>

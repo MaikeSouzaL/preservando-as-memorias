@@ -19,7 +19,7 @@ export default function PoliticaPrivacidadePage() {
         <section>
           <h2 className="mb-3 font-h3 text-[1.4rem] text-on-surface">1. Informações que Coletamos</h2>
           <p>
-            Ao utilizar a plataforma <strong className="text-tertiary">Preservando as Memórias</strong>, coletamos as seguintes informações:
+            Ao utilizar a plataforma <strong className="text-tertiary">Preservando Memórias</strong>, coletamos as seguintes informações:
           </p>
           <ul className="mt-3 grid gap-2 pl-5">
             <li className="list-disc">Nome completo e endereço de e-mail para criação e autenticação da conta.</li>

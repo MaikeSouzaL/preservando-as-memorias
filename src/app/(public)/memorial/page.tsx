@@ -627,7 +627,7 @@ export default function TransicaoQrPage() {
                   <div className="relative z-10 h-32 w-32 overflow-hidden rounded-full border border-[#e9c349]/20 shadow-[0_0_30px_rgba(233,195,73,0.2)] bg-[#141d2b]/60 flex items-center justify-center p-4 md:h-48 md:w-48">
                     <img
                       src="/imagens/logo.png"
-                      alt="Preservando as Memórias"
+                      alt="Preservando Memórias"
                       className="max-h-full max-w-full object-contain animate-pulse"
                     />
                   </div>
