@@ -625,11 +625,7 @@ export default function TransicaoQrPage() {
                 <div className="relative mb-8 group">
                   <div className="absolute -inset-4 rounded-full bg-[#e9c349]/10 blur-xl animate-pulse-glow" />
                   <div className="relative z-10 h-32 w-32 overflow-hidden rounded-full border border-[#e9c349]/20 shadow-[0_0_30px_rgba(233,195,73,0.2)] bg-[#141d2b]/60 flex items-center justify-center p-4 md:h-48 md:w-48">
-                    <img
-                      src="/imagens/logo.png"
-                      alt="Preservando Memórias"
-                      className="max-h-full max-w-full object-contain animate-pulse"
-                    />
+                    <span className="material-symbols-outlined text-6xl md:text-8xl text-[#e9c349] animate-pulse drop-shadow-[0_0_20px_rgba(233,195,73,0.6)]">local_fire_department</span>
                   </div>
                 </div>
 
@@ -677,8 +673,8 @@ export default function TransicaoQrPage() {
           {/* TopAppBar */}
           <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
-              <img src="/imagens/logo.png" alt="Logo Preservando Memórias" className="h-30 md:h-12 w-auto object-contain drop-shadow-md md:scale-[1.8] md:origin-left md:mr-6" />
-              <div className="font-h3 text-xl md:text-2xl text-[#e9c349] tracking-widest uppercase text-center md:text-left leading-tight">Preservando Memórias</div>
+              <span className="material-symbols-outlined text-3xl md:text-4xl text-[#e9c349] drop-shadow-[0_0_12px_rgba(233,195,73,0.5)]">local_fire_department</span>
+              <div className="font-serif italic text-base md:text-xl text-[#e9c349] font-bold tracking-widest uppercase text-center md:text-left leading-tight">PRESERVANDO MEMÓRIAS</div>
               <Link
                 href="/landing"
                 className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-[#e9c349]/30 bg-[#e9c349]/5 px-4 py-1.5 font-label-caps text-[0.65rem] uppercase tracking-[0.14em] text-[#e9c349] transition hover:bg-[#e9c349]/15"

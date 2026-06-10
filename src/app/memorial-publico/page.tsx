@@ -697,8 +697,8 @@ export default function MemorialPublicoPage() {
           <div className="animate-fade-in">
           <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300">
             <Link href="/" className="flex flex-col md:flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
-              <img src="/imagens/logo.png" alt="Logo Preservando Memórias" className="h-30 md:h-12 w-auto object-contain drop-shadow-md md:scale-[1.8] md:origin-left md:mr-6" />
-              <div className="font-h3 text-xl md:text-2xl text-[#e9c349] tracking-widest uppercase text-center md:text-left leading-tight">Preservando Memórias</div>
+              <span className="material-symbols-outlined text-3xl md:text-4xl text-[#e9c349] drop-shadow-[0_0_12px_rgba(233,195,73,0.5)]">local_fire_department</span>
+              <div className="font-serif italic text-base md:text-xl text-[#e9c349] font-bold tracking-widest uppercase text-center md:text-left leading-tight">PRESERVANDO MEMÓRIAS</div>
             </Link>
             <nav className="hidden md:flex gap-8">
               <a href="#hero" className="text-[#e9c349] font-semibold border-b border-[#e9c349] pb-1 font-label-caps text-xs tracking-widest uppercase">O Homenageado</a>

@@ -135,15 +135,9 @@ export function PrivateShell({ children }: PrivateShellProps) {
       >
         <div className="flex items-center justify-between px-4 py-8">
           <div className="flex items-center gap-3">
-            <Image
-              src="/imagens/logo.png"
-              alt="Logo"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain drop-shadow-[0_2px_10px_rgba(233,195,73,0.3)]"
-            />
+            <span className="material-symbols-outlined text-3xl text-tertiary drop-shadow-[0_2px_10px_rgba(233,195,73,0.4)]">local_fire_department</span>
             <div>
-              <h1 className="font-h3 text-[1.25rem] text-tertiary leading-none">Memorial Digital</h1>
+              <h1 className="font-serif italic text-[1rem] font-bold text-tertiary leading-none tracking-widest">PRESERVANDO MEMÓRIAS</h1>
               <p className="mt-1 font-label-caps text-[0.6rem] uppercase tracking-[0.15em] text-on-surface-variant">
                 Digital Eternalism
               </p>
@@ -200,14 +194,8 @@ export function PrivateShell({ children }: PrivateShellProps) {
               
               {/* Logo do Header Privado */}
               <Link href="/dashboard" className="flex items-center gap-2 mr-2">
-                <Image
-                  src="/imagens/logo.png"
-                  alt="Logo"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 object-contain drop-shadow-[0_2px_8px_rgba(233,195,73,0.3)] hover:scale-105 transition duration-300"
-                />
-                <span className="hidden font-h3 text-sm text-tertiary font-bold sm:block">Preservando Memórias</span>
+                <span className="material-symbols-outlined text-2xl text-tertiary drop-shadow-[0_2px_8px_rgba(233,195,73,0.3)]">local_fire_department</span>
+                <span className="hidden font-serif italic text-sm font-bold tracking-widest text-tertiary sm:block">PRESERVANDO MEMÓRIAS</span>
               </Link>
               <div className="hidden items-center md:flex">
                 <span className="material-symbols-outlined mr-3 text-on-surface-variant">search</span>

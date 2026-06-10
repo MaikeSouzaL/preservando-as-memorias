@@ -171,13 +171,7 @@ export function AdminShell({ children }: AdminShellProps) {
         <div className="flex h-full flex-col justify-between">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-3 border-b border-outline-variant/50 pb-4">
-              <Image
-                src="/imagens/logo.png"
-                alt="Logo"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(233,195,73,0.4)]"
-              />
+              <span className="material-symbols-outlined text-4xl text-tertiary drop-shadow-[0_2px_8px_rgba(233,195,73,0.4)]">local_fire_department</span>
               <div>
                 <h1 className="font-h3 text-lg leading-tight text-on-surface">Admin Master</h1>
                 <p className="text-[0.75rem] uppercase tracking-[0.15em] text-outline">Preservando  Memórias</p>

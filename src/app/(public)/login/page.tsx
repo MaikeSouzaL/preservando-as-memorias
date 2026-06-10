@@ -132,7 +132,10 @@ function LoginContent() {
             <div className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-tertiary/5 blur-[100px]" />
 
             <div className="flex flex-col items-center gap-base text-center">
-              <Image src="/imagens/logo.png" alt="Logo" width={140} height={48} className="mb-base h-12 w-auto opacity-90" />
+              <div className="flex items-center gap-2 font-serif italic text-tertiary mb-1">
+                <span className="material-symbols-outlined text-3xl">local_fire_department</span>
+                <span className="text-sm font-bold tracking-widest">PRESERVANDO MEMÓRIAS</span>
+              </div>
               <h2 className="font-h3 text-[1.75rem] text-on-surface">Bem-vindo de volta</h2>
               <p className="text-on-surface-variant">Acesse sua conta para continuar preservando histórias eternas.</p>
             </div>

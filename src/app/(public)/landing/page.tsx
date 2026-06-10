@@ -90,22 +90,17 @@ export default function LandingPage() {
 
       <div className="pointer-events-none absolute left-[10%] top-[15%] -z-10 h-[500px] w-[500px] rounded-full bg-[#e9c349]/5 blur-[120px] animate-float-blob-1" />
       <div className="pointer-events-none absolute right-[10%] top-[40%] -z-10 h-[560px] w-[560px] rounded-full bg-[#e9c349]/3 blur-[140px] animate-float-blob-2" />
-      <div className="pointer-events-none absolute right-0 top-0 z-[1] hidden h-[980px] w-[min(60vw,1060px)] overflow-hidden lg:block">
-        <Image
-          src="/imagens/logo.png"
-          alt=""
-          width={1120}
-          height={1120}
-          className="absolute -right-44 top-8 h-auto w-[1120px] max-w-none opacity-[0.58] mix-blend-screen"
+      <div className="pointer-events-none absolute right-0 top-0 z-[1] hidden h-[980px] w-[min(55vw,900px)] overflow-hidden lg:flex items-center justify-end pr-16">
+        <span
+          className="material-symbols-outlined text-[600px] leading-none text-[#e9c349] opacity-[0.06] select-none"
           style={{
-            filter:
-              "contrast(1.22) brightness(1.15) saturate(1.2) drop-shadow(0 0 42px rgba(233,195,73,0.3))",
-            WebkitMaskImage:
-              "linear-gradient(to left, rgba(0,0,0,1) 58%, rgba(0,0,0,0) 100%)",
-            maskImage:
-              "linear-gradient(to left, rgba(0,0,0,1) 58%, rgba(0,0,0,0) 100%)",
+            fontVariationSettings: "'FILL' 1",
+            WebkitMaskImage: "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+            maskImage: "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
           }}
-        />
+        >
+          local_fire_department
+        </span>
       </div>
       {/* ── DRAWER OVERLAY ── */}
       <div
@@ -191,9 +186,9 @@ export default function LandingPage() {
         <div className="flex min-w-0 items-center justify-between gap-2 px-4 py-2.5 sm:px-6 sm:py-3">
 
           {/* Logo */}
-          <Link href="/" className="min-w-0 flex items-center gap-2 font-serif italic text-[#e9c349]">
-            <span className="material-symbols-outlined text-lg sm:text-2xl">local_fire_department</span>
-            <span className="block max-w-[130px] truncate text-xs font-semibold tracking-[0.08em] sm:max-w-none sm:text-sm sm:tracking-widest">
+          <Link href="/" className="flex items-center gap-2 font-serif italic text-[#e9c349]">
+            <span className="material-symbols-outlined text-xl sm:text-2xl">local_fire_department</span>
+            <span className="text-[11px] font-bold tracking-[0.1em] sm:text-sm sm:tracking-widest">
               PRESERVANDO MEMÓRIAS
             </span>
           </Link>
@@ -383,8 +378,8 @@ export default function LandingPage() {
 
           <div className="flex flex-col gap-3">
             <h4 className="mb-1 text-xs uppercase tracking-widest text-[#e9c349]">Institucional</h4>
-            <Link className="text-xs text-[#c4c7c7]/80 transition hover:text-white" href="/faq">Politica de Privacidade</Link>
-            <Link className="text-xs text-[#c4c7c7]/80 transition hover:text-white" href="/contato">Termos de Uso</Link>
+            <Link className="text-xs text-[#c4c7c7]/80 transition hover:text-white" href="/politica-privacidade">Política de Privacidade</Link>
+            <Link className="text-xs text-[#c4c7c7]/80 transition hover:text-white" href="/termos-uso">Termos de Uso</Link>
           </div>
 
           <div className="flex flex-col gap-3 md:items-end">

@@ -5,6 +5,7 @@ import { requireDevAdminSession } from "@/src/lib/dev-auth";
 import { PlatformAdminPanel } from "@/src/components/dev/platform-admin-panel";
 import { CommissionConfigPanel } from "@/src/components/dev/commission-config-panel";
 import { RepassePanel } from "@/src/components/dev/repasse-panel";
+import { CriarMemorialButton } from "@/src/components/dev/criar-memorial-button";
 import { decrypt } from "@/src/lib/encrypt";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +89,17 @@ export default async function DevPage() {
             plataforma gerencia o restante.
           </p>
         </header>
+
+        {/* Criar Memorial gratuito */}
+        <section className="flex items-center justify-between rounded-xl border border-[#e9c349]/15 bg-[#e9c349]/5 px-6 py-4">
+          <div>
+            <p className="text-sm font-medium text-on-surface">Criar memorial gratuito</p>
+            <p className="text-xs text-on-surface-variant">
+              Memorial criado por você fica ativo imediatamente, sem cobrança.
+            </p>
+          </div>
+          <CriarMemorialButton />
+        </section>
 
         {/* Métricas do sistema */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

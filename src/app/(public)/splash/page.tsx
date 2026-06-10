@@ -68,17 +68,12 @@ export default function SplashPage() {
       <main className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1200px] flex-col items-center justify-center px-6">
         <section className="fade-rise flex max-w-3xl flex-col items-center text-center">
           
-          {/* Logo Premium - Apenas a árvore dourada flutuando com brilho sublime */}
+          {/* Ícone de fogo premium com brilho sublime */}
           <div className="relative mb-12 flex h-60 w-60 items-center justify-center animate-pulse-glow">
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(233,195,73,0.15)_0%,transparent_70%)] blur-xl" />
-            <Image
-              src="/imagens/logo.png"
-              alt="Logo Preservando Memórias"
-              width={240}
-              height={240}
-              priority
-              className="relative z-10 h-full w-full object-contain filter drop-shadow-[0_0_35px_rgba(233,195,73,0.65)] hover:scale-105 transition duration-500"
-            />
+            <span className="relative z-10 material-symbols-outlined text-[9rem] text-[#e9c349] filter drop-shadow-[0_0_35px_rgba(233,195,73,0.65)] hover:scale-105 transition duration-500" style={{ fontVariationSettings: "'FILL' 1" }}>
+              local_fire_department
+            </span>
           </div>
 
           <h1 className="mb-6 font-h1 text-[clamp(2.5rem,6vw,4.5rem)] font-light leading-[1.1] tracking-[-0.02em] text-[#e5e2e1] text-glow">
