@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UserAvatar } from "@/src/components/ui/user-avatar";
 
 type PrivateShellProps = {
   children: React.ReactNode;
@@ -234,14 +234,14 @@ export function PrivateShell({ children }: PrivateShellProps) {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="h-10 w-10 overflow-hidden rounded-full border border-outline-variant hover:border-tertiary transition-all duration-300 flex items-center justify-center cursor-pointer bg-surface-container shadow-md"
+                  className="h-10 w-10 overflow-hidden rounded-full border border-outline-variant hover:border-tertiary transition-all duration-300 flex items-center justify-center cursor-pointer shadow-md"
                   aria-label="Menu do Usuário"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={profile?.avatarUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
-                    alt={profile?.name || "Avatar"}
-                    className="h-full w-full object-cover transition duration-300 hover:scale-105"
+                  <UserAvatar
+                    avatarUrl={profile?.avatarUrl}
+                    name={profile?.name}
+                    size={40}
+                    className="transition duration-300 hover:scale-105"
                   />
                 </button>
                 
@@ -329,17 +329,14 @@ export function PrivateShell({ children }: PrivateShellProps) {
               <div>
                 <label className="block text-xs uppercase tracking-wider text-outline mb-2 font-semibold">Foto de Perfil</label>
                 <div className="flex items-center gap-4 rounded-xl border border-outline-variant bg-surface-container/60 p-4">
-                  <div className="relative h-16 w-16 overflow-hidden rounded-full border border-tertiary/20 bg-background shrink-0">
-                    {formAvatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={formAvatarUrl} alt="Prévia" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-outline-variant">
-                        <span className="material-symbols-outlined text-2xl">account_circle</span>
-                      </div>
-                    )}
+                  <div className="relative h-16 w-16 shrink-0">
+                    <UserAvatar
+                      avatarUrl={formAvatarUrl || undefined}
+                      name={formName || profile?.name}
+                      size={64}
+                    />
                     {uploading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                      <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60">
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-tertiary border-t-transparent" />
                       </div>
                     )}
