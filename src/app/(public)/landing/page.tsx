@@ -263,7 +263,7 @@ export default function LandingPage() {
             <div className="relative w-full max-w-[290px] sm:max-w-[320px]">
               <div className="group h-[560px] w-full overflow-hidden rounded-[2rem] border border-[#e9c349]/30 bg-[#111616] p-2 shadow-2xl sm:h-[640px]">
                 <Image
-                  src="/images/hero-bg.png"
+                  src="/imagens/image.png"
                   alt="Santuário digital"
                   width={640}
                   height={960}

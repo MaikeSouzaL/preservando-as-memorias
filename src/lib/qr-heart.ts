@@ -7,8 +7,7 @@
  *   • The QR square is rendered rotated 45 ° → diamond shape.
  *   • Two semicircles are attached to the upper-left and upper-right edges
  *     of the diamond, completing the classic heart silhouette.
- *   • The entire heart is white-on-dark QR data; the bumps above the
- *     diamond show the QR's own corner modules (also readable).
+ *   • The bumps carry optional text (name + dates) in the system gold colour.
  *
  * The result can be used as `src` on any <img> or downloaded directly.
  */
@@ -24,6 +23,32 @@ interface HeartQrOptions {
   dark?: string;
   /** Light module / background colour. Default: "#ffffff" */
   light?: string;
+  /**
+   * Optional text overlaid inside the two circular heart bumps.
+   *   Left bump  → name + birth date
+   *   Right bump → death date
+   */
+  overlay?: {
+    /** Line 1 in the left bump (e.g. person's short name) */
+    leftLine1?: string;
+    /** Line 2 in the left bump (e.g. "✦ DD/MM/AAAA") */
+    leftLine2?: string;
+    /** Line 1 in the right bump (e.g. "✝") */
+    rightLine1?: string;
+    /** Line 2 in the right bump (e.g. "DD/MM/AAAA") */
+    rightLine2?: string;
+    /** Accent colour. Default: "#e9c349" (system gold) */
+    color?: string;
+  };
+}
+
+/** Escape characters that are special inside SVG text content. */
+function escXml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 /**
@@ -36,6 +61,7 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
     marginModules = 2,
     dark = "#0b0f0f",
     light = "#ffffff",
+    overlay,
   } = opts;
 
   // ── QR module matrix (synchronous) ─────────────────────────────────────────
@@ -81,7 +107,7 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
   const cLx = cx - r / 2;
   const cLy = cy - r / 2;
   const cRx = cx + r / 2;
-  const cRy = cy - r / 2;
+  const cRy = cy - r / 2; // same y as cLy
 
   // ── Dark-module rectangles (run-length merged per row for smaller SVG) ──────
   const marginPx = marginModules * moduleSize;
@@ -113,6 +139,57 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
   // so the top-left of the QR image lands at the right position.
   const transform = `translate(${cx},${cy}) rotate(45) translate(${-s / 2},${-s / 2})`;
 
+  // ── Overlay text inside the bumps ───────────────────────────────────────────
+  // Each bump is the half of a circle that sits ABOVE the diagonal chord
+  // (= upper diamond edge).  The chord passes through each circle centre, so
+  // the visible bump spans exactly circleR pixels above the centre.
+  //
+  // Text is placed at the vertical mid-point of each bump:
+  //   bumpMidY = cLy − circleR × 0.5
+  //
+  // The bump constraint limits the symmetric half-width of horizontally-
+  // centred text to circleR / 2, so font sizes are proportional and the
+  // caller should truncate long names (≈ 13 chars max at moduleSize 8).
+
+  let overlayText = "";
+
+  if (overlay) {
+    const textColor = overlay.color ?? "#e9c349";
+
+    // Font sizes proportional to bump radius
+    const fontSize1 = Math.round(circleR / 7.5); // name / symbol   (larger)
+    const fontSize2 = Math.round(circleR / 9.5); // date            (smaller)
+
+    // Vertical mid-point of the visible bump (same y for both bumps)
+    const bumpMidY = cLy - circleR * 0.5;
+
+    // Half-gap between two lines when both are present
+    const halfGap = Math.round(fontSize1 * 0.85);
+
+    /** Returns a <g> with up to two text lines centred at (bx, bumpMidY). */
+    function bumpText(bx: number, line1?: string, line2?: string): string {
+      if (!line1 && !line2) return "";
+      const hasBoth = !!(line1 && line2);
+      let g =
+        `<g clip-path="url(#hc)" text-anchor="middle" dominant-baseline="middle"` +
+        ` font-family="Georgia,'Times New Roman',serif" fill="${textColor}">`;
+      if (line1) {
+        const y = hasBoth ? bumpMidY - halfGap : bumpMidY;
+        g += `<text x="${bx}" y="${y}" font-size="${fontSize1}" font-weight="bold">${escXml(line1)}</text>`;
+      }
+      if (line2) {
+        const y = hasBoth ? bumpMidY + halfGap : bumpMidY;
+        g += `<text x="${bx}" y="${y}" font-size="${fontSize2}">${escXml(line2)}</text>`;
+      }
+      g += `</g>`;
+      return g;
+    }
+
+    overlayText =
+      bumpText(cLx, overlay.leftLine1, overlay.leftLine2) +
+      bumpText(cRx, overlay.rightLine1, overlay.rightLine2);
+  }
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" \
 width="${canvasW}" height="${canvasH}" \
 viewBox="0 0 ${canvasW} ${canvasH}">
@@ -136,6 +213,9 @@ viewBox="0 0 ${canvasW} ${canvasH}">
       ${rects.join("")}
     </g>
   </g>
+
+  <!-- Name / dates in the two bumps (gold accent, Georgia serif) -->
+  ${overlayText}
 </svg>`;
 
   return "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64");

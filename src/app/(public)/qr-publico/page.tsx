@@ -4,6 +4,28 @@ import { generateHeartQr } from "@/src/lib/qr-heart";
 
 export const dynamic = "force-dynamic";
 
+function fmtDate(iso?: string | null): string | undefined {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return undefined;
+  return [
+    String(d.getUTCDate()).padStart(2, "0"),
+    String(d.getUTCMonth() + 1).padStart(2, "0"),
+    String(d.getUTCFullYear()),
+  ].join("/");
+}
+
+function shortName(full: string, max = 13): string {
+  const trimmed = full.trim();
+  if (trimmed.length <= max) return trimmed;
+  const parts = trimmed.split(/\s+/);
+  if (parts.length >= 2) {
+    const two = `${parts[0]} ${parts[1]}`;
+    if (two.length <= max) return two;
+  }
+  return parts[0].length <= max ? parts[0] : parts[0].slice(0, max - 1) + "…";
+}
+
 type QrPublicoPageProps = {
   searchParams: Promise<{
     memorial?: string;
@@ -39,7 +61,18 @@ export default async function QrPublicoPage({ searchParams }: QrPublicoPageProps
 
   const publicPath = `/memorial-publico?memorial=${memorial.id}`;
   const baseUrl = process.env.NEXT_PUBLIC_URL ?? "";
-  const qrUrl = generateHeartQr(`${baseUrl}${publicPath}`, { moduleSize: 9 });
+  const birth = fmtDate(memorial.birthDate);
+  const death = fmtDate(memorial.deathDate);
+  const qrUrl = generateHeartQr(`${baseUrl}${publicPath}`, {
+    moduleSize: 9,
+    overlay: {
+      leftLine1: shortName(memorial.name),
+      leftLine2: birth ? `✦ ${birth}` : undefined,
+      rightLine1: "✝",
+      rightLine2: death,
+      color: "#e9c349",
+    },
+  });
 
   return (
     <main className="mx-auto flex w-full max-w-[900px] flex-1 flex-col items-center px-gutter py-12 text-center">

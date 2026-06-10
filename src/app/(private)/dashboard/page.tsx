@@ -7,6 +7,33 @@ import { MemorialCard } from "@/src/components/private/memorial-card";
 
 export const dynamic = "force-dynamic";
 
+/** Format an ISO date string as "DD/MM/AAAA" (Brazilian style). */
+function fmtDate(iso?: string | null): string | undefined {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return undefined;
+  return [
+    String(d.getUTCDate()).padStart(2, "0"),
+    String(d.getUTCMonth() + 1).padStart(2, "0"),
+    String(d.getUTCFullYear()),
+  ].join("/");
+}
+
+/**
+ * Shorten a full name to fit inside the heart bump (~13 chars max).
+ * Strategy: first name + second name; if still too long, first name only.
+ */
+function shortName(full: string, max = 13): string {
+  const trimmed = full.trim();
+  if (trimmed.length <= max) return trimmed;
+  const parts = trimmed.split(/\s+/);
+  if (parts.length >= 2) {
+    const two = `${parts[0]} ${parts[1]}`;
+    if (two.length <= max) return two;
+  }
+  return parts[0].length <= max ? parts[0] : parts[0].slice(0, max - 1) + "…";
+}
+
 export default async function DashboardPage() {
   const session = await getAuthSession();
   if (!session) redirect("/login");
@@ -21,7 +48,17 @@ export default async function DashboardPage() {
 
   const qrMap: Record<string, string> = {};
   for (const m of memorials.filter((m) => m.status === "ativo")) {
-    qrMap[m.id] = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${m.id}`);
+    const birth = fmtDate(m.birthDate);
+    const death = fmtDate(m.deathDate);
+    qrMap[m.id] = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${m.id}`, {
+      overlay: {
+        leftLine1: shortName(m.name),
+        leftLine2: birth ? `✦ ${birth}` : undefined,
+        rightLine1: "✝",
+        rightLine2: death,
+        color: "#e9c349",
+      },
+    });
   }
 
   return (
