@@ -81,7 +81,6 @@ export default function MemorialPublicoPage() {
   const [newMessage, setNewMessage] = useState("");
   const [selectedTag, setSelectedTag] = useState("🕊️ Saudade");
   const [isTributePinned, setIsTributePinned] = useState(false);
-  const [pixActionType, setPixActionType] = useState<"candle" | "tribute">("candle");
   const [showShareModal, setShowShareModal] = useState(false);
   const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
@@ -509,7 +508,7 @@ export default function MemorialPublicoPage() {
     if (!newAuthor || !newMessage) return;
 
     const finalAuthor   = newAuthor;
-    const finalDonation = tributeDonationCents;
+    const finalDonation = isTributePinned ? Math.max(500, tributeDonationCents) : tributeDonationCents;
 
     setTimeout(() => {
       heartbeatSoundRef.current?.play('short');
@@ -1297,7 +1296,6 @@ export default function MemorialPublicoPage() {
             <div className="flex justify-center">
               <button
                 onClick={() => {
-                  setPixActionType("tribute");
                   setIsTributePinned(false);
                   setShowTributeModal(true);
                 }}
@@ -1503,13 +1501,7 @@ export default function MemorialPublicoPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (isTributePinned) {
-                  setShowTributeModal(false);
-                  setPixActionType("tribute");
-                  setShowPixModal(true);
-                } else {
-                  handleLeaveTribute(e);
-                }
+                handleLeaveTribute(e);
               }}
               className="relative z-10 w-full max-w-md rounded-2xl border border-[#e9c349]/20 bg-[#1c2020] p-8 shadow-2xl"
             >

@@ -357,7 +357,7 @@ function GalleryStep({ gallery, uploading, onUpload, onUpdateTitle, onRemove }: 
   );
 }
 
-function TimelineItem({ ev, index, uploading, onUpdate, onImageUpload, onRemove }: { ev: TimelineEvent; index: number; uploading: boolean; onUpdate: (f: keyof TimelineEvent, v: string) => void; onImageUpload: (f: File) => void; onRemove: () => void }) {
+function TimelineItem({ ev, uploading, onUpdate, onImageUpload, onRemove }: { ev: TimelineEvent; uploading: boolean; onUpdate: (f: keyof TimelineEvent, v: string) => void; onImageUpload: (f: File) => void; onRemove: () => void }) {
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div className="rounded-xl border border-outline-variant/20 bg-surface-container-low/40 p-4 flex flex-col gap-3">
@@ -391,7 +391,6 @@ function TimelineStep({ events, uploading, onAdd, onUpdate, onImageUpload, onRem
         <TimelineItem
           key={i}
           ev={ev}
-          index={i}
           uploading={uploading}
           onUpdate={(f, v) => onUpdate(i, f, v)}
           onImageUpload={(f) => onImageUpload(i, f)}
