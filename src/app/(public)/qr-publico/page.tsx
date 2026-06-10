@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { readPlatformData } from "@/src/lib/platform-data";
+import { generateHeartQr } from "@/src/lib/qr-heart";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +38,8 @@ export default async function QrPublicoPage({ searchParams }: QrPublicoPageProps
   }
 
   const publicPath = `/memorial-publico?memorial=${memorial.id}`;
-  const publicLink = publicPath;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(publicLink)}`;
+  const baseUrl = process.env.NEXT_PUBLIC_URL ?? "";
+  const qrUrl = generateHeartQr(`${baseUrl}${publicPath}`, { moduleSize: 9 });
 
   return (
     <main className="mx-auto flex w-full max-w-[900px] flex-1 flex-col items-center px-gutter py-12 text-center">
@@ -54,16 +54,22 @@ export default async function QrPublicoPage({ searchParams }: QrPublicoPageProps
       </p>
 
       <section className="mt-8 w-full max-w-md rounded-2xl border border-tertiary/15 bg-surface-container/80 p-6">
-        <div className="rounded-lg bg-white p-3">
-          <Image src={qrUrl} alt={`QR Code de ${memorial.name}`} width={360} height={360} className="mx-auto h-auto w-full" />
-        </div>
+        {/* Heart-shaped QR code — SVG data URL, no external request */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={qrUrl}
+          alt={`QR Code de ${memorial.name}`}
+          width={360}
+          height={390}
+          className="mx-auto h-auto w-full max-w-[300px] drop-shadow-[0_4px_32px_rgba(233,195,73,0.12)]"
+        />
         <p className="mt-4 break-all text-sm text-on-surface-variant">{publicPath}</p>
       </section>
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a
           href={qrUrl}
-          download
+          download={`qrcode-${memorial.name.toLowerCase().replace(/\s+/g, "-")}.svg`}
           className="rounded-full border border-tertiary/50 px-5 py-2 text-tertiary transition hover:bg-tertiary/10"
         >
           Baixar QR

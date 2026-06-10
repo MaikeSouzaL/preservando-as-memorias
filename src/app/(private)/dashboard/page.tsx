@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import QRCode from "qrcode";
 import { getAuthSession } from "@/src/lib/auth-session";
 import { readPlatformData } from "@/src/lib/platform-data";
+import { generateHeartQr } from "@/src/lib/qr-heart";
 import { MemorialCard } from "@/src/components/private/memorial-card";
 
 export const dynamic = "force-dynamic";
-
-async function generateQr(url: string): Promise<string> {
-  return QRCode.toDataURL(url, {
-    width: 300,
-    margin: 2,
-    color: { dark: "#0b0f0f", light: "#ffffff" },
-  });
-}
 
 export default async function DashboardPage() {
   const session = await getAuthSession();
@@ -28,13 +20,9 @@ export default async function DashboardPage() {
   const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
 
   const qrMap: Record<string, string> = {};
-  await Promise.all(
-    memorials
-      .filter((m) => m.status === "ativo")
-      .map(async (m) => {
-        qrMap[m.id] = await generateQr(`${baseUrl}/memorial-publico?memorial=${m.id}`);
-      })
-  );
+  for (const m of memorials.filter((m) => m.status === "ativo")) {
+    qrMap[m.id] = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${m.id}`);
+  }
 
   return (
     <div>

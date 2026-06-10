@@ -42,6 +42,9 @@ export default function TransicaoQrPage() {
   const [showMemorial, setShowMemorial] = useState(false);
   const [showBackButton, setShowBackButton] = useState(false);
 
+  // No modo de demonstração as interações ficam só em memória local (sem API, sem cobrança).
+  const isDemoMode = process.env.NEXT_PUBLIC_PAYMENT_GATEWAY !== "stripe";
+
   const [isBgMuted, setIsBgMuted] = useState(true);
   const isBgMutedRef = useRef(isBgMuted);
   useEffect(() => {
@@ -293,26 +296,30 @@ export default function TransicaoQrPage() {
     e?.preventDefault();
     if (!memorial) return;
     const finalName = isCandleAnonymous ? "Visitante Anônimo" : (newCandleName || "Visitante");
-    
-    // Tocar o som
-    setTimeout(() => {
-      matchSoundRef.current?.play();
-    }, 50);
 
-    const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "candle",
+    setTimeout(() => { matchSoundRef.current?.play(); }, 50);
+
+    let newCandle: Candle;
+
+    if (isDemoMode) {
+      // Modo demo: vela fica só em memória local, some ao recarregar
+      newCandle = {
+        id: `demo_candle_${Date.now()}`,
+        memorialId: memorial.id,
         name: finalName,
         isEternal: isCandleEternal,
-      }),
-    });
-
-    if (!response.ok) return;
-
-    const payload = await response.json();
-    const newCandle = payload.candle as Candle;
+        createdAt: new Date().toISOString(),
+      } as Candle;
+    } else {
+      const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "candle", name: finalName, isEternal: isCandleEternal }),
+      });
+      if (!response.ok) return;
+      const payload = await response.json();
+      newCandle = payload.candle as Candle;
+    }
 
     setCandlesList((prev) => [newCandle, ...prev]);
     setShowCandleModal(false);
@@ -320,13 +327,10 @@ export default function TransicaoQrPage() {
     setIsCandleEternal(false);
     setIsCandleAnonymous(false);
     setSuccessModal({ isOpen: true, type: "candle" });
-
-    // Rolar a tela
     setTimeout(() => {
-      const altar = document.getElementById('candle-altar');
-      if (altar) altar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('candle-altar')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
-    };
+  };
 
   const handleSendFlower = () => {
     setFlowersCount((prev) => prev + 1);
@@ -345,30 +349,39 @@ export default function TransicaoQrPage() {
     e?.preventDefault();
     if (!memorial) return;
     if (!newAuthor || !newMessage) return;
-    
-    // Força o toque do som garantindo que não há race condition com o unmount do modal
-    setTimeout(() => {
-      heartbeatSoundRef.current?.play('short');
-      console.log("Tentando tocar o som do coração na homenagem (5s)!");
-    }, 50);
 
-    const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "tribute",
+    setTimeout(() => { heartbeatSoundRef.current?.play('short'); }, 50);
+
+    if (isDemoMode) {
+      // Modo demo: homenagem fica só em memória local
+      const demoTribute: ManagedTribute = {
+        id: `demo_tribute_${Date.now()}`,
+        memorialId: memorial.id,
         author: newAuthor,
         message: newMessage,
-        tag: selectedTag,
+        tag: selectedTag || undefined,
+        status: "aprovada",
         isPinned: isTributePinned,
-      }),
-    });
-
-    if (!response.ok) return;
-
-    const payload = await response.json();
-    if (payload.tribute) {
-      setTributesList((prev) => [payload.tribute, ...prev]);
+        createdAt: new Date().toISOString(),
+      };
+      setTributesList((prev) => [demoTribute, ...prev]);
+    } else {
+      const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "tribute",
+          author: newAuthor,
+          message: newMessage,
+          tag: selectedTag,
+          isPinned: isTributePinned,
+        }),
+      });
+      if (!response.ok) return;
+      const payload = await response.json();
+      if (payload.tribute) {
+        setTributesList((prev) => [payload.tribute, ...prev]);
+      }
     }
 
     setNewAuthor("");
@@ -663,11 +676,14 @@ export default function TransicaoQrPage() {
       ) : (
         /* STAGE 2: Seamlessly Faded Public Memorial Page */
         <>
-          {/* Floating Gold Demo Badge */}
-          <div className="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#e9c349]/10 border border-[#e9c349]/30 text-[#e9c349] px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest flex items-center gap-1.5 z-40 shadow-xl backdrop-blur-md">
-            <span className="material-symbols-outlined text-sm animate-pulse text-[#e9c349]">science</span>
-            Modo de Demonstração
-          </div>
+          {/* Botão flutuante — Voltar ao início */}
+          <Link
+            href="/"
+            className="fixed top-4 right-4 z-50 inline-flex items-center gap-1.5 rounded-full border border-[#e9c349]/30 bg-[#101414]/60 px-3 py-1.5 text-[#e9c349] backdrop-blur-md transition hover:bg-[#e9c349]/10 hover:border-[#e9c349]/60 md:top-5 md:right-6"
+          >
+            <span className="material-symbols-outlined text-[1rem]">home</span>
+            <span className="font-label-caps text-[0.65rem] uppercase tracking-[0.12em] hidden sm:inline">Início</span>
+          </Link>
 
           <div className="animate-fade-in">
           {/* TopAppBar */}
@@ -1394,7 +1410,8 @@ export default function TransicaoQrPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (isTributePinned) {
+                // Em demo mode, destaque também é gratuito — vai direto para o submit
+                if (isTributePinned && !isDemoMode) {
                   setShowTributeModal(false);
                   setPixActionType("tribute");
                   setShowPixModal(true);
@@ -1505,7 +1522,8 @@ export default function TransicaoQrPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (isCandleEternal) {
+                // Em demo mode, a vela eterna também é gratuita — vai direto para o submit
+                if (isCandleEternal && !isDemoMode) {
                   setShowCandleModal(false);
                   setShowPixModal(true);
                 } else {

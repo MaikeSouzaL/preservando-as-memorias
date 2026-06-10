@@ -130,10 +130,15 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
               <h3 className="mt-1 font-semibold text-[#e0e3e2]">{name}</h3>
             </div>
 
-            <div className="rounded-xl bg-white p-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={qrDataUrl} alt={`QR Code — ${name}`} width={200} height={200} />
-            </div>
+            {/* Heart QR — SVG already contains white background, no outer box needed */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={qrDataUrl}
+              alt={`QR Code — ${name}`}
+              width={220}
+              height={240}
+              className="mx-auto drop-shadow-[0_4px_24px_rgba(233,195,73,0.15)]"
+            />
 
             <p className="text-center text-xs text-[#c4c7c7]/50">
               Escaneie com a câmera do celular para abrir o memorial
