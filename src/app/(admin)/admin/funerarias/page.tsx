@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { FuneralSettingsPanel } from "@/src/components/admin/funeral-settings-panel";
-import { centsToBRL, cycleLabel, type PlatformConfig } from "@/src/lib/platform-types";
+import { QrDeliveryPanel } from "@/src/components/admin/qr-delivery-panel";
+import { centsToBRL, cycleLabel, type PlatformConfig, type QrDeliveryMode } from "@/src/lib/platform-types";
 import { type FuneralHomeOfferLink } from "@/src/lib/platform-data";
 
-type Tab = "cadastros" | "planos" | "ofertas";
+type Tab = "cadastros" | "planos" | "ofertas" | "qrcodes";
 
 type FuneralHome = {
   id: string;
@@ -410,12 +411,29 @@ function PlanosTab() {
   return <FuneralSettingsPanel initialConfig={config} />;
 }
 
+// ─── Aba QR Codes ─────────────────────────────────────────────────────────────
+
+function QrCodesTab() {
+  const [qrMode, setQrMode] = useState<QrDeliveryMode | null>(null);
+
+  useEffect(() => {
+    fetch("/api/platform-config")
+      .then((r) => r.json())
+      .then((d) => setQrMode(d.config?.qrDeliveryMode ?? "self"));
+  }, []);
+
+  if (qrMode === null) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
+
+  return <QrDeliveryPanel initialMode={qrMode} />;
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "cadastros", label: "Cadastros", icon: "store" },
   { id: "planos", label: "Planos de assinatura", icon: "subscriptions" },
   { id: "ofertas", label: "Ofertas (links)", icon: "link" },
+  { id: "qrcodes", label: "Entrega de QR Code", icon: "qr_code_2" },
 ];
 
 export default function AdminFunerariasPage() {
@@ -452,6 +470,7 @@ export default function AdminFunerariasPage() {
       {tab === "cadastros" && <CadastrosTab />}
       {tab === "planos" && <PlanosTab />}
       {tab === "ofertas" && <OfertasTab />}
+      {tab === "qrcodes" && <QrCodesTab />}
     </div>
   );
 }

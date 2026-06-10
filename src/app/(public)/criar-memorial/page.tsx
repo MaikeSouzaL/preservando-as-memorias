@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { DeliveryAddress } from "@/src/lib/platform-data";
 
 type GalleryItem = { title: string; url: string };
 type TimelineEvent = {
@@ -30,7 +31,7 @@ type FormData = {
   email: string;
 };
 
-const STEPS = [
+const STEPS_BASE = [
   { id: 1, label: "Foto" },
   { id: 2, label: "Identificação" },
   { id: 3, label: "Biografia" },
@@ -40,6 +41,7 @@ const STEPS = [
   { id: 7, label: "Vídeo" },
   { id: 8, label: "Seus dados" },
 ];
+const STEP_ENTREGA = { id: 9, label: "Entrega do QR" };
 
 export default function CriarMemorialPage() {
   const router = useRouter();
@@ -64,6 +66,32 @@ export default function CriarMemorialPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Entrega de QR Code — carregado da config da plataforma
+  const [qrDeliveryMode, setQrDeliveryMode] = useState<"admin" | "self">("self");
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
+    recipientName: "",
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/platform-config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.config?.qrDeliveryMode === "admin") setQrDeliveryMode("admin");
+      })
+      .catch(() => {});
+  }, []);
+
+  const STEPS = qrDeliveryMode === "admin"
+    ? [...STEPS_BASE, STEP_ENTREGA]
+    : STEPS_BASE;
+
   function set<K extends keyof FormData>(field: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
@@ -81,6 +109,15 @@ export default function CriarMemorialPage() {
     if (step === 8) {
       if (!form.familyName.trim()) return "Informe seu nome.";
       if (!form.email.trim() || !form.email.includes("@")) return "Informe um e-mail válido.";
+    }
+    if (step === 9) {
+      if (!deliveryAddress.recipientName.trim()) return "Informe o nome do destinatário.";
+      if (!deliveryAddress.cep.replace(/\D/g, "").match(/^\d{8}$/)) return "CEP inválido (8 dígitos).";
+      if (!deliveryAddress.logradouro.trim()) return "Informe o logradouro.";
+      if (!deliveryAddress.numero.trim()) return "Informe o número.";
+      if (!deliveryAddress.bairro.trim()) return "Informe o bairro.";
+      if (!deliveryAddress.cidade.trim()) return "Informe a cidade.";
+      if (!deliveryAddress.estado.trim()) return "Informe o estado.";
     }
     return "";
   }
@@ -120,6 +157,7 @@ export default function CriarMemorialPage() {
         body: JSON.stringify({
           ...form,
           videoUrl: form.videoUrl || undefined,
+          deliveryAddress: qrDeliveryMode === "admin" ? deliveryAddress : undefined,
         }),
       });
       const payload = await res.json();
@@ -153,7 +191,7 @@ export default function CriarMemorialPage() {
         {/* Progress bar */}
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between text-[0.65rem] uppercase tracking-widest text-[#c4c7c7]/40">
-            <span>{STEPS[step - 1].label}</span>
+            <span>{STEPS[step - 1]?.label ?? STEP_ENTREGA.label}</span>
             <span>{step} / {STEPS.length}</span>
           </div>
           <div className="h-1 w-full overflow-hidden rounded-full bg-white/5">
@@ -287,6 +325,15 @@ export default function CriarMemorialPage() {
               email={form.email}
               onName={(v) => set("familyName", v)}
               onEmail={(v) => set("email", v)}
+            />
+          )}
+
+          {step === 9 && qrDeliveryMode === "admin" && (
+            <StepEntrega
+              address={deliveryAddress}
+              onChange={(field, value) =>
+                setDeliveryAddress((prev) => ({ ...prev, [field]: value }))
+              }
             />
           )}
         </div>
@@ -716,6 +763,102 @@ function StepSeusDados({
           <p className="text-xs text-[#c4c7c7]/40">
             Você usará este e-mail para acessar o dashboard e gerenciar o memorial.
           </p>
+        </div>
+      </div>
+    </StepWrapper>
+  );
+}
+
+function StepEntrega({
+  address,
+  onChange,
+}: {
+  address: DeliveryAddress;
+  onChange: (field: keyof DeliveryAddress, value: string) => void;
+}) {
+  return (
+    <StepWrapper
+      title="Endereço de entrega"
+      subtitle="O QR Code físico será enviado para este endereço pelo administrador da plataforma."
+    >
+      {/* Aviso informativo */}
+      <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/8 p-4 text-xs text-amber-300">
+        <span className="material-symbols-outlined shrink-0 text-[1.1rem]">local_shipping</span>
+        <span>
+          O administrador é responsável pela impressão e entrega do QR Code. Preencha o endereço
+          completo para que o envio chegue corretamente.
+        </span>
+      </div>
+
+      <div className="grid gap-4">
+        <Field
+          label="Nome do destinatário *"
+          value={address.recipientName}
+          onChange={(v) => onChange("recipientName", v)}
+          placeholder="Quem vai receber o QR Code"
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs uppercase tracking-wider text-[#c4c7c7]/60">CEP *</span>
+            <input
+              type="text"
+              maxLength={9}
+              value={address.cep}
+              onChange={(e) => {
+                // Formatar CEP automaticamente: 12345-678
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                const formatted = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
+                onChange("cep", formatted);
+              }}
+              placeholder="00000-000"
+              className="rounded-lg border border-white/10 bg-[#0b0f0f]/60 px-3 py-2.5 text-sm text-[#e0e3e2] placeholder-white/20 outline-none transition focus:border-[#e9c349]/40"
+            />
+          </label>
+
+          <Field
+            label="Estado *"
+            value={address.estado}
+            onChange={(v) => onChange("estado", v.toUpperCase().slice(0, 2))}
+            placeholder="SP"
+          />
+        </div>
+
+        <Field
+          label="Logradouro (rua, avenida…) *"
+          value={address.logradouro}
+          onChange={(v) => onChange("logradouro", v)}
+          placeholder="Ex: Rua das Flores"
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Número *"
+            value={address.numero}
+            onChange={(v) => onChange("numero", v)}
+            placeholder="Ex: 123"
+          />
+          <Field
+            label="Complemento"
+            value={address.complemento ?? ""}
+            onChange={(v) => onChange("complemento", v)}
+            placeholder="Apto, bloco… (opcional)"
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Bairro *"
+            value={address.bairro}
+            onChange={(v) => onChange("bairro", v)}
+            placeholder="Ex: Centro"
+          />
+          <Field
+            label="Cidade *"
+            value={address.cidade}
+            onChange={(v) => onChange("cidade", v)}
+            placeholder="Ex: São Paulo"
+          />
         </div>
       </div>
     </StepWrapper>

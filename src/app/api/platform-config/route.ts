@@ -40,6 +40,18 @@ export async function PATCH(request: Request) {
     const admin = await requireAdminSession();
     if (admin.response) return admin.response;
 
+    if (target === "qr_delivery") {
+      const mode = String(body.qrDeliveryMode ?? "");
+      if (mode !== "admin" && mode !== "self") {
+        throw new Error("Modo inválido. Use 'admin' ou 'self'.");
+      }
+      const updatedQr = await updatePlatformData((data) => {
+        data.config.qrDeliveryMode = mode as "admin" | "self";
+        return data.config;
+      });
+      return NextResponse.json({ config: updatedQr });
+    }
+
     const updated = await updatePlatformData((data) => {
       if (target === "prices") {
         const familyCents = Math.round(Number(body.familyMemorialPriceCents));
@@ -52,18 +64,6 @@ export async function PATCH(request: Request) {
 
         data.config.familyMemorialPriceCents = familyCents;
         data.config.funeralHomeMemorialPriceCents = funeralCents;
-      }
-
-      if (target === "qr_delivery") {
-        const mode = String(body.qrDeliveryMode ?? "");
-        if (mode !== "admin" && mode !== "self") {
-          throw new Error("Modo inválido. Use 'admin' ou 'self'.");
-        }
-        const updated2 = await updatePlatformData((data) => {
-          data.config.qrDeliveryMode = mode as "admin" | "self";
-          return data.config;
-        });
-        return NextResponse.json({ config: updated2 });
       }
 
       if (target === "funeral") {

@@ -811,16 +811,6 @@ export default function MemorialPublicoPage() {
         }
       `}</style>
 
-      {/* Banner modo demonstração */}
-      {isDemoMode && (
-        <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 bg-amber-500/90 backdrop-blur-sm px-4 py-2 text-[#101414]">
-          <span className="material-symbols-outlined text-[1rem] leading-none">science</span>
-          <span className="font-label-caps text-[0.7rem] font-semibold uppercase tracking-[0.15em]">
-            Modo demonstração — velas e homenagens são temporárias e somem ao recarregar
-          </span>
-        </div>
-      )}
-
       {!showMemorial && showBackButton && (
         <Link
           href="/"
@@ -882,12 +872,15 @@ export default function MemorialPublicoPage() {
       ) : (
         <>
           <div className="animate-fade-in">
-          <header className={`fixed left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300 ${isDemoMode ? "top-9" : "top-0"}`}>
-            <Link href="/" className="flex flex-col md:flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
-              <span className="material-symbols-outlined text-3xl md:text-4xl text-[#e9c349] drop-shadow-[0_0_12px_rgba(233,195,73,0.5)]">local_fire_department</span>
-              <div className="font-serif italic text-base md:text-xl text-[#e9c349] font-bold tracking-widest uppercase text-center md:text-left leading-tight">PRESERVANDO MEMÓRIAS</div>
+          <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-between items-center px-4 md:px-16 py-4 transition-all duration-300">
+            {/* Logo */}
+            <Link href="/" className="flex flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
+              <span className="material-symbols-outlined text-2xl md:text-4xl text-[#e9c349] drop-shadow-[0_0_12px_rgba(233,195,73,0.5)]">local_fire_department</span>
+              <div className="font-serif italic text-sm md:text-xl text-[#e9c349] font-bold tracking-widest uppercase leading-tight">PRESERVANDO MEMÓRIAS</div>
             </Link>
-            <nav className="hidden md:flex gap-8">
+
+            {/* Nav central — apenas desktop */}
+            <nav className="hidden lg:flex gap-6">
               <a href="#hero" className="text-[#e9c349] font-semibold border-b border-[#e9c349] pb-1 font-label-caps text-xs tracking-widest uppercase">O Homenageado</a>
               <a href="#legacy" className="text-[#c4c7c7] font-label-caps text-xs tracking-widest uppercase hover:text-[#e9c349] transition">Legado</a>
               <a href="#voice" className="text-[#c4c7c7] font-label-caps text-xs tracking-widest uppercase hover:text-[#e9c349] transition">Memória Viva</a>
@@ -895,6 +888,15 @@ export default function MemorialPublicoPage() {
               <a href="#gallery" className="text-[#c4c7c7] font-label-caps text-xs tracking-widest uppercase hover:text-[#e9c349] transition">Galeria</a>
               <a href="#tributes" className="text-[#c4c7c7] font-label-caps text-xs tracking-widest uppercase hover:text-[#e9c349] transition">Santuário</a>
             </nav>
+
+            {/* Botão Voltar à tela inicial */}
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#e9c349]/30 bg-[#101414]/60 px-3 py-1.5 md:px-4 md:py-2 text-[#e9c349] backdrop-blur-md transition hover:bg-[#e9c349]/10 hover:border-[#e9c349]/60"
+            >
+              <span className="material-symbols-outlined text-[1rem]">home</span>
+              <span className="font-label-caps text-[0.65rem] uppercase tracking-[0.12em] hidden sm:inline">Início</span>
+            </Link>
           </header>
 
           {/* 1. Hero Section */}
