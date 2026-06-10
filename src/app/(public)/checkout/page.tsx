@@ -156,6 +156,25 @@ function CheckoutContent() {
     return <CheckoutLoading message={error || "Carregando..."} />;
   }
 
+  // Preço zero = admin ainda não configurou
+  if (isMemorialMode && memorialPriceCents === 0) {
+    return (
+      <div className="relative min-h-screen bg-[#101414] text-[#e0e3e2] flex items-center justify-center px-6">
+        <div className="max-w-md w-full rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-10 text-center">
+          <span className="material-symbols-outlined text-5xl text-yellow-400 mb-4 block">warning</span>
+          <h2 className="text-xl font-semibold text-yellow-300 mb-3">Preço ainda não configurado</h2>
+          <p className="text-sm text-[#c4c7c7] leading-relaxed mb-6">
+            O administrador da plataforma ainda não definiu o valor do memorial. Assim que os preços forem configurados, você poderá concluir o pagamento.
+          </p>
+          <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-full border border-yellow-400/40 px-6 py-2.5 text-sm text-yellow-300 transition hover:bg-yellow-500/10">
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            Voltar ao dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (order) {
     if (isMemorialMode) {
       return <MemorialCheckoutSuccess order={order} memorialName={memorialName || "memorial"} memorialId={memorialId} payerType={payerType!} />;

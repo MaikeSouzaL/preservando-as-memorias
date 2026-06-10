@@ -97,6 +97,12 @@ export async function POST(request: Request) {
         productName = `Plano ${plan.name}`;
       }
 
+      if (priceCents === 0) {
+        throw new Error(
+          "O administrador da plataforma ainda não configurou o preço dos memoriais. Entre em contato antes de prosseguir."
+        );
+      }
+
       const totals = calculateOrderTotals(priceCents, data.config.ownerCommissionPercent, discountCode);
       const isPaid = gateway === "sandbox";
 
@@ -120,6 +126,9 @@ export async function POST(request: Request) {
         platformCommissionCents: totals.platformCommissionCents,
         operatorAmountCents: totals.operatorAmountCents,
         status: isPaid ? ("paid" as const) : ("pending" as const),
+        // Repasse manual: retemos o valor no nosso Stripe e marcamos como pendente
+        // até que o dev admin confirme a transferência ao admin parceiro.
+        repasseStatus: isPaid ? ("pendente" as const) : undefined,
         source: (source || payerType || "plan") as "family" | "funeral_home" | "funeral_home_offer" | "plan",
         offerLinkId: offerLinkId || undefined,
         funeralHomeId: orderFuneralHomeId,

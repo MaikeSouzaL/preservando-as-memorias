@@ -99,6 +99,10 @@ export type PlatformOrder = {
   platformCommissionCents: number;
   operatorAmountCents: number;
   status: "paid" | "pending";
+  /** "pendente" = dinheiro retido no nosso Stripe, repasse manual ainda não feito
+   *  "realizado" = repasse confirmado manualmente pelo dev admin
+   *  undefined   = pedido antigo (tratar como pendente) */
+  repasseStatus?: "pendente" | "realizado";
   source?: "plan" | "funeral_home_offer" | "funeral_home" | "family";
   offerLinkId?: string;
   funeralHomeId?: string;

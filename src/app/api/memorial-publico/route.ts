@@ -103,6 +103,7 @@ export async function POST(request: Request) {
       biography: asString(body.biography) || "",
       imageUrl: asString(body.imageUrl) || "/images/hero-bg.png",
       audioUrl: asString(body.audioUrl) || undefined,
+      videoUrl: asString(body.videoUrl) || undefined,
       gallery,
       timelineEvents,
       status: "pending_payment" as const,

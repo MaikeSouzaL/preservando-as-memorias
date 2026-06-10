@@ -23,6 +23,7 @@ type FormData = {
   biography: string;
   imageUrl: string;
   audioUrl: string;
+  videoUrl: string;
   gallery: GalleryItem[];
   timelineEvents: TimelineEvent[];
   familyName: string;
@@ -36,7 +37,8 @@ const STEPS = [
   { id: 4, label: "Galeria" },
   { id: 5, label: "Linha do tempo" },
   { id: 6, label: "Áudio" },
-  { id: 7, label: "Seus dados" },
+  { id: 7, label: "Vídeo" },
+  { id: 8, label: "Seus dados" },
 ];
 
 export default function CriarMemorialPage() {
@@ -52,6 +54,7 @@ export default function CriarMemorialPage() {
     biography: "",
     imageUrl: "",
     audioUrl: "",
+    videoUrl: "",
     gallery: [],
     timelineEvents: [],
     familyName: "",
@@ -75,7 +78,7 @@ export default function CriarMemorialPage() {
 
   function validateStep(): string {
     if (step === 2 && !form.name.trim()) return "Informe o nome do falecido.";
-    if (step === 7) {
+    if (step === 8) {
       if (!form.familyName.trim()) return "Informe seu nome.";
       if (!form.email.trim() || !form.email.includes("@")) return "Informe um e-mail válido.";
     }
@@ -100,10 +103,24 @@ export default function CriarMemorialPage() {
     setError("");
     setSaving(true);
     try {
+      // 1. Verifica se os preços foram configurados antes de criar o memorial
+      const configRes = await fetch("/api/platform-config");
+      const configPayload = await configRes.json();
+      const familyPrice: number = configPayload?.config?.familyMemorialPriceCents ?? 0;
+      if (familyPrice === 0) {
+        setError("O administrador ainda não configurou o valor do memorial. Por favor, tente novamente mais tarde ou entre em contato com o suporte.");
+        setSaving(false);
+        return;
+      }
+
+      // 2. Cria o memorial
       const res = await fetch("/api/memorial-publico", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          videoUrl: form.videoUrl || undefined,
+        }),
       });
       const payload = await res.json();
       if (!res.ok) { setError(payload.error ?? "Não foi possível criar o memorial."); return; }
@@ -250,6 +267,21 @@ export default function CriarMemorialPage() {
           )}
 
           {step === 7 && (
+            <StepVideo
+              videoUrl={form.videoUrl}
+              uploading={uploading}
+              onUpload={async (file) => {
+                setUploading(true);
+                const url = await uploadImage(file);
+                setUploading(false);
+                if (url) set("videoUrl", url);
+                else setError("Não foi possível enviar o vídeo.");
+              }}
+              onRemove={() => set("videoUrl", "")}
+            />
+          )}
+
+          {step === 8 && (
             <StepSeusDados
               familyName={form.familyName}
               email={form.email}
@@ -571,6 +603,72 @@ function StepAudio({
         ref={ref}
         type="file"
         accept="audio/*"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }}
+      />
+      <p className="mt-3 text-xs text-[#c4c7c7]/40">Deixe sem arquivo para pular esta etapa.</p>
+    </StepWrapper>
+  );
+}
+
+function StepVideo({
+  videoUrl,
+  uploading,
+  onUpload,
+  onRemove,
+}: {
+  videoUrl: string;
+  uploading: boolean;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  return (
+    <StepWrapper title="Vídeo tributo" subtitle="Envie um vídeo da galeria para exibir no memorial. Etapa opcional.">
+      {videoUrl ? (
+        <div className="flex flex-col gap-3">
+          <video
+            src={videoUrl}
+            controls
+            playsInline
+            className="w-full rounded-xl border border-white/10 bg-black"
+          />
+          <button
+            type="button"
+            onClick={onRemove}
+            className="self-start text-xs text-[#c4c7c7]/40 transition hover:text-red-400"
+          >
+            Remover vídeo
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => ref.current?.click()}
+          disabled={uploading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[#e9c349]/20 py-10 text-sm text-[#c4c7c7]/60 transition hover:border-[#e9c349]/40 hover:text-[#e9c349] disabled:opacity-50"
+        >
+          {uploading ? (
+            <>
+              <span className="material-symbols-outlined animate-spin text-xl">progress_activity</span>
+              Enviando vídeo...
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined text-2xl">video_file</span>
+              <span>
+                Selecionar vídeo da galeria
+                <span className="mt-1 block text-[0.65rem] text-[#c4c7c7]/40">MP4, MOV, WebM — máx. 100 MB</span>
+              </span>
+            </>
+          )}
+        </button>
+      )}
+      <input
+        ref={ref}
+        type="file"
+        accept="video/*"
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }}
       />

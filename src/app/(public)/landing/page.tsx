@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -50,8 +50,24 @@ const faqs = [
   },
 ];
 
+const NAV_LINKS = [
+  { href: "#legado", label: "Legado" },
+  { href: "#processo", label: "Processo" },
+  { href: "#simulator", label: "Como funciona" },
+  { href: "#faq", label: "Dúvidas" },
+];
+
 export default function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Bloqueia scroll do body quando drawer está aberto
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [drawerOpen]);
+
+  function closeDrawer() { setDrawerOpen(false); }
 
   return (
     <div className="relative isolate max-w-full overflow-x-clip bg-[#0d1010] text-[#e0e3e2] antialiased selection:bg-[#e9c349]/20 selection:text-[#e9c349]">
@@ -91,30 +107,130 @@ export default function LandingPage() {
           }}
         />
       </div>
-      <header className="fixed left-1/2 top-3 z-50 w-[calc(100%-16px)] max-w-[1200px] -translate-x-1/2 rounded-full border border-[#e9c349]/10 bg-[#161c1c]/50 shadow-2xl backdrop-blur-xl sm:top-6 sm:w-[92%]">
-        <div className="flex min-w-0 items-center justify-between gap-2 px-3 py-2 sm:px-6 sm:py-3">
+      {/* ── DRAWER OVERLAY ── */}
+      <div
+        className={`fixed inset-0 z-[60] transition-all duration-300 md:hidden ${drawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      >
+        {/* Backdrop */}
+        <div
+          onClick={closeDrawer}
+          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
+        />
+
+        {/* Painel lateral */}
+        <div
+          className={`absolute right-0 top-0 flex h-full w-[80vw] max-w-[320px] flex-col bg-[#0d1010] border-l border-[#e9c349]/10 shadow-2xl transition-transform duration-300 ease-out ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
+        >
+          {/* Cabeçalho do drawer */}
+          <div className="flex items-center justify-between border-b border-[#e9c349]/10 px-6 py-5">
+            <Link href="/" onClick={closeDrawer} className="flex items-center gap-2 font-serif italic text-[#e9c349]">
+              <span className="material-symbols-outlined text-xl">local_fire_department</span>
+              <span className="text-sm font-semibold tracking-widest">PRESERVANDO</span>
+            </Link>
+            <button
+              onClick={closeDrawer}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-[#c4c7c7] transition hover:border-[#e9c349]/40 hover:text-[#e9c349]"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+
+          {/* Links de navegação */}
+          <nav className="flex flex-col gap-1 px-4 py-6">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={closeDrawer}
+                className="flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium text-[#c4c7c7] transition hover:bg-white/5 hover:text-[#e9c349]"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="mx-4 h-px bg-[#e9c349]/10" />
+
+          {/* CTAs */}
+          <div className="flex flex-col gap-3 px-4 py-6">
+            <Link
+              href="/login"
+              onClick={closeDrawer}
+              className="flex items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm font-semibold text-[#c4c7c7] transition hover:border-white/25 hover:text-white"
+            >
+              <span className="material-symbols-outlined text-base">login</span>
+              Entrar na conta
+            </Link>
+            <Link
+              href="/funeraria/login"
+              onClick={closeDrawer}
+              className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e9c349] to-[#c9a52e] py-3 text-sm font-bold text-[#0d1010] shadow-lg shadow-[#e9c349]/20 transition hover:shadow-[#e9c349]/35"
+            >
+              <span className="material-symbols-outlined text-base">handshake</span>
+              Sou parceiro funerário
+            </Link>
+            <Link
+              href="/criar-memorial"
+              onClick={closeDrawer}
+              className="flex items-center justify-center gap-2 rounded-full border border-[#e9c349]/40 py-3 text-sm font-semibold text-[#e9c349] transition hover:bg-[#e9c349]/10"
+            >
+              <span className="material-symbols-outlined text-base">add_circle</span>
+              Criar memorial
+            </Link>
+          </div>
+
+          {/* Rodapé do drawer */}
+          <div className="mt-auto border-t border-[#e9c349]/10 px-6 py-4">
+            <p className="text-[10px] text-[#c4c7c7]/40 text-center uppercase tracking-widest">Eternismo digital com dignidade</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── HEADER ── */}
+      <header className="fixed left-1/2 top-3 z-50 w-[calc(100%-16px)] max-w-[1200px] -translate-x-1/2 rounded-full border border-[#e9c349]/10 bg-[#161c1c]/60 shadow-2xl backdrop-blur-xl sm:top-6 sm:w-[92%]">
+        <div className="flex min-w-0 items-center justify-between gap-2 px-4 py-2.5 sm:px-6 sm:py-3">
+
+          {/* Logo */}
           <Link href="/" className="min-w-0 flex items-center gap-2 font-serif italic text-[#e9c349]">
             <span className="material-symbols-outlined text-lg sm:text-2xl">local_fire_department</span>
-            <span className="block max-w-[120px] truncate text-xs font-semibold tracking-[0.08em] sm:max-w-none sm:text-base sm:tracking-widest">
+            <span className="block max-w-[130px] truncate text-xs font-semibold tracking-[0.08em] sm:max-w-none sm:text-sm sm:tracking-widest">
               PRESERVANDO MEMÓRIAS
             </span>
           </Link>
 
+          {/* Nav — somente desktop */}
           <nav className="hidden items-center gap-6 md:flex">
-            <a href="#legado" className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">Legado</a>
-            <a href="#processo" className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">Processo</a>
-            <a href="#simulator" className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">Como funciona</a>
-            <a href="#faq" className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">Duvidas</a>
+            {NAV_LINKS.map((link) => (
+              <a key={link.href} href={link.href} className="text-xs uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349]">
+                {link.label}
+              </a>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
-            <Link href="/login" className="text-[10px] uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] font-semibold sm:text-xs">
+          {/* Ações direita */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Entrar — visível no desktop */}
+            <Link href="/login" className="hidden text-xs font-semibold uppercase tracking-widest text-[#c4c7c7] transition hover:text-[#e9c349] md:block">
               Entrar
             </Link>
-            <Link href="/funeraria/login" className="rounded-full border border-[#e9c349]/40 bg-[#e9c349]/10 px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-[#e9c349] transition hover:bg-[#e9c349]/25 hover:border-[#e9c349] sm:px-4 sm:text-xs sm:tracking-widest flex items-center gap-1.5 font-bold">
-              <span className="material-symbols-outlined text-xs sm:text-sm">business</span>
-              Área da Funerária
+
+            {/* Botão parceiro — desktop: moderno com gradiente */}
+            <Link
+              href="/funeraria/login"
+              className="hidden md:flex items-center gap-2 rounded-full bg-gradient-to-r from-[#e9c349] to-[#c9a52e] px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-[#0d1010] shadow-md shadow-[#e9c349]/20 transition hover:shadow-[#e9c349]/40 hover:brightness-110"
+            >
+              <span className="material-symbols-outlined text-sm">handshake</span>
+              Parceiro Funerário
             </Link>
+
+            {/* Hamburger — somente mobile */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="flex md:hidden h-9 w-9 items-center justify-center rounded-full border border-[#e9c349]/20 bg-[#e9c349]/5 text-[#e9c349] transition hover:bg-[#e9c349]/15"
+              aria-label="Abrir menu"
+            >
+              <span className="material-symbols-outlined text-xl">menu</span>
+            </button>
           </div>
         </div>
       </header>
@@ -159,23 +275,6 @@ export default function LandingPage() {
                   className="h-full w-full rounded-[1.8rem] object-cover opacity-65 transition duration-700 group-hover:scale-105 group-hover:opacity-85"
                 />
                 <div className="pointer-events-none absolute inset-0 rounded-[1.8rem] bg-gradient-to-t from-[#0d1010] via-transparent to-transparent opacity-80" />
-
-                <div className="absolute left-5 top-8 rounded-2xl border border-[#e9c349]/30 bg-[#222]/65 p-4 backdrop-blur-lg">
-                  <div className="inline-block rounded-lg bg-white p-2 shadow-lg">
-                    <span className="material-symbols-outlined text-4xl text-black">qr_code_2</span>
-                  </div>
-                  <p className="mt-2 text-center text-[10px] font-semibold uppercase tracking-widest text-[#e9c349]">Escanear placa</p>
-                </div>
-
-                <div className="absolute bottom-14 right-5 flex items-center gap-3 rounded-2xl border border-[#e9c349]/20 bg-[#222]/65 p-4 backdrop-blur-lg">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e9c349]/10">
-                    <span className="material-symbols-outlined text-[#e9c349]">local_fire_department</span>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-white">342 velas</h4>
-                    <p className="text-[9px] uppercase text-[#c4c7c7]">Acesas por amigos</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

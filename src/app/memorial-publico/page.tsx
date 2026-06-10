@@ -7,6 +7,7 @@ import { Memorial, Candle, TimelineEvent } from "@/src/mock-db/database";
 
 interface ExtendedMemorial extends Memorial {
   audioUrl?: string;
+  videoUrl?: string;
   nickname?: string;
   city?: string;
 }
@@ -67,7 +68,6 @@ export default function MemorialPublicoPage() {
   const [showPixModal, setShowPixModal] = useState(false);
   const [heartsCount, setHeartsCount] = useState(0);
   const [flowersCount, setFlowersCount] = useState(18);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const [showTributeModal, setShowTributeModal] = useState(false);
   const [newAuthor, setNewAuthor] = useState("");
@@ -170,6 +170,7 @@ export default function MemorialPublicoPage() {
                   name: m.name,
                   nickname: m.nickname || undefined,
                   city: m.city || undefined,
+                  videoUrl: m.videoUrl || undefined,
                   years: payload.years || [m.birthDate, m.deathDate]
                     .filter(Boolean)
                     .map((date: unknown) => new Date(date as string).getFullYear())
@@ -316,21 +317,14 @@ export default function MemorialPublicoPage() {
     return () => clearTimeout(transitionTimer);
   }, [revealMemorial, showMemorial, hasError]);
 
+  // Animação das barras de áudio — avança enquanto o áudio estiver tocando
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlayingAudio) {
-      timer = setInterval(() => {
-        setAudioProgress((prev) => {
-          if (prev >= 100) {
-            setIsPlayingAudio(false);
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 300);
-    }
+    if (isBgMuted) return;
+    const timer = setInterval(() => {
+      setAudioProgress((prev) => (prev + 1) % 360);
+    }, 80);
     return () => clearInterval(timer);
-  }, [isPlayingAudio]);
+  }, [isBgMuted]);
 
   const handleLightCandle = () => {
     setShowCandleModal(true);
@@ -821,6 +815,7 @@ export default function MemorialPublicoPage() {
           </section>
 
           {/* 2. Audio Message Section - Memória Viva */}
+          {memorial.audioUrl && (
           <section id="voice" className="py-20 px-6 max-w-[1200px] mx-auto animate-fade-in" style={{ animationDelay: '2600ms', animationFillMode: 'both' }}>
             <div className="glass-panel rounded-2xl p-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center border border-[#e9c349]/10">
               <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
@@ -833,41 +828,38 @@ export default function MemorialPublicoPage() {
               <div className="md:col-span-8 flex flex-col justify-center bg-[#0b0f0f]/40 p-6 rounded-xl border border-white/5">
                 <div className="flex items-center gap-4 mb-4">
                   <button
-                    onClick={() => setIsPlayingAudio(!isPlayingAudio)}
+                    onClick={() => setIsBgMuted((m) => !m)}
                     className="w-12 h-12 rounded-full bg-[#e9c349] flex items-center justify-center text-[#101414] hover:bg-[#ffe088] transition shadow-lg shadow-[#e9c349]/20"
                   >
                     <span className="material-symbols-outlined text-xl font-bold">
-                      {isPlayingAudio ? "pause" : "play_arrow"}
+                      {!isBgMuted ? "pause" : "play_arrow"}
                     </span>
                   </button>
                   <div className="flex-1">
                     <p className="text-xs text-[#c4c7c7] uppercase tracking-widest font-semibold mb-1">Áudio de Lembranças</p>
-                    <p className="text-xs text-[#c4c7c7]/50">Voz de {memorial.name}</p>
+                    <p className="text-xs text-[#c4c7c7]/50">{!isBgMuted ? "Tocando agora..." : `Áudio de ${memorial.name}`}</p>
                   </div>
+                  <span className="material-symbols-outlined text-[#e9c349]/60 text-xl">
+                    {!isBgMuted ? "volume_up" : "volume_off"}
+                  </span>
                 </div>
 
-                <div className="h-10 flex items-center gap-[4px] px-2 mb-4 justify-between">
+                <div className="h-10 flex items-center gap-[4px] px-2 justify-between">
                   {[20, 40, 15, 60, 30, 80, 45, 90, 25, 70, 35, 85, 40, 60, 15, 75, 50, 95, 20, 60, 30, 80, 45, 90, 15, 50, 35, 75, 40, 85].map((height, i) => (
                     <div
                       key={i}
                       className="flex-1 bg-[#e9c349] rounded-full transition-all duration-300"
                       style={{
-                        height: isPlayingAudio ? `${Math.max(10, Math.sin((audioProgress + i) * 0.5) * height)}%` : "15%",
-                        opacity: isPlayingAudio ? 0.9 : 0.3
+                        height: !isBgMuted ? `${Math.max(10, Math.sin((audioProgress + i) * 0.5) * height)}%` : "15%",
+                        opacity: !isBgMuted ? 0.9 : 0.3
                       }}
                     />
                   ))}
                 </div>
-
-                <div className="relative h-[2px] w-full bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-[#e9c349] transition-all duration-300"
-                    style={{ width: `${audioProgress}%` }}
-                  />
-                </div>
               </div>
             </div>
           </section>
+          )}
 
           {/* 3. Introdução & Biografia */}
           <section id="legacy" className="py-20 px-6 max-w-[1200px] mx-auto animate-fade-in" style={{ animationDelay: '3000ms', animationFillMode: 'both' }}>
@@ -894,6 +886,29 @@ export default function MemorialPublicoPage() {
               </div>
             </div>
           </section>
+
+          {/* Vídeo Tributo */}
+          {memorial.videoUrl && (
+            <section id="video" className="py-20 px-6 max-w-[1200px] mx-auto animate-fade-in" style={{ animationDelay: '3200ms', animationFillMode: 'both' }}>
+              <div className="text-center mb-10">
+                <span className="material-symbols-outlined text-4xl text-[#e9c349] mb-3 block">play_circle</span>
+                <h2 className="font-h2 text-2xl md:text-3xl text-[#e5e2e1] uppercase tracking-widest">Vídeo Tributo</h2>
+                <div className="h-[1px] w-16 bg-[#e9c349] mx-auto mt-4" />
+                <p className="text-[#c4c7c7] mt-3 text-sm">Um registro em vídeo que eterniza os momentos mais especiais.</p>
+              </div>
+              <div className="relative rounded-2xl overflow-hidden border border-[#e9c349]/15 shadow-2xl shadow-black/60 bg-[#0b0f0f]">
+                <video
+                  src={memorial.videoUrl}
+                  controls
+                  playsInline
+                  className="w-full max-h-[560px] object-contain"
+                  poster={memorial.imageUrl || undefined}
+                >
+                  Seu navegador não suporta a reprodução de vídeo.
+                </video>
+              </div>
+            </section>
+          )}
 
           {/* Linha do Tempo de Memórias */}
           {timelineList.length > 0 && (

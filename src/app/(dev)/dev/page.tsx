@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { readPlatformData } from "@/src/lib/platform-data";
+import { readPlatformData, type AdminBankData } from "@/src/lib/platform-data";
 import { requireDevAdminSession } from "@/src/lib/dev-auth";
 import { PlatformAdminPanel } from "@/src/components/dev/platform-admin-panel";
 import { CommissionConfigPanel } from "@/src/components/dev/commission-config-panel";
+import { RepassePanel } from "@/src/components/dev/repasse-panel";
+import { decrypt } from "@/src/lib/encrypt";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +28,19 @@ export default async function DevPage() {
 
   const data = await readPlatformData();
   const paidOrders = data.orders.filter((o) => o.status === "paid");
+
+  // Dados bancários do admin parceiro (descriptografados para exibir chave Pix)
+  let adminBankConfigured = false;
+  let adminPixKey: string | null = null;
+  if (data.adminBankDataEncrypted) {
+    try {
+      const bankData: AdminBankData = JSON.parse(decrypt(data.adminBankDataEncrypted));
+      adminBankConfigured = Boolean(bankData.holderName);
+      adminPixKey = bankData.pixKey ?? null;
+    } catch {
+      adminBankConfigured = true; // existe mas não conseguiu descriptografar
+    }
+  }
 
   const grossRevenue = paidOrders.reduce((s, o) => s + o.grossAmountCents, 0);
   const systemCut = paidOrders.reduce((s, o) => s + o.platformCommissionCents, 0);
@@ -111,6 +126,21 @@ export default async function DevPage() {
             systemCutCents={systemCut}
             adminRepasseCents={adminRepasse}
             commissionPercent={data.config.ownerCommissionPercent}
+          />
+        </section>
+
+        {/* Repasse ao admin parceiro */}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-xl font-medium text-on-surface">Repasse ao admin parceiro</h2>
+            <p className="text-sm text-on-surface-variant">
+              Valores retidos no Stripe aguardando transferência manual.
+            </p>
+          </div>
+          <RepassePanel
+            orders={data.orders}
+            adminBankConfigured={adminBankConfigured}
+            adminPixKey={adminPixKey}
           />
         </section>
 
