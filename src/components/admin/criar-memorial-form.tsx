@@ -419,6 +419,14 @@ function AudioStep({ audioUrl, uploading, onUpload, onRemove }: { audioUrl: stri
         </button>
       )}
       <input ref={ref} type="file" accept="audio/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }} />
+
+      {/* Aviso de direitos autorais */}
+      <div className="flex items-start gap-2 rounded-xl border border-amber-400/15 bg-amber-400/5 px-3 py-2.5">
+        <span className="material-symbols-outlined mt-0.5 shrink-0 text-xs text-amber-400/70">warning</span>
+        <p className="text-[0.6rem] leading-relaxed text-amber-300/60">
+          <strong className="font-semibold text-amber-300/80">Direitos autorais:</strong> envie apenas voz gravada, música autoral ou conteúdo livre de direitos. Músicas de artistas ou bandas exigem licença de uso público.
+        </p>
+      </div>
     </div>
   );
 }

@@ -607,6 +607,14 @@ function StepAudio({
         onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }}
       />
       <p className="mt-3 text-xs text-[#c4c7c7]/40">Deixe sem arquivo para pular esta etapa.</p>
+
+      {/* Aviso de direitos autorais */}
+      <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-400/15 bg-amber-400/5 px-4 py-3">
+        <span className="material-symbols-outlined mt-0.5 shrink-0 text-sm text-amber-400/70">warning</span>
+        <p className="text-[0.65rem] leading-relaxed text-amber-300/60">
+          <strong className="font-semibold text-amber-300/80">Direitos autorais:</strong> envie apenas áudios de sua propriedade ou com licença de uso — voz gravada, música autoral ou conteúdo livre de direitos. O upload de músicas protegidas (artistas, bandas, etc.) pode infringir direitos autorais e violar os <a href="/termos-uso" target="_blank" className="underline underline-offset-2 hover:text-amber-300">Termos de Uso</a>.
+        </p>
+      </div>
     </StepWrapper>
   );
 }

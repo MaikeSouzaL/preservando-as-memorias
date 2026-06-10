@@ -856,6 +856,12 @@ export default function MemorialPublicoPage() {
                     />
                   ))}
                 </div>
+
+                {/* Aviso de direitos autorais */}
+                <p className="mt-4 flex items-start gap-1.5 text-[0.6rem] leading-relaxed text-[#c4c7c7]/30">
+                  <span className="material-symbols-outlined text-[0.7rem] shrink-0 mt-px">info</span>
+                  Áudio enviado pela família. Os direitos sobre este conteúdo pertencem aos seus respectivos titulares. Preservando Memórias não detém direitos sobre o áudio aqui reproduzido.
+                </p>
               </div>
             </div>
           </section>
@@ -1700,17 +1706,17 @@ export default function MemorialPublicoPage() {
         )}
 
         {showMemorial && (
-          <div 
+          <div
             className="fixed right-4 top-[235px] md:right-8 md:top-28 z-[95] flex flex-col items-end gap-2 transition-opacity duration-300"
-            style={{ 
-              opacity: scrollOpacity, 
-              pointerEvents: scrollOpacity === 0 ? 'none' : 'auto' 
+            style={{
+              opacity: scrollOpacity,
+              pointerEvents: scrollOpacity === 0 ? 'none' : 'auto'
             }}
           >
             <button
               onClick={() => setIsBgMuted(!isBgMuted)}
               className="w-12 h-12 rounded-full glass-panel flex items-center justify-center text-[#e9c349] hover:bg-white/5 hover:scale-105 transition-all duration-300 border border-[#e9c349]/20 shadow-xl group relative"
-              title={isBgMuted ? "Ativar Áudio de Fundo" : "Mutar Áudio de Fundo"}
+              title={isBgMuted ? "Ativar Áudio" : "Pausar Áudio"}
             >
               <span className="material-symbols-outlined text-xl">
                 {isBgMuted ? "volume_off" : "volume_up"}
