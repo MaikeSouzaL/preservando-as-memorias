@@ -75,11 +75,16 @@ export async function POST(request: Request, context: MemorialInteractionsContex
       }
 
       if (type === "candle") {
+        // Velas eternas passam pelo fluxo de pagamento em /api/candle-payment
+        if (body.isEternal) {
+          throw new Error("Velas eternas requerem pagamento. Use /api/candle-payment.");
+        }
+
         const candle = {
           id: `candle_${Date.now().toString(36)}`,
           memorialId: id,
           name: limitText(asString(body.name), 80) || "Visitante",
-          isEternal: Boolean(body.isEternal),
+          isEternal: false,
           createdAt: new Date().toISOString(),
         };
 

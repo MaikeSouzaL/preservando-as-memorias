@@ -74,6 +74,8 @@ export type ManagedCandle = {
   name: string;
   isEternal: boolean;
   createdAt: string;
+  /** ID da sessão Stripe que confirmou o pagamento — previne replay */
+  paymentSessionId?: string;
 };
 
 export type ManagedComplaint = {
@@ -392,6 +394,7 @@ function mapCandle(r: any): ManagedCandle {
     name: r.name,
     isEternal: r.is_eternal ?? false,
     createdAt: r.created_at,
+    paymentSessionId: r.payment_session_id ?? undefined,
   };
 }
 
@@ -401,6 +404,7 @@ function toDbCandle(c: ManagedCandle) {
     memorial_id: c.memorialId,
     name: c.name,
     is_eternal: c.isEternal ?? false,
+    payment_session_id: c.paymentSessionId ?? null,
   };
 }
 

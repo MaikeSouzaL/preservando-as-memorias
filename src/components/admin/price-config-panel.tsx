@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { centsToBRL } from "@/src/lib/platform-types";
+import { centsToBRL, estimateStripeFeeCents } from "@/src/lib/platform-types";
 import type { PlatformConfig } from "@/src/lib/platform-types";
 
 export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformConfig }) {
@@ -62,6 +62,39 @@ export function PriceConfigPanel({ initialConfig }: { initialConfig: PlatformCon
         />
       </div>
 
+      {/* ── Breakdown estimado por venda ─────────────────────────────────── */}
+      <div className="mt-6 rounded-lg border border-outline-variant/30 bg-[#0a192f33] p-4">
+        <p className="mb-3 text-[0.7rem] uppercase tracking-[0.14em] text-tertiary">
+          Simulação de repasse por venda
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <BreakdownCard
+            label="Memorial Família"
+            priceCents={Math.round(parseFloat(familyPrice || "0") * 100) || 0}
+            commissionPercent={initialConfig.ownerCommissionPercent}
+          />
+          <BreakdownCard
+            label="Memorial Funerária"
+            priceCents={Math.round(parseFloat(funeralPrice || "0") * 100) || 0}
+            commissionPercent={initialConfig.ownerCommissionPercent}
+          />
+        </div>
+        <p className="mt-3 text-[0.68rem] leading-relaxed text-outline">
+          <span className="text-amber-400">★</span> A comissão da plataforma ({initialConfig.ownerCommissionPercent}%) é calculada sobre o{" "}
+          <strong className="text-on-surface-variant">valor bruto</strong> (antes da taxa Stripe). A taxa Stripe é deduzida do seu repasse.{" "}
+          Taxa estimada — cartão nacional: 3,49% + R$0,39 · PIX: 0,99%. Confirme em{" "}
+          <a
+            href="https://stripe.com/br/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-tertiary underline underline-offset-2"
+          >
+            stripe.com/br/pricing
+          </a>
+          .
+        </p>
+      </div>
+
       {message && (
         <p
           className={`mt-4 text-sm ${message.ok ? "text-emerald-400" : "text-red-400"}`}
@@ -109,6 +142,76 @@ function PriceInput({
         />
       </div>
       <p className="text-xs text-outline">{hint}</p>
+    </div>
+  );
+}
+
+/** Exibe a simulação de repasse para um preço, mostrando dedução Stripe + comissão plataforma */
+function BreakdownCard({
+  label,
+  priceCents,
+  commissionPercent,
+}: {
+  label: string;
+  priceCents: number;
+  commissionPercent: number;
+}) {
+  if (priceCents <= 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-outline-variant/30 p-4 text-center text-xs text-outline">
+        {label} — preço não configurado
+      </div>
+    );
+  }
+
+  // Taxa Stripe estimada (cartão nacional)
+  const stripeCard = estimateStripeFeeCents(priceCents, "card");
+  const stripePix  = estimateStripeFeeCents(priceCents, "pix");
+
+  // Comissão da plataforma (dev admin) — calculada sobre o BRUTO
+  const platformCommission = Math.round((priceCents * commissionPercent) / 100);
+
+  // Repasse ao parceiro para cada método
+  const parceiroCreditCard = priceCents - stripeCard - platformCommission;
+  const parceiroPix        = priceCents - stripePix  - platformCommission;
+
+  const row = (desc: string, value: number, highlight?: "green" | "amber" | "red") => (
+    <div className="flex items-center justify-between gap-2 text-xs">
+      <span className="text-outline">{desc}</span>
+      <span
+        className={
+          highlight === "green"
+            ? "font-semibold text-emerald-400"
+            : highlight === "amber"
+            ? "font-semibold text-tertiary"
+            : highlight === "red"
+            ? "text-red-400"
+            : "text-on-surface-variant"
+        }
+      >
+        {value < 0 ? "—" : centsToBRL(value)}
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-1.5 rounded-lg border border-outline-variant/30 bg-[#0b0f0f]/60 p-4">
+      <p className="mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-on-surface">
+        {label}
+      </p>
+      {row("Cliente paga", priceCents)}
+      <div className="my-1 border-t border-outline-variant/20" />
+
+      <p className="text-[0.62rem] uppercase tracking-wider text-outline">Via cartão</p>
+      {row("Taxa Stripe (cartão)", stripeCard, "red")}
+      {row(`Comissão plataforma (${commissionPercent}%)`, platformCommission, "amber")}
+      {row("Você recebe (parceiro)", parceiroCreditCard, parceiroCreditCard > 0 ? "green" : "red")}
+
+      <div className="my-1 border-t border-outline-variant/20" />
+      <p className="text-[0.62rem] uppercase tracking-wider text-outline">Via PIX</p>
+      {row("Taxa Stripe (PIX)", stripePix, "red")}
+      {row(`Comissão plataforma (${commissionPercent}%)`, platformCommission, "amber")}
+      {row("Você recebe (parceiro)", parceiroPix, parceiroPix > 0 ? "green" : "red")}
     </div>
   );
 }

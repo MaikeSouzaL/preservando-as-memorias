@@ -66,6 +66,13 @@ export default function MemorialPublicoPage() {
   const [isCandleAnonymous, setIsCandleAnonymous] = useState(false);
   const [isCandleEternal, setIsCandleEternal] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
+  const [candlePaymentLoading, setCandlePaymentLoading] = useState(false);
+  const [candlePaymentError, setCandlePaymentError] = useState("");
+  // Contribuição simbólica na homenagem
+  const [tributeDonationCents, setTributeDonationCents] = useState(0);
+  const [showTributeDonationModal, setShowTributeDonationModal] = useState(false);
+  const [tributePaymentLoading, setTributePaymentLoading] = useState(false);
+  const [tributePaymentError, setTributePaymentError] = useState("");
   const [heartsCount, setHeartsCount] = useState(0);
   const [flowersCount, setFlowersCount] = useState(18);
   const [audioProgress, setAudioProgress] = useState(0);
@@ -94,6 +101,10 @@ export default function MemorialPublicoPage() {
   };
 
   const [tributesList, setTributesList] = useState<ManagedTribute[]>([]);
+
+  // Em modo demonstração (sandbox) todas as interações ficam só em memória local.
+  // Ao recarregar a página elas somem — ideal para testes sem cobranças.
+  const isDemoMode = process.env.NEXT_PUBLIC_PAYMENT_GATEWAY !== "stripe";
 
   const loadInteractions = useCallback(async (memorialId: string) => {
     try {
@@ -200,6 +211,40 @@ export default function MemorialPublicoPage() {
                 );
                 loadInteractions(normalized.id);
                 registerVisit(normalized.id);
+
+                // Verificar se voltou do Stripe após doação de homenagem
+                if (params.get("tribute_ok") === "1") {
+                  const cleanUrl = `${window.location.pathname}?memorial=${normalized.id}`;
+                  window.history.replaceState(null, "", cleanUrl);
+                  setSuccessModal({ isOpen: true, type: "tribute" });
+                }
+
+                // Verificar se voltou do Stripe após pagar vela eterna
+                const candleOk = params.get("candle_ok");
+                if (candleOk) {
+                  // Limpar o param da URL sem recarregar
+                  const cleanUrl = `${window.location.pathname}?memorial=${normalized.id}`;
+                  window.history.replaceState(null, "", cleanUrl);
+
+                  fetch("/api/candle-payment/confirm", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sessionId: candleOk }),
+                  })
+                    .then((r) => r.json())
+                    .then((payload) => {
+                      if (payload.candle) {
+                        setCandlesList((prev) => [payload.candle, ...prev]);
+                        setSuccessModal({ isOpen: true, type: "candle" });
+                        setTimeout(() => {
+                          document
+                            .getElementById("candle-altar")
+                            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }, 600);
+                      }
+                    })
+                    .catch(() => {});
+                }
 
                 setTimeout(() => {
                   setShowMemorial(true);
@@ -327,44 +372,122 @@ export default function MemorialPublicoPage() {
   }, [isBgMuted]);
 
   const handleLightCandle = () => {
+    setCandlePaymentError("");
     setShowCandleModal(true);
   };
 
-  const handleSubmitCandle = async (e?: React.SyntheticEvent) => {
+  /** Vela GRATUITA (simples) */
+  const handleSubmitFreeCandle = async (e?: React.SyntheticEvent) => {
     e?.preventDefault();
     if (!memorial) return;
     const finalName = isCandleAnonymous ? "Visitante Anônimo" : (newCandleName || "Visitante");
-    
-    setTimeout(() => {
-      matchSoundRef.current?.play();
-    }, 50);
 
-    const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "candle",
+    setTimeout(() => { matchSoundRef.current?.play(); }, 50);
+
+    let newCandle: Candle;
+
+    if (isDemoMode) {
+      // Modo demonstração: vela fica só em memória, some ao recarregar
+      newCandle = {
+        id: `demo_candle_${Date.now()}`,
+        memorialId: memorial.id,
         name: finalName,
-        isEternal: isCandleEternal,
-      }),
-    });
+        isEternal: false,
+        createdAt: new Date().toISOString(),
+      } as Candle;
+    } else {
+      const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "candle", name: finalName }),
+      });
 
-    if (!response.ok) return;
+      if (!response.ok) return;
 
-    const payload = await response.json();
-    const newCandle = payload.candle as Candle;
+      const payload = await response.json();
+      newCandle = payload.candle as Candle;
+    }
 
     setCandlesList((prev) => [newCandle, ...prev]);
     setShowCandleModal(false);
     setNewCandleName("");
-    setIsCandleEternal(false);
     setIsCandleAnonymous(false);
     setSuccessModal({ isOpen: true, type: "candle" });
 
     setTimeout(() => {
-      const altar = document.getElementById('candle-altar');
-      if (altar) altar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById("candle-altar")?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 300);
+  };
+
+  /** Vela ETERNA — inicia o fluxo de pagamento (ou cria localmente em modo demo) */
+  const handleStartEternalCandlePayment = async () => {
+    if (!memorial) return;
+    const finalName = isCandleAnonymous ? "Visitante Anônimo" : (newCandleName || "Visitante");
+
+    setTimeout(() => { matchSoundRef.current?.play(); }, 50);
+
+    // Modo demonstração: vela eterna fica só em memória local — sem cobrança
+    if (isDemoMode) {
+      const demoCandle = {
+        id: `demo_eternal_${Date.now()}`,
+        memorialId: memorial.id,
+        name: finalName,
+        isEternal: true,
+        createdAt: new Date().toISOString(),
+      } as Candle;
+      setCandlesList((prev) => [demoCandle, ...prev]);
+      setShowCandleModal(false);
+      setNewCandleName("");
+      setIsCandleEternal(false);
+      setIsCandleAnonymous(false);
+      setSuccessModal({ isOpen: true, type: "candle" });
+      setTimeout(() => {
+        document.getElementById("candle-altar")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+      return;
+    }
+
+    setCandlePaymentLoading(true);
+    setCandlePaymentError("");
+    setShowCandleModal(false);
+    setShowPixModal(true);
+
+    try {
+      const res = await fetch("/api/candle-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memorialId: memorial.id, candleName: finalName }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCandlePaymentError(data.error ?? "Erro ao iniciar pagamento.");
+        setCandlePaymentLoading(false);
+        return;
+      }
+
+      if (data.gateway === "sandbox") {
+        // Sandbox: vela já criada — mostra sucesso
+        if (data.candle) {
+          setCandlesList((prev) => [data.candle, ...prev]);
+        }
+        setShowPixModal(false);
+        setNewCandleName("");
+        setIsCandleEternal(false);
+        setIsCandleAnonymous(false);
+        setSuccessModal({ isOpen: true, type: "candle" });
+        setTimeout(() => {
+          document.getElementById("candle-altar")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      } else if (data.checkoutUrl) {
+        // Stripe: redirecionar para checkout
+        window.location.href = data.checkoutUrl;
+      }
+    } catch {
+      setCandlePaymentError("Erro de conexão. Tente novamente.");
+    } finally {
+      setCandlePaymentLoading(false);
+    }
   };
 
   const handleSendFlower = () => {
@@ -384,34 +507,88 @@ export default function MemorialPublicoPage() {
     e?.preventDefault();
     if (!memorial) return;
     if (!newAuthor || !newMessage) return;
-    
+
+    const finalAuthor   = newAuthor;
+    const finalDonation = tributeDonationCents;
+
     setTimeout(() => {
       heartbeatSoundRef.current?.play('short');
     }, 50);
 
-    const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "tribute",
-        author: newAuthor,
+    // Passo 1 — Salvar a homenagem (sempre gratuita)
+    if (isDemoMode) {
+      const demoTribute: ManagedTribute = {
+        id: `demo_tribute_${Date.now()}`,
+        memorialId: memorial.id,
+        author: finalAuthor,
         message: newMessage,
-        tag: selectedTag,
+        tag: selectedTag || undefined,
+        status: "aprovada",
         isPinned: isTributePinned,
-      }),
-    });
+        createdAt: new Date().toISOString(),
+      };
+      setTributesList((prev) => [demoTribute, ...prev]);
+    } else {
+      const response = await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "tribute",
+          author: finalAuthor,
+          message: newMessage,
+          tag: selectedTag,
+          isPinned: isTributePinned,
+        }),
+      });
 
-    if (!response.ok) return;
+      if (!response.ok) return;
 
-    const payload = await response.json();
-    if (payload.tribute) {
-      setTributesList((prev) => [payload.tribute, ...prev]);
+      const payload = await response.json();
+      if (payload.tribute) {
+        setTributesList((prev) => [payload.tribute, ...prev]);
+      }
     }
 
+    // Resetar campos do modal
     setNewAuthor("");
     setNewMessage("");
     setIsTributePinned(false);
+    setTributeDonationCents(0);
     setShowTributeModal(false);
+
+    // Passo 2 — Se doação selecionada e não é modo demo, iniciar pagamento
+    if (finalDonation > 0 && !isDemoMode) {
+      setTributePaymentLoading(true);
+      setTributePaymentError("");
+      setShowTributeDonationModal(true);
+      try {
+        const res = await fetch("/api/tribute-donation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            memorialId: memorial.id,
+            amountCents: finalDonation,
+            donorName: finalAuthor,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setTributePaymentError(data.error ?? "Erro ao iniciar doação.");
+          setTributePaymentLoading(false);
+          return;
+        }
+        if (data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+          return; // redireciona — não mostra o modal de sucesso agora
+        }
+      } catch {
+        setTributePaymentError("Erro de conexão. Tente novamente.");
+        setTributePaymentLoading(false);
+      }
+      return;
+    }
+
+    // Sem doação (ou modo demo) → sucesso imediato
     setSuccessModal({ isOpen: true, type: "tribute" });
   };
 
@@ -634,6 +811,16 @@ export default function MemorialPublicoPage() {
         }
       `}</style>
 
+      {/* Banner modo demonstração */}
+      {isDemoMode && (
+        <div className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-center gap-2 bg-amber-500/90 backdrop-blur-sm px-4 py-2 text-[#101414]">
+          <span className="material-symbols-outlined text-[1rem] leading-none">science</span>
+          <span className="font-label-caps text-[0.7rem] font-semibold uppercase tracking-[0.15em]">
+            Modo demonstração — velas e homenagens são temporárias e somem ao recarregar
+          </span>
+        </div>
+      )}
+
       {!showMemorial && showBackButton && (
         <Link
           href="/"
@@ -695,7 +882,7 @@ export default function MemorialPublicoPage() {
       ) : (
         <>
           <div className="animate-fade-in">
-          <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300">
+          <header className={`fixed left-0 w-full z-50 bg-[#0b0f0f]/40 backdrop-blur-xl border-b border-[#e9c349]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex justify-center md:justify-between items-center px-8 md:px-16 py-4 transition-all duration-300 ${isDemoMode ? "top-9" : "top-0"}`}>
             <Link href="/" className="flex flex-col md:flex-row items-center gap-2 md:gap-4 hover:opacity-90 transition-opacity">
               <span className="material-symbols-outlined text-3xl md:text-4xl text-[#e9c349] drop-shadow-[0_0_12px_rgba(233,195,73,0.5)]">local_fire_department</span>
               <div className="font-serif italic text-base md:text-xl text-[#e9c349] font-bold tracking-widest uppercase text-center md:text-left leading-tight">PRESERVANDO MEMÓRIAS</div>
@@ -819,7 +1006,7 @@ export default function MemorialPublicoPage() {
           <section id="voice" className="py-20 px-6 max-w-[1200px] mx-auto animate-fade-in" style={{ animationDelay: '2600ms', animationFillMode: 'both' }}>
             <div className="glass-panel rounded-2xl p-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center border border-[#e9c349]/10">
               <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
-                <span className="material-symbols-outlined text-4xl text-[#e9c349] mb-4">mic_user</span>
+                <span className="material-symbols-outlined text-4xl text-[#e9c349] mb-4">record_voice_over</span>
                 <h3 className="font-h3 text-2xl text-[#e5e2e1] mb-2">Mensagem de Voz</h3>
                 <p className="text-sm text-[#c4c7c7] max-w-xs leading-relaxed">
                   Ouvir a voz de quem amamos é uma das formas mais bonitas de reatar a proximidade e reviver os sentimentos.
@@ -1383,10 +1570,45 @@ export default function MemorialPublicoPage() {
                   />
                 </div>
 
+                {/* Contribuição Simbólica */}
+                <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[1rem] text-rose-400">volunteer_activism</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[#c4c7c7]/90">Contribuição Simbólica</span>
+                    <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-outline">Opcional</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#c4c7c7]/60">
+                    Ajude a manter este memorial vivo. Qualquer valor é bem-vindo e vai direto para a plataforma.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {([
+                      [0,    "Não agora"],
+                      [200,  "R$2"],
+                      [500,  "R$5"],
+                      [1000, "R$10"],
+                      [2000, "R$20"],
+                    ] as [number, string][]).map(([cents, label]) => (
+                      <button
+                        key={cents}
+                        type="button"
+                        onClick={() => setTributeDonationCents(cents)}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                          tributeDonationCents === cents
+                            ? "border-rose-400 bg-rose-400/10 text-rose-300"
+                            : "border-white/10 text-[#c4c7c7] hover:border-white/30"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Destacar no Topo */}
                 <div className="border border-[#e9c349]/30 bg-[#e9c349]/5 rounded-xl p-4 transition hover:bg-[#e9c349]/10">
                   <label className="flex items-start gap-3 cursor-pointer">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       className="mt-1 accent-[#e9c349] cursor-pointer"
                       checked={isTributePinned}
                       onChange={(e) => setIsTributePinned(e.target.checked)}
@@ -1410,8 +1632,14 @@ export default function MemorialPublicoPage() {
                   type="submit"
                   className="w-full py-3 bg-[#e9c349] text-[#101414] font-label-caps text-xs tracking-widest rounded-full hover:bg-[#ffe088] transition font-semibold uppercase mt-4 flex items-center justify-center gap-2"
                 >
-                  <span className="material-symbols-outlined text-sm">grade</span>
-                  {isTributePinned ? "Destacar e Enviar (R$ 5,00)" : "Enviar Homenagem Simples"}
+                  <span className="material-symbols-outlined text-sm">
+                    {isTributePinned ? "grade" : tributeDonationCents > 0 ? "volunteer_activism" : "send"}
+                  </span>
+                  {isTributePinned
+                    ? "Destacar e Enviar (R$ 5,00)"
+                    : tributeDonationCents > 0
+                    ? `Enviar + Contribuir R$${(tributeDonationCents / 100).toFixed(2).replace(".", ",")}`
+                    : "Enviar Homenagem"}
                 </button>
               </div>
             </form>
@@ -1426,10 +1654,9 @@ export default function MemorialPublicoPage() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (isCandleEternal) {
-                  setShowCandleModal(false);
-                  setShowPixModal(true);
+                  handleStartEternalCandlePayment();
                 } else {
-                  handleSubmitCandle(e);
+                  handleSubmitFreeCandle(e);
                 }
               }}
               className="relative z-10 w-full max-w-md rounded-2xl border border-[#e9c349]/20 bg-[#1c2020] p-8 shadow-2xl animate-fade-in"
@@ -1510,59 +1737,107 @@ export default function MemorialPublicoPage() {
           </div>
         )}
 
-        {/* PIX Modal */}
+        {/* Modal de Pagamento — Chama Eterna */}
         {showPixModal && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-[#0b0f0f]/80 backdrop-blur-md" onClick={() => setShowPixModal(false)}></div>
+            <div className="absolute inset-0 bg-[#0b0f0f]/80 backdrop-blur-md" onClick={() => { if (!candlePaymentLoading) setShowPixModal(false); }} />
             <div className="relative w-full max-w-sm glass-panel rounded-2xl p-6 sm:p-8 flex flex-col items-center animate-fade-in text-center border border-[#e9c349]/20 shadow-[0_0_40px_rgba(233,195,73,0.15)]">
-              <button
-                onClick={() => setShowPixModal(false)}
-                className="absolute top-4 right-4 text-[#c4c7c7] hover:text-white transition"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-              
-              <div className="w-16 h-16 rounded-full bg-[#e9c349]/10 flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-3xl text-[#e9c349]">pix</span>
-              </div>
-              <h3 className="font-h3 text-xl text-[#e9c349] uppercase tracking-widest mb-2">
-                {pixActionType === "tribute" ? "Homenagem Premium" : "Chama Eterna"}
-              </h3>
-              <p className="font-body-md text-sm text-[#c4c7c7] mb-6">
-                {pixActionType === "tribute" 
-                  ? "Escaneie o QR Code abaixo para transferir R$ 5,00 e destacar sua mensagem no topo de todas as outras para sempre." 
-                  : "Escaneie o QR Code abaixo para doar R$ 1,00 e eternizar sua vela no altar virtual."}
-              </p>
-              
-              <div className="bg-white p-2 rounded-lg mb-6 w-48 h-48 mx-auto flex items-center justify-center">
-                <img
-                  alt="Pix QR Code"
-                  className="w-full h-full object-contain"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHKXR2fPODdqfkE9haT2ZaeRptqBdj8pqy_vdcNFPQCoehoIHH0jA5LGs81n3q8ly2o_11YpSdcy39xoKZz4xPB-6PjHAPdDOFMhdEVR2fvpCfyq--WGYJtYGptcZ0WtgkPO7rP5bf6JlyakxwZnR8FSssmXp-xTAwcztV9dBT0kghzjjTRAWjKRvBBugmFWtuqN7r14HbXAw0WGFmxds3a6HEx8EyUX7mmWSmY3leK6fOJdcgzX8ONN40GcV0WCE09hPedoGIJMw"
-                />
-              </div>
-
-              <div className="flex flex-col gap-3 w-full">
-                <button
-                  onClick={(e) => {
-                    setShowPixModal(false);
-                    if (pixActionType === "tribute") {
-                      handleLeaveTribute(e);
-                    } else {
-                      handleSubmitCandle(e);
-                    }
-                  }}
-                  className="w-full py-3 px-4 rounded-xl bg-[#e9c349] text-[#101414] hover:bg-[#ffe088] transition flex items-center justify-center gap-3 font-semibold uppercase tracking-widest text-xs cursor-pointer"
-                >
-                  Simular Pagamento Confirmado
-                </button>
+              {!candlePaymentLoading && (
                 <button
                   onClick={() => setShowPixModal(false)}
-                  className="w-full py-3 px-4 rounded-xl bg-white/5 text-white border border-white/10 hover:bg-white/10 transition flex items-center justify-center gap-3 font-semibold uppercase tracking-widest text-xs cursor-pointer"
+                  className="absolute top-4 right-4 text-[#c4c7c7] hover:text-white transition"
                 >
-                  Cancelar
+                  <span className="material-symbols-outlined">close</span>
                 </button>
-              </div>
+              )}
+
+              {candlePaymentLoading ? (
+                /* Estado: processando */
+                <>
+                  <div className="w-16 h-16 rounded-full bg-[#e9c349]/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined animate-spin text-3xl text-[#e9c349]">progress_activity</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#e9c349] mb-2">Preparando pagamento...</h3>
+                  <p className="text-sm text-[#c4c7c7]/70">Você será redirecionado para o ambiente seguro de pagamento.</p>
+                </>
+              ) : candlePaymentError ? (
+                /* Estado: erro */
+                <>
+                  <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined text-3xl text-red-400">error</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-red-300 mb-2">Não foi possível processar</h3>
+                  <p className="text-sm text-[#c4c7c7]/70 mb-6">{candlePaymentError}</p>
+                  <button
+                    onClick={() => { setShowPixModal(false); setShowCandleModal(true); }}
+                    className="w-full py-3 px-4 rounded-xl bg-[#e9c349] text-[#101414] font-semibold text-xs uppercase tracking-widest transition hover:bg-[#ffe088]"
+                  >
+                    Tentar novamente
+                  </button>
+                </>
+              ) : (
+                /* Estado: aguardando retorno do Stripe (não deve aparecer — redireciona) */
+                <>
+                  <div className="w-16 h-16 rounded-full bg-[#e9c349]/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined text-3xl text-[#e9c349]">local_fire_department</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#e9c349] mb-2">Chama Eterna</h3>
+                  <p className="text-sm text-[#c4c7c7]/70">Redirecionando para pagamento seguro...</p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Pagamento — Contribuição Simbólica */}
+        {showTributeDonationModal && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-[#0b0f0f]/80 backdrop-blur-md"
+              onClick={() => { if (!tributePaymentLoading) setShowTributeDonationModal(false); }}
+            />
+            <div className="relative w-full max-w-sm glass-panel rounded-2xl p-6 sm:p-8 flex flex-col items-center animate-fade-in text-center border border-rose-500/20 shadow-[0_0_40px_rgba(244,63,94,0.15)]">
+              {!tributePaymentLoading && (
+                <button
+                  onClick={() => setShowTributeDonationModal(false)}
+                  className="absolute top-4 right-4 text-[#c4c7c7] hover:text-white transition"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              )}
+
+              {tributePaymentLoading ? (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined animate-spin text-3xl text-rose-400">progress_activity</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-rose-300 mb-2">Preparando sua doação...</h3>
+                  <p className="text-sm text-[#c4c7c7]/70">Você será redirecionado para o ambiente seguro de pagamento.</p>
+                </>
+              ) : tributePaymentError ? (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined text-3xl text-red-400">error</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-red-300 mb-2">Não foi possível processar</h3>
+                  <p className="text-sm text-[#c4c7c7]/70 mb-4">{tributePaymentError}</p>
+                  <p className="text-xs text-[#c4c7c7]/50 mb-6">Sua homenagem foi salva normalmente. A doação pode ser tentada novamente.</p>
+                  <button
+                    onClick={() => { setShowTributeDonationModal(false); setSuccessModal({ isOpen: true, type: "tribute" }); }}
+                    className="w-full py-3 px-4 rounded-xl bg-rose-500 text-white font-semibold text-xs uppercase tracking-widest transition hover:bg-rose-400"
+                  >
+                    Fechar e ver homenagem
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-5">
+                    <span className="material-symbols-outlined text-3xl text-rose-400">volunteer_activism</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-rose-300 mb-2">Contribuição Simbólica</h3>
+                  <p className="text-sm text-[#c4c7c7]/70">Redirecionando para pagamento seguro...</p>
+                </>
+              )}
             </div>
           </div>
         )}

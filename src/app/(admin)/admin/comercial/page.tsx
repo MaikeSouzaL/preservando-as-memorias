@@ -1,6 +1,7 @@
 import { PriceConfigPanel } from "@/src/components/admin/price-config-panel";
 import { BankDataPanel } from "@/src/components/admin/bank-data-panel";
 import { readPlatformData, type PlatformOrder } from "@/src/lib/platform-data";
+import { estimateStripeFeeCents } from "@/src/lib/platform-types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,10 @@ export default async function AdminCommercialPage() {
         <p className="mb-2 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Admin do sistema</p>
         <h1 className="font-h2 text-[clamp(2rem,4vw,3rem)] text-on-surface">Configuração comercial</h1>
         <p className="mt-2 max-w-2xl text-on-surface-variant">
-          Famílias e funerárias pagam à plataforma. O Stripe coleta 100%, distribui {100 - data.config.ownerCommissionPercent}% ao administrador e
-          retém {data.config.ownerCommissionPercent}% como taxa do sistema.
+          Famílias e funerárias pagam à plataforma. A comissão da plataforma (
+          <strong className="text-tertiary">{data.config.ownerCommissionPercent}%</strong>) é calculada sobre o{" "}
+          <strong className="text-on-surface">valor bruto</strong> — antes da taxa Stripe. A taxa Stripe
+          é descontada do repasse ao parceiro, não da comissão da plataforma.
         </p>
       </header>
 
@@ -53,9 +56,10 @@ export default async function AdminCommercialPage() {
                   <th className="pb-3 font-normal">Cliente</th>
                   <th className="pb-3 font-normal">Plano</th>
                   <th className="pb-3 font-normal">Pagamento</th>
-                  <th className="pb-3 text-right font-normal">Total</th>
-                  <th className="pb-3 text-right font-normal">Taxa {data.config.ownerCommissionPercent}% (sistema)</th>
-                  <th className="pb-3 text-right font-normal">Repasse {100 - data.config.ownerCommissionPercent}% (admin)</th>
+                  <th className="pb-3 text-right font-normal">Total bruto</th>
+                  <th className="pb-3 text-right font-normal text-red-400/70">Taxa Stripe (est.)</th>
+                  <th className="pb-3 text-right font-normal text-tertiary/80">Plataforma ({data.config.ownerCommissionPercent}%)</th>
+                  <th className="pb-3 text-right font-normal text-emerald-400/70">Repasse parceiro</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,6 +99,10 @@ function Metric({ label, value, highlight }: { label: string; value: string; hig
 }
 
 function OrderRow({ order, planName }: { order: PlatformOrder; planName: string }) {
+  const method = order.paymentMethod === "pix" ? "pix" : "card";
+  const stripeFee = estimateStripeFeeCents(order.grossAmountCents, method);
+  const parceiro  = order.operatorAmountCents - stripeFee;
+
   return (
     <tr className="border-b border-outline-variant/20">
       <td className="py-4">
@@ -104,8 +112,9 @@ function OrderRow({ order, planName }: { order: PlatformOrder; planName: string 
       <td className="py-4 text-on-surface-variant">{planName}</td>
       <td className="py-4 uppercase text-on-surface-variant">{order.paymentMethod}</td>
       <td className="py-4 text-right text-on-surface">{formatBRL(order.grossAmountCents)}</td>
+      <td className="py-4 text-right text-red-400">{formatBRL(stripeFee)}</td>
       <td className="py-4 text-right text-tertiary">{formatBRL(order.platformCommissionCents)}</td>
-      <td className="py-4 text-right text-[#e9c349]">{formatBRL(order.operatorAmountCents)}</td>
+      <td className="py-4 text-right text-emerald-400">{formatBRL(Math.max(0, parceiro))}</td>
     </tr>
   );
 }

@@ -56,6 +56,23 @@ export function cycleLabel(cycle: BillingCycle) {
   return "pagamento único";
 }
 
+/**
+ * Estima a taxa cobrada pelo Stripe (valores de referência para o Brasil).
+ * Cartão de crédito nacional: 3,49% + R$0,39 por transação.
+ * PIX: 0,99% (sem taxa fixa).
+ * IMPORTANTE: use apenas para estimativas; confirme no dashboard Stripe.
+ */
+export function estimateStripeFeeCents(
+  amountCents: number,
+  method: "card" | "pix" = "card"
+): number {
+  if (method === "pix") {
+    return Math.round(amountCents * 0.0099);
+  }
+  // Cartão: 3,49% + R$0,39
+  return Math.round(amountCents * 0.0349) + 39;
+}
+
 export function calculateCommission(amountCents: number, commissionPercent: number) {
   const platformCommissionCents = Math.round((amountCents * commissionPercent) / 100);
   return {
