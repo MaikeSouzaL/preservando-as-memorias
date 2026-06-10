@@ -29,11 +29,21 @@ export type FuneralPlan = {
   };
 };
 
+export type QrDeliveryMode = "admin" | "self";
+export type QrDeliveryOverride = "inherit" | "admin" | "self";
+
 export type PlatformConfig = {
   ownerCommissionPercent: number;
   familyMemorialPriceCents: number;
   funeralHomeMemorialPriceCents: number;
   candlePriceCents: number;
+  /**
+   * Modo global de entrega do QR Code:
+   * "admin" → o admin parceiro é responsável por imprimir e enviar o QR ao familiar.
+   *           Famílias PRECISAM preencher endereço de entrega no formulário.
+   * "self"  → a família/funerária imprime o próprio QR (padrão).
+   */
+  qrDeliveryMode?: QrDeliveryMode;
   // Legacy plan fields kept for DB backward compatibility
   defaultPlanId?: string;
   plans?: PlatformPlan[];

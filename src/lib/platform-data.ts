@@ -1,5 +1,17 @@
-export type { BillingCycle, PlatformConfig, PlatformPlan } from "@/src/lib/platform-types";
-import type { PlatformConfig } from "@/src/lib/platform-types";
+export type { BillingCycle, PlatformConfig, PlatformPlan, QrDeliveryMode, QrDeliveryOverride } from "@/src/lib/platform-types";
+import type { PlatformConfig, QrDeliveryOverride } from "@/src/lib/platform-types";
+
+/** Endereço de entrega do QR Code físico — preenchido pela família quando o admin é responsável pelo envio */
+export type DeliveryAddress = {
+  recipientName: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+};
 import { createAdminClient } from "@/src/lib/supabase";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -41,6 +53,8 @@ export type ManagedMemorial = {
   funeralHomeId?: string;
   offerLinkId?: string;
   visits: number;
+  /** Endereço para entrega do QR Code físico — preenchido quando qrDeliveryMode === "admin" */
+  deliveryAddress?: DeliveryAddress;
   createdAt: string;
   updatedAt: string;
 };
@@ -128,6 +142,13 @@ export type FuneralHome = {
   isActive: boolean;
   approvalStatus: "pending" | "approved" | "rejected";
   stripeAccountId?: string;
+  /**
+   * Override do modo de entrega de QR Code para ESTA funerária:
+   * "inherit" → segue a configuração global da plataforma (padrão)
+   * "admin"   → admin é responsável pelo envio para clientes desta funerária
+   * "self"    → clientes desta funerária imprimem o próprio QR
+   */
+  qrDeliveryMode?: QrDeliveryOverride;
   createdAt: string;
   updatedAt: string;
 };
@@ -304,6 +325,7 @@ function mapMemorial(r: any): ManagedMemorial {
     funeralHomeId: r.funeral_home_id ?? undefined,
     offerLinkId: r.offer_link_id ?? undefined,
     visits: r.visits ?? 0,
+    deliveryAddress: r.delivery_address ?? undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -332,6 +354,7 @@ function toDbMemorial(m: ManagedMemorial) {
     funeral_home_id: m.funeralHomeId ?? null,
     offer_link_id: m.offerLinkId ?? null,
     visits: m.visits ?? 0,
+    delivery_address: m.deliveryAddress ?? null,
   };
 }
 
@@ -492,6 +515,7 @@ function mapFuneralHome(r: any): FuneralHome {
     isActive: r.is_active ?? true,
     approvalStatus: r.approval_status ?? "pending",
     stripeAccountId: r.stripe_account_id ?? undefined,
+    qrDeliveryMode: (r.qr_delivery_mode as QrDeliveryOverride) ?? "inherit",
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };

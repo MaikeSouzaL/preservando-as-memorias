@@ -54,6 +54,18 @@ export async function PATCH(request: Request) {
         data.config.funeralHomeMemorialPriceCents = funeralCents;
       }
 
+      if (target === "qr_delivery") {
+        const mode = String(body.qrDeliveryMode ?? "");
+        if (mode !== "admin" && mode !== "self") {
+          throw new Error("Modo inválido. Use 'admin' ou 'self'.");
+        }
+        const updated2 = await updatePlatformData((data) => {
+          data.config.qrDeliveryMode = mode as "admin" | "self";
+          return data.config;
+        });
+        return NextResponse.json({ config: updated2 });
+      }
+
       if (target === "funeral") {
         const planId = String(body.planId ?? "");
         const plans = data.config.funeralPlans ?? [];
