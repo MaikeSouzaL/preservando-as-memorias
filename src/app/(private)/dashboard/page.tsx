@@ -41,7 +41,7 @@ export default async function DashboardPage() {
 
   const data = await readPlatformData();
   const memorials = data.memorials.filter(
-    (m) => m.id !== "default" && (session.isAdmin || m.ownerId.toLowerCase().trim() === session.email)
+    (m) => m.id !== "default" && (session.isAdmin || session.isDevAdmin || m.ownerId === session.userId || m.ownerId.toLowerCase().trim() === session.email)
   );
 
   const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";

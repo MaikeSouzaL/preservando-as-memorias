@@ -379,7 +379,7 @@ function toDbMemorial(m: ManagedMemorial) {
     funeral_home_id: m.funeralHomeId ?? null,
     offer_link_id: m.offerLinkId ?? null,
     visits: m.visits ?? 0,
-    delivery_address: m.deliveryAddress ?? null,
+    // delivery_address: m.deliveryAddress ?? null, // TODO: Run DB migration to add delivery_address column
   };
 }
 
