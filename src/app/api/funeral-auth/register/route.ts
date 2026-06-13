@@ -67,6 +67,7 @@ export async function POST(request: Request) {
         city: city || undefined,
         state: state || undefined,
         passwordHash: hashPassword(password),
+        adminCommissionPercent: 0,
         isActive: false,
         approvalStatus: "pending" as const,
         createdAt: new Date().toISOString(),
