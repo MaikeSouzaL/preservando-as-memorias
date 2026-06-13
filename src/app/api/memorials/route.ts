@@ -110,6 +110,8 @@ export async function POST(request: Request) {
               ]
             : []);
 
+      const isAdmin = session.isAdmin || session.isDevAdmin;
+
       const memorial = {
         id,
         ownerId: session.userId,
@@ -125,9 +127,9 @@ export async function POST(request: Request) {
         videoUrl: asString(body.videoUrl) || undefined,
         gallery,
         timelineEvents,
-        status: "pending_payment" as const,
-        paymentStatus: "pending" as const,
-        qrUnlocked: false,
+        status: isAdmin ? ("ativo" as const) : ("pending_payment" as const),
+        paymentStatus: isAdmin ? ("paid" as const) : ("pending" as const),
+        qrUnlocked: isAdmin ? true : false,
         source: "customer" as const,
         visits: 0,
         createdAt: now,

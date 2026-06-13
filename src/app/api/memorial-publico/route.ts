@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { updatePlatformData } from "@/src/lib/platform-data";
 import { createAdminClient } from "@/src/lib/supabase";
+import { getAuthSession } from "@/src/lib/auth-session";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,8 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createAdminClient();
+    const session = await getAuthSession();
+    const isAdmin = session?.isAdmin || session?.isDevAdmin;
 
     // Find or create the user
     let userId: string;
@@ -39,7 +42,8 @@ export async function POST(request: Request) {
       const serviceKeySet = process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith("ADICIONE");
 
       if (serviceKeySet) {
-        const { data: newUser, error: createError } = await (supabase as any).auth.admin.createUser({
+        type SupabaseAdmin = { auth: { admin: { createUser: (params: { email: string; email_confirm: boolean; user_metadata: unknown }) => Promise<{ data: { user: { id: string } | null }; error: Error | null }> } } };
+        const { data: newUser, error: createError } = await (supabase as unknown as SupabaseAdmin).auth.admin.createUser({
           email,
           email_confirm: true,
           user_metadata: { full_name: familyName, name: familyName },
@@ -78,9 +82,9 @@ export async function POST(request: Request) {
       url: asString(g.url),
     }));
 
-    const rawTimeline: { year: string; title: string; description: string; longStory: string; imageUrl: string }[] =
+    const rawTimeline: { year?: string; title?: string; description?: string; longStory?: string; imageUrl?: string }[] =
       Array.isArray(body.timelineEvents)
-        ? (body.timelineEvents as any[]).filter((t) => t?.year && t?.title)
+        ? (body.timelineEvents as Array<{ year?: string; title?: string; description?: string; longStory?: string; imageUrl?: string }>).filter((t) => t?.year && t?.title)
         : [];
     const timelineEvents = rawTimeline.map((t) => ({
       id: crypto.randomUUID(),
@@ -106,9 +110,9 @@ export async function POST(request: Request) {
       videoUrl: asString(body.videoUrl) || undefined,
       gallery,
       timelineEvents,
-      status: "pending_payment" as const,
-      paymentStatus: "pending" as const,
-      qrUnlocked: false,
+      status: isAdmin ? ("ativo" as const) : ("pending_payment" as const),
+      paymentStatus: isAdmin ? ("paid" as const) : ("pending" as const),
+      qrUnlocked: isAdmin ? true : false,
       source: "customer" as const,
       visits: 0,
       createdAt: now,

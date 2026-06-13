@@ -79,6 +79,8 @@ export default function CriarMemorialPage() {
     estado: "",
   });
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
     fetch("/api/platform-config")
       .then((r) => r.json())
@@ -86,11 +88,24 @@ export default function CriarMemorialPage() {
         if (d.config?.qrDeliveryMode === "admin") setQrDeliveryMode("admin");
       })
       .catch(() => {});
+
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.profile && (d.profile.isAdmin || d.profile.isDevAdmin)) {
+          setIsAdmin(true);
+          setForm((f) => ({ ...f, familyName: d.profile.name || "Admin", email: d.profile.email }));
+        }
+      })
+      .catch(() => {});
   }, []);
 
+  const filteredStepsBase = isAdmin ? STEPS_BASE.filter(s => s.id !== 8) : STEPS_BASE;
   const STEPS = qrDeliveryMode === "admin"
-    ? [...STEPS_BASE, STEP_ENTREGA]
-    : STEPS_BASE;
+    ? [...filteredStepsBase, STEP_ENTREGA]
+    : filteredStepsBase;
+
+  const currentStepId = STEPS[step - 1]?.id;
 
   function set<K extends keyof FormData>(field: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -105,12 +120,12 @@ export default function CriarMemorialPage() {
   }
 
   function validateStep(): string {
-    if (step === 2 && !form.name.trim()) return "Informe o nome do falecido.";
-    if (step === 8) {
+    if (currentStepId === 2 && !form.name.trim()) return "Informe o nome do falecido.";
+    if (currentStepId === 8 && !isAdmin) {
       if (!form.familyName.trim()) return "Informe seu nome.";
       if (!form.email.trim() || !form.email.includes("@")) return "Informe um e-mail válido.";
     }
-    if (step === 9) {
+    if (currentStepId === 9) {
       if (!deliveryAddress.recipientName.trim()) return "Informe o nome do destinatário.";
       if (!deliveryAddress.cep.replace(/\D/g, "").match(/^\d{8}$/)) return "CEP inválido (8 dígitos).";
       if (!deliveryAddress.logradouro.trim()) return "Informe o logradouro.";
@@ -162,7 +177,12 @@ export default function CriarMemorialPage() {
       });
       const payload = await res.json();
       if (!res.ok) { setError(payload.error ?? "Não foi possível criar o memorial."); return; }
-      router.push(`/checkout?memorialId=${payload.memorialId}&payerType=family&email=${encodeURIComponent(form.email)}&name=${encodeURIComponent(form.familyName)}`);
+      
+      if (isAdmin) {
+        router.push("/dashboard");
+      } else {
+        router.push(`/checkout?memorialId=${payload.memorialId}&payerType=family&email=${encodeURIComponent(form.email)}&name=${encodeURIComponent(form.familyName)}`);
+      }
     } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
@@ -218,7 +238,7 @@ export default function CriarMemorialPage() {
 
         {/* Step content */}
         <div className="flex flex-1 flex-col">
-          {step === 1 && (
+          {currentStepId === 1 && (
             <StepPhoto
               imageUrl={form.imageUrl}
               uploading={uploading}
@@ -233,14 +253,14 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 2 && (
+          {currentStepId === 2 && (
             <StepIdentificacao
               form={form}
               onChange={(field, val) => set(field as keyof FormData, val as FormData[keyof FormData])}
             />
           )}
 
-          {step === 3 && (
+          {currentStepId === 3 && (
             <StepBiografia
               epitaph={form.epitaph}
               biography={form.biography}
@@ -249,7 +269,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 4 && (
+          {currentStepId === 4 && (
             <StepGaleria
               gallery={form.gallery}
               uploading={uploading}
@@ -270,7 +290,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 5 && (
+          {currentStepId === 5 && (
             <StepTimeline
               events={form.timelineEvents}
               uploading={uploading}
@@ -289,7 +309,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 6 && (
+          {currentStepId === 6 && (
             <StepAudio
               audioUrl={form.audioUrl}
               uploading={uploading}
@@ -304,7 +324,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 7 && (
+          {currentStepId === 7 && (
             <StepVideo
               videoUrl={form.videoUrl}
               uploading={uploading}
@@ -319,7 +339,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 8 && (
+          {currentStepId === 8 && !isAdmin && (
             <StepSeusDados
               familyName={form.familyName}
               email={form.email}
@@ -328,7 +348,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {step === 9 && qrDeliveryMode === "admin" && (
+          {currentStepId === 9 && qrDeliveryMode === "admin" && (
             <StepEntrega
               address={deliveryAddress}
               onChange={(field, value) =>
@@ -379,6 +399,11 @@ export default function CriarMemorialPage() {
                 <>
                   <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
                   Salvando...
+                </>
+              ) : isAdmin ? (
+                <>
+                  <span className="material-symbols-outlined text-sm">check_circle</span>
+                  Salvar e Concluir
                 </>
               ) : (
                 <>

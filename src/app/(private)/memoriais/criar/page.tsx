@@ -19,6 +19,7 @@ type SavedMemorial = {
     videoUrl?: string;
     gallery?: Array<{ title: string; url: string }>;
     timelineEvents?: Array<{ year: string; title: string; description: string; imageUrl: string }>;
+    status?: "ativo" | "pending_payment";
   };
   qrCode: { publicPath: string };
 };
@@ -35,12 +36,14 @@ export default function CriarMemorialPage() {
   useEffect(() => {
     const memorialId = new URLSearchParams(window.location.search).get("edit") ?? "";
     if (!memorialId) {
-      setInitialData({});
+      setTimeout(() => setInitialData({}), 0);
       return;
     }
 
-    setEditId(memorialId);
-    setIsLoadingEdit(true);
+    setTimeout(() => {
+      setEditId(memorialId);
+      setIsLoadingEdit(true);
+    }, 0);
 
     fetch(`/api/memorials/${memorialId}`)
       .then(async (res) => {
@@ -171,23 +174,35 @@ export default function CriarMemorialPage() {
           <p className="mb-1 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Memorial salvo</p>
           <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-light text-on-surface">{saved.memorial.name}</h1>
           <p className="mt-3 max-w-md text-on-surface-variant">
-            O memorial está pronto! Faça o pagamento para publicar e gerar o QR Code.
+            {saved.memorial.status === "ativo" 
+              ? "O memorial está pronto e já está publicado! Você pode acessar o QR Code."
+              : "O memorial está pronto! Faça o pagamento para publicar e gerar o QR Code."}
           </p>
         </div>
-        <div className="w-full rounded-xl border border-tertiary/15 bg-[var(--pm-card-bg)] p-6 text-left">
-          <p className="mb-1 text-xs uppercase tracking-widest text-outline">Próximo passo</p>
-          <h2 className="mb-2 font-semibold text-on-surface">Publicar memorial</h2>
-          <p className="mb-4 text-sm text-on-surface-variant">
-            Após o pagamento, a página pública e o QR Code ficam disponíveis imediatamente.
-          </p>
-          <a
-            href={`/checkout?memorialId=${saved.memorial.id}&payerType=family`}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-tertiary py-3 text-sm font-semibold text-on-tertiary transition hover:bg-tertiary/80"
-          >
-            <span className="material-symbols-outlined text-sm">payment</span>
-            Pagar para publicar
-          </a>
-        </div>
+        
+        {saved.memorial.status !== "ativo" ? (
+          <div className="w-full rounded-xl border border-tertiary/15 bg-[var(--pm-card-bg)] p-6 text-left">
+            <p className="mb-1 text-xs uppercase tracking-widest text-outline">Próximo passo</p>
+            <h2 className="mb-2 font-semibold text-on-surface">Publicar memorial</h2>
+            <p className="mb-4 text-sm text-on-surface-variant">
+              Após o pagamento, a página pública e o QR Code ficam disponíveis imediatamente.
+            </p>
+            <a
+              href={`/checkout?memorialId=${saved.memorial.id}&payerType=family`}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-tertiary py-3 text-sm font-semibold text-on-tertiary transition hover:bg-tertiary/80"
+            >
+              <span className="material-symbols-outlined text-sm">payment</span>
+              Pagar para publicar
+            </a>
+          </div>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href={saved.qrCode.publicPath} target="_blank" className="rounded-full bg-tertiary px-6 py-3 text-sm font-semibold text-on-tertiary">
+              Ver memorial público
+            </Link>
+          </div>
+        )}
+
         <button
           onClick={() => downloadFramedQRCode(saved.memorial.name, saved.memorial.epitaph, `${window.location.origin}${saved.qrCode.publicPath}`)}
           className="text-sm text-outline hover:text-on-surface-variant"
@@ -195,7 +210,7 @@ export default function CriarMemorialPage() {
           Baixar placa QR (PNG)
         </button>
         <Link href="/dashboard" className="text-sm text-outline hover:text-on-surface-variant">
-          Fazer isso depois
+          Ir para o dashboard
         </Link>
       </main>
     );
