@@ -21,6 +21,7 @@ export async function GET() {
     state: fh.state,
     isActive: fh.isActive,
     approvalStatus: fh.approvalStatus ?? "approved",
+    adminCommissionPercent: fh.adminCommissionPercent ?? 20,
     createdAt: fh.createdAt,
   }));
 

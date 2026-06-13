@@ -20,6 +20,7 @@ const adminItems: AdminMenuItem[] = [
   { label: "Dashboard", icon: "dashboard", href: "/admin/dashboard" },
   { label: "Comercial", icon: "payments", href: "/admin/comercial" },
   { label: "Funerárias", icon: "store", href: "/admin/funerarias" },
+  { label: "Contrato", icon: "description", href: "/admin/contrato" },
   { label: "Usuários", icon: "group", href: "/admin/usuarios" },
   { label: "Memoriais", icon: "favorite", href: "/admin/memoriais" },
   { label: "Homenagens", icon: "card_giftcard", href: "/admin/homenagens" },

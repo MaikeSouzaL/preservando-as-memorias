@@ -102,13 +102,22 @@ export default function FunerariaDashboardPage() {
             </p>
             <h1 className="text-lg font-semibold text-white">{funeralHome.name}</h1>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-[#c4c7c7] transition hover:border-white/20 hover:text-white"
-          >
-            <span className="material-symbols-outlined text-sm">logout</span>
-            Sair
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/funeraria/dados-bancarios"
+              className="flex items-center gap-1.5 rounded-lg border border-[#e9c349]/20 bg-[#e9c349]/5 px-3 py-1.5 text-xs text-[#e9c349] transition hover:bg-[#e9c349]/10"
+            >
+              <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+              Dados PIX
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-[#c4c7c7] transition hover:border-white/20 hover:text-white"
+            >
+              <span className="material-symbols-outlined text-sm">logout</span>
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 

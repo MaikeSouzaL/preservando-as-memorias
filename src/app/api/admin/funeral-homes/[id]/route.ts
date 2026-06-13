@@ -30,6 +30,21 @@ export async function PATCH(
     return NextResponse.json({ success: true, funeralHome: updated });
   }
 
+  if (action === "set_commission") {
+    const percent = Number(body.adminCommissionPercent);
+    if (isNaN(percent) || percent < 0 || percent > 100) {
+      return NextResponse.json({ error: "Percentual inválido (0–100)." }, { status: 400 });
+    }
+    const updated = await updatePlatformData((data) => {
+      const fh = data.funeralHomes.find((f) => f.id === id);
+      if (!fh) throw new Error("Funerária não encontrada.");
+      fh.adminCommissionPercent = percent;
+      fh.updatedAt = new Date().toISOString();
+      return { id: fh.id, name: fh.name, adminCommissionPercent: fh.adminCommissionPercent };
+    });
+    return NextResponse.json({ success: true, funeralHome: updated });
+  }
+
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "Ação inválida." }, { status: 400 });
   }

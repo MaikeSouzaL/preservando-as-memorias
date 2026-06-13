@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { updatePlatformData } from "@/src/lib/platform-data";
-import { calculateOrderTotals, type PaymentMethod } from "@/src/lib/platform-types";
+import { calculateOrderTotals, calculateCascadeOrderTotals, type PaymentMethod } from "@/src/lib/platform-types";
 
 export const dynamic = "force-dynamic";
 
@@ -103,14 +103,46 @@ export async function POST(request: Request) {
         );
       }
 
-      const totals = calculateOrderTotals(priceCents, data.config.ownerCommissionPercent, discountCode);
-      const isPaid = gateway === "sandbox";
-
+      // Descobrir funeralHomeId e funerária para o pedido
       let orderFuneralHomeId: string | undefined;
       if (memorialId) {
         const memorial = data.memorials.find((m) => m.id === memorialId);
         orderFuneralHomeId = memorial?.funeralHomeId;
       }
+      if (!orderFuneralHomeId && isOfferFlow) {
+        const offer = data.offerLinks.find((o) => o.id === offerLinkId);
+        orderFuneralHomeId = offer?.funeralHomeId;
+      }
+
+      // Cálculo de divisão: cascade se envolver funerária, simples caso contrário
+      const funeralHome = orderFuneralHomeId
+        ? data.funeralHomes.find((fh) => fh.id === orderFuneralHomeId)
+        : undefined;
+
+      let totalsBase: ReturnType<typeof calculateOrderTotals>;
+      let cascadeTotals: ReturnType<typeof calculateCascadeOrderTotals> | undefined;
+
+      if (funeralHome) {
+        // Cascade: Admin Parceiro cobra adminCommissionPercent% da funerária
+        // Dev Admin leva ownerCommissionPercent% do que o Admin Parceiro recebe
+        const grossAmountCents = priceCents;
+        cascadeTotals = calculateCascadeOrderTotals(
+          grossAmountCents,
+          funeralHome.adminCommissionPercent,
+          data.config.ownerCommissionPercent
+        );
+        totalsBase = {
+          discountPercent: 0,
+          discountCents: 0,
+          grossAmountCents,
+          platformCommissionCents: cascadeTotals.devAdminAmountCents,
+          operatorAmountCents: cascadeTotals.adminParceiroNetCents,
+        };
+      } else {
+        totalsBase = calculateOrderTotals(priceCents, data.config.ownerCommissionPercent, discountCode);
+      }
+
+      const isPaid = gateway === "sandbox";
 
       const nextOrder = {
         id: `ord_${Date.now().toString(36)}`,
@@ -121,13 +153,14 @@ export async function POST(request: Request) {
         planId: actualPlanId,
         paymentMethod,
         discountCode: discountCode || undefined,
-        discountCents: totals.discountCents,
-        grossAmountCents: totals.grossAmountCents,
-        platformCommissionCents: totals.platformCommissionCents,
-        operatorAmountCents: totals.operatorAmountCents,
+        discountCents: totalsBase.discountCents,
+        grossAmountCents: totalsBase.grossAmountCents,
+        platformCommissionCents: totalsBase.platformCommissionCents,
+        operatorAmountCents: totalsBase.operatorAmountCents,
+        funeralHomeCommissionCents: cascadeTotals?.funeralHomeCommissionCents,
+        funeralHomeAmountCents: cascadeTotals?.funeralHomeAmountCents,
+        adminParceiroAmountCents: cascadeTotals?.adminParceiroNetCents,
         status: isPaid ? ("paid" as const) : ("pending" as const),
-        // Repasse manual: retemos o valor no nosso Stripe e marcamos como pendente
-        // até que o dev admin confirme a transferência ao admin parceiro.
         repasseStatus: isPaid ? ("pendente" as const) : undefined,
         source: (source || payerType || "plan") as "family" | "funeral_home" | "funeral_home_offer" | "plan",
         offerLinkId: offerLinkId || undefined,
@@ -202,8 +235,12 @@ export async function POST(request: Request) {
         ._funeralHomeStripeAccountId;
 
       if (funeralHomeStripeAccountId) {
+        // Com cascade: application_fee = tudo que fica na plataforma (dev admin + admin parceiro)
+        // A funerária recebe o restante direto na conta conectada Stripe dela
+        const applicationFee = (order as { funeralHomeCommissionCents?: number }).funeralHomeCommissionCents
+          ?? order.platformCommissionCents;
         sessionParams.payment_intent_data = {
-          application_fee_amount: order.platformCommissionCents,
+          application_fee_amount: applicationFee,
           transfer_data: { destination: funeralHomeStripeAccountId },
         };
       }

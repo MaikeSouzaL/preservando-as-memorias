@@ -19,6 +19,7 @@ type FuneralHome = {
   state?: string;
   isActive: boolean;
   approvalStatus: "pending" | "approved" | "rejected";
+  adminCommissionPercent: number;
   createdAt: string;
 };
 
@@ -28,6 +29,8 @@ function CadastrosTab() {
   const [homes, setHomes] = useState<FuneralHome[]>([]);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
+  const [commissionEditing, setCommissionEditing] = useState<string | null>(null);
+  const [commissionValue, setCommissionValue] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -48,6 +51,20 @@ function CadastrosTab() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
     });
+    await load();
+    setActing(null);
+  }
+
+  async function saveCommission(id: string) {
+    const val = Number(commissionValue[id]);
+    if (isNaN(val) || val < 0 || val > 100) return;
+    setActing(id);
+    await fetch(`/api/admin/funeral-homes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "set_commission", adminCommissionPercent: val }),
+    });
+    setCommissionEditing(null);
     await load();
     setActing(null);
   }
@@ -92,7 +109,22 @@ function CadastrosTab() {
         ) : (
           <div className="space-y-3">
             {active.map((fh) => (
-              <FuneralCard key={fh.id} fh={fh} acting={acting} onAct={act} showReject />
+              <FuneralCard
+                key={fh.id}
+                fh={fh}
+                acting={acting}
+                onAct={act}
+                showReject
+                commissionEditing={commissionEditing}
+                commissionValue={commissionValue[fh.id] ?? String(fh.adminCommissionPercent)}
+                onCommissionEdit={(id) => {
+                  setCommissionEditing(id);
+                  setCommissionValue((p) => ({ ...p, [id]: String(fh.adminCommissionPercent) }));
+                }}
+                onCommissionChange={(id, val) => setCommissionValue((p) => ({ ...p, [id]: val }))}
+                onCommissionSave={saveCommission}
+                onCommissionCancel={() => setCommissionEditing(null)}
+              />
             ))}
           </div>
         )}
@@ -131,6 +163,7 @@ function Metric({ label, value, color }: { label: string; value: number; color: 
 
 function FuneralCard({
   fh, acting, onAct, showActions, showReject, showApprove,
+  commissionEditing, commissionValue, onCommissionEdit, onCommissionChange, onCommissionSave, onCommissionCancel,
 }: {
   fh: FuneralHome;
   acting: string | null;
@@ -138,41 +171,104 @@ function FuneralCard({
   showActions?: boolean;
   showReject?: boolean;
   showApprove?: boolean;
+  commissionEditing?: string | null;
+  commissionValue?: string;
+  onCommissionEdit?: (id: string) => void;
+  onCommissionChange?: (id: string, val: string) => void;
+  onCommissionSave?: (id: string) => void;
+  onCommissionCancel?: () => void;
 }) {
+  const isEditingCommission = commissionEditing === fh.id;
+
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-outline-variant/30 bg-surface-container/40 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-w-0">
-        <p className="font-semibold text-on-surface">{fh.name}</p>
-        <p className="text-sm text-on-surface-variant">{fh.contactName} · {fh.email}</p>
-        <p className="text-xs text-outline">
-          {fh.phone}
-          {fh.city ? ` · ${fh.city}${fh.state ? `/${fh.state}` : ""}` : ""}
-          {fh.cnpj ? ` · ${fh.cnpj}` : ""}
-        </p>
-        <p className="mt-0.5 text-xs text-outline">
-          Cadastro: {new Date(fh.createdAt).toLocaleDateString("pt-BR")}
-        </p>
+    <div className="rounded-xl border border-outline-variant/30 bg-surface-container/40 p-5 space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="font-semibold text-on-surface">{fh.name}</p>
+          <p className="text-sm text-on-surface-variant">{fh.contactName} · {fh.email}</p>
+          <p className="text-xs text-outline">
+            {fh.phone}
+            {fh.city ? ` · ${fh.city}${fh.state ? `/${fh.state}` : ""}` : ""}
+            {fh.cnpj ? ` · ${fh.cnpj}` : ""}
+          </p>
+          <p className="mt-0.5 text-xs text-outline">
+            Cadastro: {new Date(fh.createdAt).toLocaleDateString("pt-BR")}
+          </p>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          {(showActions || showApprove) && (
+            <button
+              disabled={acting === fh.id}
+              onClick={() => onAct(fh.id, "approve")}
+              className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-300 transition hover:bg-green-500/20 disabled:opacity-50"
+            >
+              {acting === fh.id ? "..." : "Aprovar"}
+            </button>
+          )}
+          {(showActions || showReject) && (
+            <button
+              disabled={acting === fh.id}
+              onClick={() => onAct(fh.id, "reject")}
+              className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/15 disabled:opacity-50"
+            >
+              {acting === fh.id ? "..." : "Rejeitar"}
+            </button>
+          )}
+        </div>
       </div>
-      <div className="flex shrink-0 gap-2">
-        {(showActions || showApprove) && (
-          <button
-            disabled={acting === fh.id}
-            onClick={() => onAct(fh.id, "approve")}
-            className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-300 transition hover:bg-green-500/20 disabled:opacity-50"
-          >
-            {acting === fh.id ? "..." : "Aprovar"}
-          </button>
-        )}
-        {(showActions || showReject) && (
-          <button
-            disabled={acting === fh.id}
-            onClick={() => onAct(fh.id, "reject")}
-            className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/15 disabled:opacity-50"
-          >
-            {acting === fh.id ? "..." : "Rejeitar"}
-          </button>
-        )}
-      </div>
+
+      {/* Comissão — só para funerárias aprovadas */}
+      {onCommissionEdit && (
+        <div className="border-t border-outline-variant/20 pt-3">
+          {isEditingCommission ? (
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+                Minha comissão:
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={commissionValue ?? ""}
+                    onChange={(e) => onCommissionChange?.(fh.id, e.target.value)}
+                    className="w-20 rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-1.5 pr-6 text-sm text-on-surface focus:border-tertiary focus:outline-none"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-outline">%</span>
+                </div>
+              </label>
+              <button
+                disabled={acting === fh.id}
+                onClick={() => onCommissionSave?.(fh.id)}
+                className="rounded-lg bg-tertiary/20 px-3 py-1.5 text-xs font-semibold text-tertiary hover:bg-tertiary/30 disabled:opacity-50"
+              >
+                {acting === fh.id ? "..." : "Salvar"}
+              </button>
+              <button
+                onClick={onCommissionCancel}
+                className="rounded-lg px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-on-surface-variant">
+                Minha comissão desta funerária:{" "}
+                <span className="font-semibold text-tertiary">{fh.adminCommissionPercent}%</span>
+                <span className="ml-1 text-outline">
+                  (funerária fica com {100 - fh.adminCommissionPercent}%)
+                </span>
+              </p>
+              <button
+                onClick={() => onCommissionEdit(fh.id)}
+                className="rounded-lg px-3 py-1 text-xs text-on-surface-variant border border-outline-variant/30 hover:border-outline-variant/60 transition"
+              >
+                Editar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

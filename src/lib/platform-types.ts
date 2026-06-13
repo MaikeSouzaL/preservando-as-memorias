@@ -112,3 +112,36 @@ export function calculateOrderTotals(priceCents: number, commissionPercent: numb
     ...commission,
   };
 }
+
+/**
+ * Cascade para transações com funerária:
+ *
+ * Cliente paga → grossAmountCents (preço do serviço)
+ * Admin Parceiro cobra adminCommissionPercent% da funerária:
+ *   adminParceiroGross = gross * adminCommissionPercent / 100
+ * Dev Admin leva devAdminPercent% do que o Admin Parceiro recebe:
+ *   devAdminAmount = adminParceiroGross * devAdminPercent / 100
+ * Admin Parceiro líquido: adminParceiroGross - devAdminAmount
+ * Funerária recebe: gross - adminParceiroGross
+ */
+export function calculateCascadeOrderTotals(
+  grossAmountCents: number,
+  adminCommissionPercent: number,
+  devAdminPercent: number
+) {
+  const adminParceiroGrossCents = Math.round((grossAmountCents * adminCommissionPercent) / 100);
+  const devAdminAmountCents = Math.round((adminParceiroGrossCents * devAdminPercent) / 100);
+  const adminParceiroNetCents = adminParceiroGrossCents - devAdminAmountCents;
+  const funeralHomeAmountCents = grossAmountCents - adminParceiroGrossCents;
+
+  return {
+    adminParceiroGrossCents,
+    devAdminAmountCents,
+    adminParceiroNetCents,
+    funeralHomeAmountCents,
+    // aliases usados no checkout
+    platformCommissionCents: devAdminAmountCents,
+    operatorAmountCents: adminParceiroNetCents,
+    funeralHomeCommissionCents: adminParceiroGrossCents,
+  };
+}

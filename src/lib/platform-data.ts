@@ -114,6 +114,12 @@ export type PlatformOrder = {
   grossAmountCents: number;
   platformCommissionCents: number;
   operatorAmountCents: number;
+  /** Cascade: valor bruto retido pelo Admin Parceiro da funerária */
+  funeralHomeCommissionCents?: number;
+  /** Cascade: valor líquido repassado à funerária */
+  funeralHomeAmountCents?: number;
+  /** Cascade: valor líquido repassado ao Admin Parceiro */
+  adminParceiroAmountCents?: number;
   status: "paid" | "pending";
   /** "pendente" = dinheiro retido no nosso Stripe, repasse manual ainda não feito
    *  "realizado" = repasse confirmado manualmente pelo dev admin
@@ -142,6 +148,12 @@ export type FuneralHome = {
   isActive: boolean;
   approvalStatus: "pending" | "approved" | "rejected";
   stripeAccountId?: string;
+  /** % que o Admin Parceiro cobra desta funerária (default 20) */
+  adminCommissionPercent: number;
+  /** Dados bancários da funerária para repasse */
+  bankPixKey?: string;
+  bankHolderName?: string;
+  bankCpfCnpj?: string;
   /**
    * Override do modo de entrega de QR Code para ESTA funerária:
    * "inherit" → segue a configuração global da plataforma (padrão)
@@ -151,6 +163,18 @@ export type FuneralHome = {
   qrDeliveryMode?: QrDeliveryOverride;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ContractAcceptance = {
+  id: string;
+  type: "dev_to_admin" | "admin_to_funeral";
+  signerEmail: string;
+  signerName?: string;
+  funeralHomeId?: string;
+  acceptedAt: string;
+  ipAddress?: string;
+  contractVersion: string;
+  createdAt: string;
 };
 
 export type FuneralHomeOfferLink = {
@@ -298,6 +322,7 @@ export type PlatformData = {
   profile: CuratorProfile;
   profiles: CuratorProfile[];
   complaints: ManagedComplaint[];
+  contractAcceptances: ContractAcceptance[];
 };
 
 // ─── Row mappers (DB snake_case → TS camelCase) ───────────────────────────────
@@ -463,7 +488,11 @@ function mapOrder(r: any): PlatformOrder {
     grossAmountCents: r.gross_amount_cents ?? r.amount ?? 0,
     platformCommissionCents: r.platform_commission_cents ?? 0,
     operatorAmountCents: r.operator_amount_cents ?? 0,
+    funeralHomeCommissionCents: r.funeral_home_commission_cents ?? undefined,
+    funeralHomeAmountCents: r.funeral_home_amount_cents ?? undefined,
+    adminParceiroAmountCents: r.admin_parceiro_amount_cents ?? undefined,
     status: r.status === "paid" ? "paid" : "pending",
+    repasseStatus: r.repasse_status ?? undefined,
     source: r.source ?? undefined,
     offerLinkId: r.offer_link_id ?? undefined,
     funeralHomeId: r.funeral_home_id ?? undefined,
@@ -490,6 +519,9 @@ function toDbOrder(o: PlatformOrder) {
     amount: o.grossAmountCents ?? 0,
     platform_commission_cents: o.platformCommissionCents ?? 0,
     operator_amount_cents: o.operatorAmountCents ?? 0,
+    funeral_home_commission_cents: o.funeralHomeCommissionCents ?? 0,
+    funeral_home_amount_cents: o.funeralHomeAmountCents ?? 0,
+    admin_parceiro_amount_cents: o.adminParceiroAmountCents ?? 0,
     status: o.status ?? "pending",
     source: o.source ?? null,
     offer_link_id: o.offerLinkId ?? null,
@@ -515,9 +547,27 @@ function mapFuneralHome(r: any): FuneralHome {
     isActive: r.is_active ?? true,
     approvalStatus: r.approval_status ?? "pending",
     stripeAccountId: r.stripe_account_id ?? undefined,
+    adminCommissionPercent: r.admin_commission_percent ?? 20,
+    bankPixKey: r.bank_pix_key ?? undefined,
+    bankHolderName: r.bank_holder_name ?? undefined,
+    bankCpfCnpj: r.bank_cpf_cnpj ?? undefined,
     qrDeliveryMode: (r.qr_delivery_mode as QrDeliveryOverride) ?? "inherit",
     createdAt: r.created_at,
     updatedAt: r.updated_at,
+  };
+}
+
+function mapContractAcceptance(r: any): ContractAcceptance {
+  return {
+    id: r.id,
+    type: r.type,
+    signerEmail: r.signer_email,
+    signerName: r.signer_name ?? undefined,
+    funeralHomeId: r.funeral_home_id ?? undefined,
+    acceptedAt: r.accepted_at,
+    ipAddress: r.ip_address ?? undefined,
+    contractVersion: r.contract_version ?? "1.0",
+    createdAt: r.created_at,
   };
 }
 
@@ -682,6 +732,7 @@ export async function readPlatformData(): Promise<PlatformData> {
     { data: complaintsRows = [] },
     { data: configRows = [] },
     { data: settingsRows = [] },
+    { data: contractRows = [] },
   ] = await Promise.all([
     supabase.from("memorials").select("*").order("created_at", { ascending: false }),
     supabase.from("qr_codes").select("*"),
@@ -699,6 +750,7 @@ export async function readPlatformData(): Promise<PlatformData> {
     supabase.from("complaints").select("*"),
     supabase.from("platform_config").select("*").eq("id", 1),
     supabase.from("platform_settings").select("*"),
+    supabase.from("contract_acceptances").select("*").order("created_at", { ascending: false }),
   ]);
 
   const cfg = configRows?.[0] ?? {};
@@ -749,6 +801,7 @@ export async function readPlatformData(): Promise<PlatformData> {
     staffMembers: (staffMembersRows ?? []).map(mapStaffMember),
     funeralDocuments: (funeralDocumentsRows ?? []).map(mapFuneralDocument),
     complaints: (complaintsRows ?? []).map(mapComplaint),
+    contractAcceptances: (contractRows ?? []).map(mapContractAcceptance),
   };
 }
 
@@ -854,6 +907,10 @@ async function persistChanges(original: PlatformData, updated: PlatformData): Pr
           is_active: fh.isActive,
           approval_status: fh.approvalStatus,
           stripe_account_id: fh.stripeAccountId ?? null,
+          admin_commission_percent: fh.adminCommissionPercent ?? 20,
+          bank_pix_key: fh.bankPixKey ?? null,
+          bank_holder_name: fh.bankHolderName ?? null,
+          bank_cpf_cnpj: fh.bankCpfCnpj ?? null,
         })
         .eq("id", fh.id)
     );
@@ -938,4 +995,64 @@ export async function updatePlatformData<T>(callback: (data: PlatformData) => T 
   await persistChanges(original, copy);
 
   return result;
+}
+
+// ─── Contract acceptances ────────────────────────────────────────────────────
+
+export async function saveContractAcceptance(
+  input: Omit<ContractAcceptance, "id" | "createdAt">
+): Promise<ContractAcceptance> {
+  const supabase = await createAdminClient();
+  const { data, error } = await supabase
+    .from("contract_acceptances")
+    .insert({
+      type: input.type,
+      signer_email: input.signerEmail,
+      signer_name: input.signerName ?? null,
+      funeral_home_id: input.funeralHomeId ?? null,
+      accepted_at: input.acceptedAt,
+      ip_address: input.ipAddress ?? null,
+      contract_version: input.contractVersion,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return mapContractAcceptance(data);
+}
+
+export async function getContractAcceptances(signerEmail: string): Promise<ContractAcceptance[]> {
+  const supabase = await createAdminClient();
+  const { data } = await supabase
+    .from("contract_acceptances")
+    .select("*")
+    .eq("signer_email", signerEmail)
+    .order("created_at", { ascending: false });
+  return (data ?? []).map(mapContractAcceptance);
+}
+
+export async function updateFuneralHomeCommission(
+  funeralHomeId: string,
+  adminCommissionPercent: number
+): Promise<void> {
+  const supabase = await createAdminClient();
+  await supabase
+    .from("funeral_homes")
+    .update({ admin_commission_percent: adminCommissionPercent })
+    .eq("id", funeralHomeId);
+}
+
+export async function updateFuneralHomeBankData(
+  funeralHomeId: string,
+  bankData: { bankPixKey?: string; bankHolderName?: string; bankCpfCnpj?: string }
+): Promise<void> {
+  const supabase = await createAdminClient();
+  await supabase
+    .from("funeral_homes")
+    .update({
+      bank_pix_key: bankData.bankPixKey ?? null,
+      bank_holder_name: bankData.bankHolderName ?? null,
+      bank_cpf_cnpj: bankData.bankCpfCnpj ?? null,
+    })
+    .eq("id", funeralHomeId);
 }
