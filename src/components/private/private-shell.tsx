@@ -7,6 +7,7 @@ import { UserAvatar } from "@/src/components/ui/user-avatar";
 
 type PrivateShellProps = {
   children: React.ReactNode;
+  isDevAdmin?: boolean;
 };
 
 const menuItems = [
@@ -15,7 +16,7 @@ const menuItems = [
   { href: "/configuracoes", label: "Configurações", icon: "settings" },
 ];
 
-export function PrivateShell({ children }: PrivateShellProps) {
+export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -164,6 +165,17 @@ export function PrivateShell({ children }: PrivateShellProps) {
               <span>{item.label}</span>
             </Link>
           ))}
+
+          {isDevAdmin && (
+            <Link
+              href="/dev"
+              className="flex items-center space-x-4 rounded-lg px-4 py-3 transition-all duration-300 mt-4 border border-[#e9c349]/20 bg-[#e9c349]/5 text-[#e9c349] hover:bg-[#e9c349]/10"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="material-symbols-outlined">construction</span>
+              <span className="text-sm font-semibold">Dev Console</span>
+            </Link>
+          )}
         </nav>
 
         <div className="p-6">
@@ -266,6 +278,17 @@ export function PrivateShell({ children }: PrivateShellProps) {
                         <span className="material-symbols-outlined text-[20px] text-tertiary">settings</span>
                         <span>Configurações</span>
                       </button>
+
+                      {isDevAdmin && (
+                        <Link
+                          href="/dev"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-[#e9c349] hover:bg-[#e9c349]/10 transition-all text-left font-medium"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">construction</span>
+                          <span>Dev Console</span>
+                        </Link>
+                      )}
 
                       <button
                         onClick={handleLogout}
