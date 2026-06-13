@@ -37,7 +37,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
 
   return (
     <>
-      <article className="flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-[#0a192f] transition duration-300 hover:-translate-y-0.5 hover:border-[#e9c349]/15">
+      <article className="flex flex-col overflow-hidden rounded-2xl border border-[var(--pm-border-faint)] bg-[var(--pm-card-solid)] transition duration-300 hover:-translate-y-0.5 hover:border-[#e9c349]/15">
         {/* Foto */}
         <div className="relative h-48 shrink-0">
           <Image
@@ -46,7 +46,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f] via-[#0a192f]/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--pm-card-img-from)] via-[var(--pm-card-img-mid)] to-transparent" />
           <div className="absolute bottom-3 left-4 right-4">
             <h3 className="font-semibold text-white line-clamp-1">{name}</h3>
             {years && <p className="text-xs text-white/50">{years}</p>}
@@ -84,7 +84,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
           <a
             href={editUrl}
             title="Editar memorial"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#c4c7c7]/60 transition hover:border-white/20 hover:text-[#e0e3e2]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--pm-border-subtle)] text-on-surface-variant/60 transition hover:border-outline/30 hover:text-on-surface"
           >
             <span className="material-symbols-outlined text-[1.1rem]">edit</span>
           </a>
@@ -95,7 +95,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
               type="button"
               title="Ver QR Code"
               onClick={() => setShowQr(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#c4c7c7]/60 transition hover:border-[#e9c349]/30 hover:text-[#e9c349]"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--pm-border-subtle)] text-on-surface-variant/60 transition hover:border-[#e9c349]/30 hover:text-[#e9c349]"
             >
               <span className="material-symbols-outlined text-[1.1rem]">qr_code_2</span>
             </button>
@@ -107,7 +107,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
               type="button"
               title="Compartilhar"
               onClick={handleShare}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#c4c7c7]/60 transition hover:border-[#e9c349]/30 hover:text-[#e9c349]"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--pm-border-subtle)] text-on-surface-variant/60 transition hover:border-[#e9c349]/30 hover:text-[#e9c349]"
             >
               <span className="material-symbols-outlined text-[1.1rem]">share</span>
             </button>
@@ -122,12 +122,12 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
           onClick={() => setShowQr(false)}
         >
           <div
-            className="flex w-full max-w-xs flex-col items-center gap-5 rounded-2xl border border-white/10 bg-[#0a192f] p-7"
+            className="flex w-full max-w-xs flex-col items-center gap-5 rounded-2xl border border-[var(--pm-border-subtle)] bg-[var(--pm-card-solid)] p-7"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
-              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-[#c4c7c7]/50">QR Code</p>
-              <h3 className="mt-1 font-semibold text-[#e0e3e2]">{name}</h3>
+              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-on-surface-variant/50">QR Code</p>
+              <h3 className="mt-1 font-semibold text-on-surface">{name}</h3>
             </div>
 
             {/* Heart QR — SVG already contains white background, no outer box needed */}
@@ -140,7 +140,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
               className="mx-auto drop-shadow-[0_4px_24px_rgba(233,195,73,0.15)]"
             />
 
-            <p className="text-center text-xs text-[#c4c7c7]/50">
+            <p className="text-center text-xs text-on-surface-variant/50">
               Escaneie com a câmera do celular para abrir o memorial
             </p>
 
@@ -156,7 +156,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
               <button
                 type="button"
                 onClick={() => setShowQr(false)}
-                className="flex flex-1 items-center justify-center rounded-full border border-white/10 py-2.5 text-xs text-[#c4c7c7]/60 transition hover:border-white/20 hover:text-[#e0e3e2]"
+                className="flex flex-1 items-center justify-center rounded-full border border-[var(--pm-border-subtle)] py-2.5 text-xs text-on-surface-variant/60 transition hover:border-outline/30 hover:text-on-surface"
               >
                 Fechar
               </button>

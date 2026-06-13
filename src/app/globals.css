@@ -45,6 +45,20 @@
 
   --background: var(--pm-surface-container-lowest);
   --foreground: var(--pm-on-surface);
+
+  /* ── Variáveis para cores hardcoded (suporte a tema Claro) ── */
+  --pm-card-bg: rgba(10, 25, 47, 0.38);
+  --pm-card-bg-light: rgba(10, 25, 47, 0.18);
+  --pm-card-solid: #0a192f;
+  --pm-shell-bg: #121212;
+  --pm-shell-overlay: radial-gradient(circle at 50% 0%, rgba(10,25,47,0.4) 0%, transparent 70%);
+  --pm-page-grad: radial-gradient(circle at 50% 0%, rgba(10,25,47,0.4) 0%, rgb(16,20,20) 60%), radial-gradient(circle at 100% 50%, rgba(233,195,73,0.03) 0%, transparent 40%);
+  --pm-dropdown-bg: rgba(10, 25, 47, 0.816);
+  --pm-select-bg: #0e1e35;
+  --pm-border-subtle: rgba(255, 255, 255, 0.1);
+  --pm-border-faint: rgba(255, 255, 255, 0.05);
+  --pm-card-img-from: #0a192f;
+  --pm-card-img-mid: rgba(10, 25, 47, 0.2);
 }
 
 @theme inline {
@@ -100,25 +114,37 @@
 
 /* ── Tema Claro ────────────────────────────────────────────────────────────── */
 [data-theme="claro"] {
-  --pm-surface: #f4f4f0;
-  --pm-surface-dim: #e8e8e4;
+  --pm-surface: #f4f0e8;
+  --pm-surface-dim: #e8e4d8;
   --pm-surface-bright: #ffffff;
   --pm-surface-container-lowest: #ffffff;
-  --pm-surface-container-low: #f0f0ec;
-  --pm-surface-container: #eaeae6;
-  --pm-surface-container-high: #e4e4e0;
-  --pm-surface-container-highest: #d8d8d4;
-  --pm-surface-variant: #e0e0dc;
+  --pm-surface-container-low: #f0ece4;
+  --pm-surface-container: #e8e4dc;
+  --pm-surface-container-high: #e0dcd4;
+  --pm-surface-container-highest: #d8d4cc;
+  --pm-surface-variant: #dedad2;
   --pm-on-surface: #1a1c1c;
   --pm-on-surface-variant: #3a3d3d;
   --pm-outline: #6e7171;
-  --pm-outline-variant: #c0c3c3;
-  --background: #f4f4f0;
+  --pm-outline-variant: #b8b4ac;
+  --pm-card-bg: rgba(255, 251, 242, 0.82);
+  --pm-card-bg-light: rgba(255, 251, 242, 0.5);
+  --pm-card-solid: #fffbf2;
+  --pm-shell-bg: #f4f0e8;
+  --pm-shell-overlay: radial-gradient(circle at 50% 0%, rgba(233,195,73,0.05) 0%, transparent 60%);
+  --pm-page-grad: radial-gradient(circle at 50% 0%, rgba(233,195,73,0.06) 0%, #f4f0e8 60%), radial-gradient(circle at 100% 50%, rgba(233,195,73,0.03) 0%, transparent 40%);
+  --pm-dropdown-bg: rgba(255, 251, 242, 0.97);
+  --pm-select-bg: #ede8dc;
+  --pm-border-subtle: rgba(0, 0, 0, 0.08);
+  --pm-border-faint: rgba(0, 0, 0, 0.05);
+  --pm-card-img-from: rgba(0, 0, 0, 0.75);
+  --pm-card-img-mid: rgba(0, 0, 0, 0.15);
+  --background: #f4f0e8;
   --foreground: #1a1c1c;
 }
 
 [data-theme="claro"] body {
-  background: #f4f4f0;
+  background: #f4f0e8;
   color: #1a1c1c;
 }
 

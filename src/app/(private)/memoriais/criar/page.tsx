@@ -174,7 +174,7 @@ export default function CriarMemorialPage() {
             O memorial está pronto! Faça o pagamento para publicar e gerar o QR Code.
           </p>
         </div>
-        <div className="w-full rounded-xl border border-tertiary/15 bg-[#0a192f]/60 p-6 text-left">
+        <div className="w-full rounded-xl border border-tertiary/15 bg-[var(--pm-card-bg)] p-6 text-left">
           <p className="mb-1 text-xs uppercase tracking-widest text-outline">Próximo passo</p>
           <h2 className="mb-2 font-semibold text-on-surface">Publicar memorial</h2>
           <p className="mb-4 text-sm text-on-surface-variant">

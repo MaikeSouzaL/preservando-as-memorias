@@ -43,7 +43,7 @@ export default async function HomenagensPage() {
       <div className="mx-auto grid max-w-container-max grid-cols-1 gap-8 lg:grid-cols-12">
         <section className="space-y-10 lg:col-span-8">
           {featuredTribute ? (
-            <article className="group relative overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f]/40 p-8 backdrop-blur-[20px]">
+            <article className="group relative overflow-hidden rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-[20px]">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-tertiary/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               <div className="absolute left-0 top-0 h-full w-1 bg-tertiary/50" />
 
@@ -71,7 +71,7 @@ export default async function HomenagensPage() {
               </div>
             </article>
           ) : (
-            <div className="text-center py-16 bg-[#0a192f]/20 rounded-xl border border-tertiary/10">
+            <div className="text-center py-16 bg-[var(--pm-card-bg-light)] rounded-xl border border-tertiary/10">
               <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">favorite_border</span>
               <p className="text-on-surface-variant text-lg">Nenhuma homenagem cadastrada ainda.</p>
             </div>
@@ -83,7 +83,7 @@ export default async function HomenagensPage() {
               {tributes.slice(1).map((tribute) => (
                 <article
                   key={tribute.id}
-                  className="rounded-lg border border-tertiary/10 bg-[#0a192f]/40 p-6 backdrop-blur-[20px] transition-transform duration-300 hover:-translate-y-1"
+                  className="rounded-lg border border-tertiary/10 bg-[var(--pm-card-bg)] p-6 backdrop-blur-[20px] transition-transform duration-300 hover:-translate-y-1"
                 >
                   <div className="mb-4 flex items-center gap-4">
                     <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-outline/20 bg-surface-container-highest text-tertiary font-bold">
@@ -105,7 +105,7 @@ export default async function HomenagensPage() {
         </section>
 
         <aside className="space-y-8 lg:col-span-4">
-          <div className="rounded-xl border border-tertiary/10 bg-[#0a192f]/40 p-6 backdrop-blur-[20px]">
+          <div className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-6 backdrop-blur-[20px]">
             <h3 className="mb-6 border-b border-tertiary/10 pb-4 text-xl text-on-surface">Métricas de Afeto</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export default async function HomenagensPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f]/40 p-6 text-center backdrop-blur-[20px]">
+          <div className="relative overflow-hidden rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-6 text-center backdrop-blur-[20px]">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-tertiary/10 to-transparent" />
             <span className="material-symbols-outlined relative z-10 mb-2 text-4xl text-tertiary">local_fire_department</span>
             <h3 className="relative z-10 mb-2 text-xl text-on-surface">Velas Acesas</h3>

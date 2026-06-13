@@ -227,7 +227,7 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="relative overflow-x-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(10,25,47,0.4)_0%,rgba(16,20,20,1)_60%),radial-gradient(circle_at_100%_50%,rgba(233,195,73,0.03)_0%,transparent_40%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10" style={{ background: 'var(--pm-page-grad)' }} />
 
       <main className="mx-auto w-full max-w-container-max pb-28">
         <header className="mb-10">
@@ -277,7 +277,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 0: Perfil */}
             {activeTab === 0 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-8 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">person</span>
                   Perfil do Curador
@@ -325,7 +325,7 @@ export default function ConfiguracoesPage() {
                         type="text"
                         name="name"
                         defaultValue={profile.name}
-                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                        className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                         required
                       />
                     </div>
@@ -336,7 +336,7 @@ export default function ConfiguracoesPage() {
                         type="email"
                         name="email"
                         defaultValue={profile.email}
-                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                        className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                         required
                       />
                     </div>
@@ -346,7 +346,7 @@ export default function ConfiguracoesPage() {
                       <textarea
                         name="bio"
                         defaultValue={profile.bio}
-                        className="h-24 w-full resize-none border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                        className="h-24 w-full resize-none border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                       />
                     </div>
 
@@ -366,7 +366,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 1: Conta */}
             {activeTab === 1 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">settings_applications</span>
                   Configurações da Conta
@@ -379,7 +379,7 @@ export default function ConfiguracoesPage() {
                     <select
                       value={profile.language}
                       onChange={(e) => saveProfileFields({ language: e.target.value })}
-                      className="w-full border-0 border-b border-white/10 bg-[#0e1e35] p-2 text-on-surface outline-none text-sm cursor-pointer"
+                      className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-[var(--pm-select-bg)] p-2 text-on-surface outline-none text-sm cursor-pointer"
                     >
                       <option value="pt-BR">Português (Brasil)</option>
                       <option value="en">English (United States)</option>
@@ -392,7 +392,7 @@ export default function ConfiguracoesPage() {
                     <select
                       value={profile.timezone}
                       onChange={(e) => saveProfileFields({ timezone: e.target.value })}
-                      className="w-full border-0 border-b border-white/10 bg-[#0e1e35] p-2 text-on-surface outline-none text-sm cursor-pointer"
+                      className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-[var(--pm-select-bg)] p-2 text-on-surface outline-none text-sm cursor-pointer"
                     >
                       <option value="GMT-3">Brasília (GMT-3)</option>
                       <option value="GMT-4">Amazonas (GMT-4)</option>
@@ -400,7 +400,7 @@ export default function ConfiguracoesPage() {
                     </select>
                   </div>
 
-                  <div className="pt-8 border-t border-white/10">
+                  <div className="pt-8 border-t border-[var(--pm-border-subtle)]">
                     <h4 className="text-error font-semibold mb-2">Excluir Conta</h4>
                     <p className="text-xs text-on-surface-variant/60 mb-4">
                       Essa ação é irreversível e excluirá permanentemente todos os seus memoriais, fotos e legados cadastrados.
@@ -419,7 +419,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 2: Privacidade */}
             {activeTab === 2 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-2 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">visibility</span>
                   Privacidade dos Memoriais
@@ -445,7 +445,7 @@ export default function ConfiguracoesPage() {
                           className={`w-full flex items-center justify-between rounded-lg p-4 transition-all text-left cursor-pointer border ${
                             isActive
                               ? "border-tertiary/30 bg-tertiary/5"
-                              : "border-transparent bg-[#0a192f]/20 hover:border-white/10"
+                              : "border-transparent bg-[var(--pm-card-bg-light)] hover:border-[var(--pm-border-subtle)]"
                           }`}
                         >
                           <div className="flex items-center gap-4">
@@ -469,7 +469,7 @@ export default function ConfiguracoesPage() {
                                 value={memorialPwd}
                                 onChange={(e) => setMemorialPwd(e.target.value)}
                                 placeholder="Crie uma senha simples"
-                                className="flex-1 border-0 border-b border-white/20 bg-transparent pb-2 text-on-surface outline-none text-sm"
+                                className="flex-1 border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 text-on-surface outline-none text-sm"
                               />
                               <button
                                 type="button"
@@ -491,7 +491,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 3: Segurança */}
             {activeTab === 3 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">security</span>
                   Segurança da Conta
@@ -506,7 +506,7 @@ export default function ConfiguracoesPage() {
                         type={showNewPwd ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 pr-8 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                        className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 pr-8 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                         placeholder="Mínimo 8 caracteres"
                       />
                       <button
@@ -527,7 +527,7 @@ export default function ConfiguracoesPage() {
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                      className="w-full border-0 border-b border-[var(--pm-border-subtle)] bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                       placeholder="••••••••"
                     />
                     {confirmPassword && newPassword !== confirmPassword && (
@@ -546,7 +546,7 @@ export default function ConfiguracoesPage() {
                   </div>
                 </form>
 
-                <div className="mt-8 pt-8 border-t border-white/10">
+                <div className="mt-8 pt-8 border-t border-[var(--pm-border-subtle)]">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-on-surface">Autenticação em Dois Fatores (2FA)</h4>
@@ -562,7 +562,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 4: Memorial */}
             {activeTab === 4 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">music_note</span>
                   Configurações do Memorial
@@ -595,7 +595,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 5: Notificações */}
             {activeTab === 5 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">notifications</span>
                   Preferências de Notificações
@@ -648,7 +648,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 6: Aparência */}
             {activeTab === 6 && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">palette</span>
                   Tema da Plataforma
@@ -696,7 +696,7 @@ export default function ConfiguracoesPage() {
 
             {/* Aba 7: Backup e Exportação — somente dev admin */}
             {activeTab === 7 && profile.isDevAdmin && (
-              <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+              <section className="rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
                   <span className="material-symbols-outlined text-tertiary">database</span>
                   Backup Completo da Plataforma
@@ -745,7 +745,7 @@ export default function ConfiguracoesPage() {
 
           {/* Coluna Lateral de Resumo */}
           <aside className="flex flex-col gap-8 lg:col-span-4">
-            <div className="relative overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
+            <div className="relative overflow-hidden rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
               <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-tertiary/5 blur-2xl" />
               <h3 className="relative z-10 mb-6 font-h3 text-[1.75rem] text-on-surface">Status</h3>
 

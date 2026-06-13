@@ -134,7 +134,10 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
   };
 
   return (
-    <div className="min-h-dvh bg-[#121212] bg-[radial-gradient(circle_at_50%_0%,rgba(10,25,47,0.4)_0%,transparent_70%)] text-on-background">
+    <div
+      className="min-h-dvh text-on-surface"
+      style={{ backgroundColor: 'var(--pm-shell-bg)', backgroundImage: 'var(--pm-shell-overlay)' }}
+    >
       <aside
         className={`fixed left-0 top-0 z-50 h-full w-72 border-r border-tertiary/10 bg-surface-container/90 p-base backdrop-blur-lg transition-transform duration-300 md:w-64 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
@@ -267,7 +270,7 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
                 {dropdownOpen && (
                   <>
                     <div className="fixed inset-0 z-40 cursor-default" onClick={() => setDropdownOpen(false)} />
-                    <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-xl border border-tertiary/10 bg-[#0a192fd0] p-2 shadow-2xl backdrop-blur-xl animate-fade-in z-50">
+                    <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-xl border border-tertiary/10 bg-[var(--pm-dropdown-bg)] p-2 shadow-2xl backdrop-blur-xl animate-fade-in z-50">
                       <div className="px-4 py-2.5 border-b border-outline-variant/30 mb-1.5">
                         <p className="text-xs text-outline">Conectado como</p>
                         <p className="font-semibold text-sm truncate text-on-surface mt-0.5">{profile?.name || "Usuário"}</p>
@@ -317,7 +320,7 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
       {/* Modal de Configurações de Perfil do Usuário Comum */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
-          <div className="relative w-full max-w-md rounded-2xl border border-tertiary/10 bg-[#0a192f] p-6 shadow-2xl backdrop-blur-2xl">
+          <div className="relative w-full max-w-md rounded-2xl border border-tertiary/10 bg-[var(--pm-card-solid)] p-6 shadow-2xl backdrop-blur-2xl">
             <h3 className="font-h3 text-2xl text-on-surface mb-2">Configurações de Perfil</h3>
             <p className="text-sm text-on-surface-variant mb-6">Ajuste seu nome, e-mail, senha e foto de perfil da plataforma.</p>
 

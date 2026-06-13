@@ -38,7 +38,7 @@ export default function DefinirSenhaPage() {
   }
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center bg-[#0b0f0f] px-5">
+    <main className="relative flex min-h-dvh items-center justify-center bg-[var(--pm-shell-bg)] px-5">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/3 top-1/4 h-[500px] w-[500px] rounded-full bg-[#e9c349]/4 blur-[120px]" />
       </div>
@@ -57,28 +57,28 @@ export default function DefinirSenhaPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-5 rounded-2xl border border-white/5 bg-[#0a192f]/60 p-7"
+          className="flex flex-col gap-5 rounded-2xl border border-[var(--pm-border-faint)] bg-[var(--pm-card-bg)] p-7"
         >
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs uppercase tracking-wider text-[#c4c7c7]/60">Nova senha</span>
+            <span className="text-xs uppercase tracking-wider text-on-surface-variant/60">Nova senha</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 8 caracteres"
               autoFocus
-              className="rounded-lg border border-white/10 bg-[#0b0f0f]/60 px-3 py-2.5 text-sm text-[#e0e3e2] placeholder-white/20 outline-none transition focus:border-[#e9c349]/40"
+              className="rounded-lg border border-[var(--pm-border-subtle)] bg-surface-container/60 px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/30 outline-none transition focus:border-tertiary/40"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs uppercase tracking-wider text-[#c4c7c7]/60">Confirmar senha</span>
+            <span className="text-xs uppercase tracking-wider text-on-surface-variant/60">Confirmar senha</span>
             <input
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               placeholder="Repita a senha"
-              className="rounded-lg border border-white/10 bg-[#0b0f0f]/60 px-3 py-2.5 text-sm text-[#e0e3e2] placeholder-white/20 outline-none transition focus:border-[#e9c349]/40"
+              className="rounded-lg border border-[var(--pm-border-subtle)] bg-surface-container/60 px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/30 outline-none transition focus:border-tertiary/40"
             />
           </label>
 

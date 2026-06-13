@@ -87,7 +87,7 @@ export default function MemoriaisListaPage() {
           placeholder="Buscar memorial por nome ou ano..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-tertiary/10 bg-[#0a192f]/40 py-3.5 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:border-tertiary/40 focus:outline-none focus:ring-1 focus:ring-tertiary/40 backdrop-blur-md transition-all"
+          className="w-full rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] py-3.5 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:border-tertiary/40 focus:outline-none focus:ring-1 focus:ring-tertiary/40 backdrop-blur-md transition-all"
         />
         {search && (
           <button
@@ -104,7 +104,7 @@ export default function MemoriaisListaPage() {
         {filteredMemorials.map((memorial) => (
           <article
             key={memorial.id}
-            className="group overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f]/40 backdrop-blur-[20px] transition duration-500 hover:scale-[1.02]"
+            className="group overflow-hidden rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] backdrop-blur-[20px] transition duration-500 hover:scale-[1.02]"
           >
             <div className="relative h-60">
               <Image
@@ -113,10 +113,10 @@ export default function MemoriaisListaPage() {
                 fill
                 className="object-cover grayscale-[30%] transition duration-700 group-hover:grayscale-0 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,25,47,0.95)_0%,rgba(10,25,47,0.3)_50%,transparent_100%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.3)_50%,transparent_100%)]" />
               <div className="absolute bottom-4 left-6 right-6">
-                <h4 className="font-h2 text-[1.75rem] leading-[1.2] text-on-surface">{memorial.name}</h4>
-                <p className="text-on-surface-variant text-sm mt-0.5">{memorial.years}</p>
+                <h4 className="font-h2 text-[1.75rem] leading-[1.2] text-white">{memorial.name}</h4>
+                <p className="text-white/60 text-sm mt-0.5">{memorial.years}</p>
                 <p className="italic text-tertiary/90 text-sm mt-1.5 line-clamp-1">{`"${memorial.epitaph}"`}</p>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function MemoriaisListaPage() {
         {/* Card Criar Novo */}
         <Link
           href="/memoriais/criar"
-          className="flex min-h-[22rem] flex-col items-center justify-center rounded-xl border border-dashed border-tertiary/30 bg-[#0a192f]/10 transition hover:bg-tertiary/5 text-center p-6 group"
+          className="flex min-h-[22rem] flex-col items-center justify-center rounded-xl border border-dashed border-tertiary/30 bg-[var(--pm-card-bg-light)] transition hover:bg-tertiary/5 text-center p-6 group"
         >
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-tertiary/10 text-tertiary group-hover:scale-110 transition duration-300">
             <span className="material-symbols-outlined text-[2rem]">add</span>
@@ -193,7 +193,7 @@ export default function MemoriaisListaPage() {
       </div>
 
       {filteredMemorials.length === 0 && (
-        <div className="text-center py-20 bg-[#0a192f]/20 rounded-xl border border-tertiary/10">
+        <div className="text-center py-20 bg-[var(--pm-card-bg-light)] rounded-xl border border-tertiary/10">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">search_off</span>
           <p className="text-on-surface-variant text-lg">{`Nenhum memorial encontrado para "${search}"`}</p>
         </div>

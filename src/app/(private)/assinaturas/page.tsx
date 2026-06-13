@@ -43,8 +43,7 @@ export default async function AssinaturasPage() {
 
   return (
     <div className="relative overflow-x-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#121212]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#121212] via-[#0a192f]/50 to-[#121212]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[var(--pm-shell-bg)]">
         <div className="absolute left-1/4 top-1/4 h-[800px] w-[800px] rounded-full bg-tertiary/5 blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 h-[600px] w-[600px] rounded-full bg-tertiary/5 blur-[100px]" />
       </div>
@@ -66,19 +65,19 @@ export default async function AssinaturasPage() {
             </p>
           </div>
 
-          <div className="relative w-full flex-1 h-[300px] md:h-[400px] overflow-hidden rounded-xl border border-tertiary/10 bg-[#0a192f]/40 p-2 shadow-2xl backdrop-blur-md">
+          <div className="relative w-full flex-1 h-[300px] md:h-[400px] overflow-hidden rounded-xl border border-tertiary/10 bg-[var(--pm-card-bg)] p-2 shadow-2xl backdrop-blur-md">
             <Image
               src={featuredImageUrl}
               alt="Memorial digital premium"
               fill
               className="rounded-lg object-cover opacity-85 mix-blend-luminosity transition-all duration-700 hover:opacity-100 hover:mix-blend-normal"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a192f]/80 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--pm-card-solid)]/80 to-transparent" />
           </div>
         </section>
 
         {currentPlan && (
-          <section className="rounded-2xl border border-tertiary/15 bg-[#0a192f]/35 p-8 backdrop-blur-md">
+          <section className="rounded-2xl border border-tertiary/15 bg-[var(--pm-card-bg)] p-8 backdrop-blur-md">
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Plano Ativo</p>
@@ -123,7 +122,7 @@ export default async function AssinaturasPage() {
                   className={`rounded-2xl border p-7 backdrop-blur-md transition-transform duration-300 hover:-translate-y-1 ${
                     isCurrent
                       ? "border-tertiary bg-tertiary/5 shadow-[0_0_20px_rgba(233,195,73,0.12)]"
-                      : "border-tertiary/10 bg-[#0a192f]/35"
+                      : "border-tertiary/10 bg-[var(--pm-card-bg)]"
                   }`}
                 >
                   <p className="mb-2 text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant">{plan.name}</p>
