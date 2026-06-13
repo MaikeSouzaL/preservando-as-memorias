@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { PwaRegister } from "./pwa-register";
+import { CookieBanner } from "@/src/components/ui/cookie-banner";
 
 export const metadata: Metadata = {
   title: "Preservando Memórias",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <PwaRegister />
         {children}
+        <CookieBanner />
       </body>
     </html>
   );
