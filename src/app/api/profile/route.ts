@@ -15,6 +15,7 @@ function toPublicProfile(row: any) {
     bio: row.bio ?? "",
     theme: row.theme ?? "noturno",
     privacy: row.privacy ?? "public",
+    memorialPassword: row.memorial_password ?? "",
     notifyVelas: row.notify_velas ?? true,
     notifyTributos: row.notify_tributos ?? true,
     multiFactorEnabled: row.multi_factor_enabled ?? false,
@@ -66,6 +67,7 @@ export async function PATCH(request: Request) {
     if (typeof body.timezone === "string") updates.timezone = body.timezone;
     if (typeof body.globalAudio === "boolean") updates.global_audio = body.globalAudio;
     if (typeof body.avatarUrl === "string") updates.avatar_url = body.avatarUrl.trim();
+    if (typeof body.memorialPassword === "string") updates.memorial_password = body.memorialPassword.trim() || null;
 
     const { data: updated, error } = await supabase
       .from("profiles")

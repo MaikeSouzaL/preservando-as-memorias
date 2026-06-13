@@ -98,6 +98,30 @@
   --font-sans: var(--font-inter);
 }
 
+/* ── Tema Claro ────────────────────────────────────────────────────────────── */
+[data-theme="claro"] {
+  --pm-surface: #f4f4f0;
+  --pm-surface-dim: #e8e8e4;
+  --pm-surface-bright: #ffffff;
+  --pm-surface-container-lowest: #ffffff;
+  --pm-surface-container-low: #f0f0ec;
+  --pm-surface-container: #eaeae6;
+  --pm-surface-container-high: #e4e4e0;
+  --pm-surface-container-highest: #d8d8d4;
+  --pm-surface-variant: #e0e0dc;
+  --pm-on-surface: #1a1c1c;
+  --pm-on-surface-variant: #3a3d3d;
+  --pm-outline: #6e7171;
+  --pm-outline-variant: #c0c3c3;
+  --background: #f4f4f0;
+  --foreground: #1a1c1c;
+}
+
+[data-theme="claro"] body {
+  background: #f4f4f0;
+  color: #1a1c1c;
+}
+
 html,
 body {
   margin: 0;

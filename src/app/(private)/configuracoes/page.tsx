@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { UserAvatar } from "@/src/components/ui/user-avatar";
 
 type CuratorProfile = {
   name: string;
@@ -8,12 +9,13 @@ type CuratorProfile = {
   bio: string;
   theme: string;
   privacy: "public" | "protected" | "private";
+  memorialPassword: string;
   notifyVelas: boolean;
   notifyTributos: boolean;
-  multiFactorEnabled: boolean;
   language: string;
   timezone: string;
   globalAudio: boolean;
+  avatarUrl: string;
 };
 
 const tabs = [
@@ -28,36 +30,48 @@ const tabs = [
 ];
 
 const themes = [
-  { id: "noturno", label: "Noturno", description: "Design moderno escuro" },
-  { id: "claro", label: "Claro", description: "Visual limpo e brilhante" },
-  { id: "cinema", label: "Cinematográfico", description: "Foco em tons quentes" },
+  { id: "noturno", label: "Noturno", icon: "dark_mode" },
+  { id: "claro", label: "Claro", icon: "light_mode" },
 ];
+
+function applyThemeToDom(themeId: string) {
+  if (themeId === "claro") {
+    document.documentElement.dataset.theme = "claro";
+  } else {
+    delete document.documentElement.dataset.theme;
+  }
+}
 
 export default function ConfiguracoesPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [profile, setProfile] = useState<CuratorProfile>({
-    name: "Felipe Silva",
-    email: "felipe@test.com",
-    bio: "Guardião das memórias da família. Curadoria emocional de histórias e lembranças.",
+    name: "",
+    email: "",
+    bio: "",
     theme: "noturno",
     privacy: "public",
+    memorialPassword: "",
     notifyVelas: true,
     notifyTributos: true,
-    multiFactorEnabled: false,
     language: "pt-BR",
     timezone: "GMT-3",
     globalAudio: true,
+    avatarUrl: "",
   });
 
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-  const [show2FADialog, setShow2FADialog] = useState(false);
-  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Senhas (aba segurança)
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPwd, setShowNewPwd] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
+  const [formAvatarUrl, setFormAvatarUrl] = useState("");
+
+  const [memorialPwd, setMemorialPwd] = useState("");
 
   useEffect(() => {
     async function loadData() {
@@ -67,6 +81,9 @@ export default function ConfiguracoesPage() {
           const json = await res.json();
           if (json.profile) {
             setProfile(json.profile);
+            setFormAvatarUrl(json.profile.avatarUrl || "");
+            setMemorialPwd(json.profile.memorialPassword || "");
+            applyThemeToDom(json.profile.theme || "noturno");
           }
         }
       } catch (err) {
@@ -78,9 +95,20 @@ export default function ConfiguracoesPage() {
     loadData();
   }, []);
 
-  const saveProfileFields = async (updates: Partial<CuratorProfile>) => {
-    setIsSaving(true);
+  const showSuccess = (msg: string) => {
+    setSuccessMsg(msg);
+    setErrorMsg("");
+    setTimeout(() => setSuccessMsg(""), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorMsg(msg);
     setSuccessMsg("");
+    setTimeout(() => setErrorMsg(""), 4000);
+  };
+
+  const saveProfileFields = async (updates: Record<string, unknown>) => {
+    setIsSaving(true);
     try {
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -90,28 +118,82 @@ export default function ConfiguracoesPage() {
       if (res.ok) {
         const json = await res.json();
         setProfile(json.profile);
-        setSuccessMsg("Configurações atualizadas com sucesso!");
-        setTimeout(() => setSuccessMsg(""), 4000);
+        showSuccess("Configurações atualizadas com sucesso!");
+      } else {
+        const json = await res.json();
+        showError(json.error || "Erro ao salvar configurações.");
       }
-    } catch (err) {
-      console.error("Erro ao salvar perfil:", err);
+    } catch {
+      showError("Erro de conexão. Tente novamente.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        setFormAvatarUrl(data.url);
+        await saveProfileFields({ avatarUrl: data.url });
+      }
+    } catch {
+      showError("Erro ao enviar foto.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      showError("As senhas não coincidem.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      showError("A nova senha deve ter pelo menos 8 caracteres.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/profile/password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Senha alterada com sucesso!");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        showError(json.error || "Erro ao alterar senha.");
+      }
+    } catch {
+      showError("Erro de conexão. Tente novamente.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleThemeChange = (themeId: string) => {
+    applyThemeToDom(themeId);
+    saveProfileFields({ theme: themeId });
   };
 
   const handleBackupExport = async () => {
     try {
       const res = await fetch("/api/memorials");
       const memorialsData = res.ok ? await res.json() : { memorials: [] };
-
       const backupObj = {
         exportedAt: new Date().toISOString(),
-        curator: {
-          name: profile.name,
-          email: profile.email,
-          bio: profile.bio,
-        },
+        curator: { name: profile.name, email: profile.email, bio: profile.bio },
         settings: {
           theme: profile.theme,
           privacy: profile.privacy,
@@ -121,9 +203,7 @@ export default function ConfiguracoesPage() {
         },
         memorials: memorialsData.memorials || [],
       };
-
-      const jsonStr = JSON.stringify(backupObj, null, 2);
-      const blob = new Blob([jsonStr], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -132,16 +212,10 @@ export default function ConfiguracoesPage() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-
-      setSuccessMsg("Backup gerado e baixado com sucesso!");
-      setTimeout(() => setSuccessMsg(""), 4000);
-    } catch (err) {
-      console.error("Erro ao exportar backup:", err);
+      showSuccess("Backup gerado e baixado com sucesso!");
+    } catch {
+      showError("Erro ao exportar backup.");
     }
-  };
-
-  const handleThemeChange = (themeId: string) => {
-    saveProfileFields({ theme: themeId });
   };
 
   if (loading) {
@@ -167,9 +241,16 @@ export default function ConfiguracoesPage() {
         </header>
 
         {successMsg && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.1)]">
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-emerald-400">
             <span className="material-symbols-outlined text-[20px]">check_circle</span>
             <span className="text-sm font-medium">{successMsg}</span>
+          </div>
+        )}
+
+        {errorMsg && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 px-4 py-3 text-error">
+            <span className="material-symbols-outlined text-[20px]">error</span>
+            <span className="text-sm font-medium">{errorMsg}</span>
           </div>
         )}
 
@@ -193,9 +274,8 @@ export default function ConfiguracoesPage() {
         </nav>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
-          {/* Coluna de Conteúdo Principal */}
           <div className="flex flex-col gap-8 lg:col-span-8">
-            
+
             {/* Aba 0: Perfil */}
             {activeTab === 0 && (
               <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
@@ -205,12 +285,27 @@ export default function ConfiguracoesPage() {
                 </h2>
 
                 <div className="flex flex-col items-start gap-8 md:flex-row">
-                  <div className="group relative">
-                    <div className="h-32 w-32 overflow-hidden rounded-full border-2 border-tertiary/20 p-1 bg-surface-container">
-                      <div className="flex h-full w-full items-center justify-center bg-tertiary/10 text-tertiary text-4xl font-bold">
-                        {profile.name.charAt(0).toUpperCase()}
-                      </div>
+                  <div className="flex flex-col items-center gap-3 shrink-0">
+                    <div className="relative h-32 w-32">
+                      <UserAvatar avatarUrl={formAvatarUrl || undefined} name={profile.name} size={128} />
+                      {uploading && (
+                        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60">
+                          <div className="h-6 w-6 animate-spin rounded-full border-2 border-tertiary border-t-transparent" />
+                        </div>
+                      )}
                     </div>
+                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-tertiary/30 bg-tertiary/10 px-4 py-2 text-xs font-semibold text-tertiary transition hover:bg-tertiary/20">
+                      <span className="material-symbols-outlined text-[16px]">upload</span>
+                      <span>{uploading ? "Enviando..." : "Alterar foto"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploading}
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-[10px] text-on-surface-variant/50">PNG, JPG ou WEBP até 5MB</p>
                   </div>
 
                   <form
@@ -231,7 +326,7 @@ export default function ConfiguracoesPage() {
                         type="text"
                         name="name"
                         defaultValue={profile.name}
-                        className="w-full border-0 border-b border-white/10 bg-white/2 pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 focus:bg-tertiary/2 text-sm"
+                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                         required
                       />
                     </div>
@@ -242,7 +337,7 @@ export default function ConfiguracoesPage() {
                         type="email"
                         name="email"
                         defaultValue={profile.email}
-                        className="w-full border-0 border-b border-white/10 bg-white/2 pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 focus:bg-tertiary/2 text-sm"
+                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                         required
                       />
                     </div>
@@ -252,7 +347,7 @@ export default function ConfiguracoesPage() {
                       <textarea
                         name="bio"
                         defaultValue={profile.bio}
-                        className="h-24 w-full resize-none border-0 border-b border-white/10 bg-white/2 pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 focus:bg-tertiary/2 text-sm"
+                        className="h-24 w-full resize-none border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
                       />
                     </div>
 
@@ -334,54 +429,63 @@ export default function ConfiguracoesPage() {
                   Defina o nível de acesso e privacidade padrão dos seus memoriais.
                 </p>
 
-                <div className="space-y-6">
-                  <button
-                    onClick={() => saveProfileFields({ privacy: "public" })}
-                    className={`w-full flex items-center justify-between rounded-lg p-4 transition-all text-left cursor-pointer border ${
-                      profile.privacy === "public" ? "border-tertiary/30 bg-tertiary/5" : "border-transparent bg-[#0a192f]/20 hover:border-white/10"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="material-symbols-outlined text-tertiary">public</span>
-                      <div>
-                        <h4 className="font-semibold text-on-surface">Público</h4>
-                        <p className="text-xs text-on-surface-variant/60">Aberto a todos que possuírem o link ou escanear o QR Code.</p>
-                      </div>
-                    </div>
-                    {profile.privacy === "public" && <span className="material-symbols-outlined text-tertiary">check_circle</span>}
-                  </button>
+                <div className="space-y-4">
+                  {(["public", "protected", "private"] as const).map((opt) => {
+                    const icons = { public: "public", protected: "vpn_key", private: "shield_person" } as const;
+                    const labels = { public: "Público", protected: "Protegido por Senha", private: "Privado (Restrito)" };
+                    const descriptions = {
+                      public: "Aberto a todos que possuírem o link ou escanear o QR Code.",
+                      protected: "Exige uma senha simples criada por você para visualização.",
+                      private: "Apenas você e e-mails convidados conseguem acessar.",
+                    };
+                    const isActive = profile.privacy === opt;
+                    return (
+                      <div key={opt}>
+                        <button
+                          onClick={() => saveProfileFields({ privacy: opt })}
+                          className={`w-full flex items-center justify-between rounded-lg p-4 transition-all text-left cursor-pointer border ${
+                            isActive
+                              ? "border-tertiary/30 bg-tertiary/5"
+                              : "border-transparent bg-[#0a192f]/20 hover:border-white/10"
+                          }`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="material-symbols-outlined text-tertiary">{icons[opt]}</span>
+                            <div>
+                              <h4 className="font-semibold text-on-surface">{labels[opt]}</h4>
+                              <p className="text-xs text-on-surface-variant/60">{descriptions[opt]}</p>
+                            </div>
+                          </div>
+                          {isActive && <span className="material-symbols-outlined text-tertiary">check_circle</span>}
+                        </button>
 
-                  <button
-                    onClick={() => saveProfileFields({ privacy: "protected" })}
-                    className={`w-full flex items-center justify-between rounded-lg p-4 transition-all text-left cursor-pointer border ${
-                      profile.privacy === "protected" ? "border-tertiary/30 bg-tertiary/5" : "border-transparent bg-[#0a192f]/20 hover:border-white/10"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="material-symbols-outlined text-tertiary">vpn_key</span>
-                      <div>
-                        <h4 className="font-semibold text-on-surface">Protegido por Senha</h4>
-                        <p className="text-xs text-on-surface-variant/60">Exige uma senha simples criada por você para visualização.</p>
+                        {opt === "protected" && isActive && (
+                          <div className="mt-2 rounded-lg border border-tertiary/20 bg-tertiary/5 p-4">
+                            <label className="mb-2 block text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">
+                              Senha de acesso ao memorial
+                            </label>
+                            <div className="flex gap-3">
+                              <input
+                                type="text"
+                                value={memorialPwd}
+                                onChange={(e) => setMemorialPwd(e.target.value)}
+                                placeholder="Crie uma senha simples"
+                                className="flex-1 border-0 border-b border-white/20 bg-transparent pb-2 text-on-surface outline-none text-sm"
+                              />
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() => saveProfileFields({ memorialPassword: memorialPwd })}
+                                className="rounded border border-tertiary/40 px-4 py-1.5 text-xs font-semibold text-tertiary hover:bg-tertiary/10 cursor-pointer disabled:opacity-50"
+                              >
+                                Salvar
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    {profile.privacy === "protected" && <span className="material-symbols-outlined text-tertiary">check_circle</span>}
-                  </button>
-
-                  <button
-                    onClick={() => saveProfileFields({ privacy: "private" })}
-                    className={`w-full flex items-center justify-between rounded-lg p-4 transition-all text-left cursor-pointer border ${
-                      profile.privacy === "private" ? "border-tertiary/30 bg-tertiary/5" : "border-transparent bg-[#0a192f]/20 hover:border-white/10"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="material-symbols-outlined text-tertiary">shield_person</span>
-                      <div>
-                        <h4 className="font-semibold text-on-surface">Privado (Restrito)</h4>
-                        <p className="text-xs text-on-surface-variant/60">Apenas você e e-mails convidados conseguem acessar.</p>
-                      </div>
-                    </div>
-                    {profile.privacy === "private" && <span className="material-symbols-outlined text-tertiary">check_circle</span>}
-                  </button>
+                    );
+                  })}
                 </div>
               </section>
             )}
@@ -393,47 +497,52 @@ export default function ConfiguracoesPage() {
                   <span className="material-symbols-outlined text-tertiary">security</span>
                   Segurança da Conta
                 </h2>
-                <p className="mb-8 text-on-surface-variant/60">Altere sua senha ou gerencie a autenticação multifator (2FA).</p>
+                <p className="mb-8 text-on-surface-variant/60">Altere sua senha de acesso à plataforma.</p>
 
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!newPassword) return;
-                    setSuccessMsg("Senha alterada com sucesso!");
-                    setOldPassword("");
-                    setNewPassword("");
-                    setTimeout(() => setSuccessMsg(""), 4000);
-                  }}
-                  className="space-y-6"
-                >
+                <form onSubmit={handlePasswordChange} className="space-y-6">
                   <div>
-                    <label className="mb-2 block text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">Senha Atual</label>
-                    <input
-                      type="password"
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      className="w-full border-0 border-b border-white/10 bg-white/2 pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 focus:bg-tertiary/2 text-sm"
-                      placeholder="••••••••"
-                    />
+                    <label className="mb-2 block text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">Nova Senha</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPwd ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full border-0 border-b border-white/10 bg-transparent pb-2 pr-8 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                        placeholder="Mínimo 8 caracteres"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPwd(!showNewPwd)}
+                        className="absolute right-0 top-0 text-on-surface-variant/60 hover:text-on-surface cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          {showNewPwd ? "visibility_off" : "visibility"}
+                        </span>
+                      </button>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">Nova Senha</label>
+                    <label className="mb-2 block text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">Confirmar Nova Senha</label>
                     <input
                       type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full border-0 border-b border-white/10 bg-white/2 pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 focus:bg-tertiary/2 text-sm"
-                      placeholder="Mínimo 8 caracteres"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full border-0 border-b border-white/10 bg-transparent pb-2 text-on-surface outline-none transition-all focus:border-b-tertiary/80 text-sm"
+                      placeholder="••••••••"
                     />
+                    {confirmPassword && newPassword !== confirmPassword && (
+                      <p className="mt-1 text-xs text-error">As senhas não coincidem.</p>
+                    )}
                   </div>
 
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="rounded border border-tertiary/50 px-6 py-3 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary transition-colors hover:bg-tertiary/10 cursor-pointer"
+                      disabled={isSaving || !newPassword || newPassword !== confirmPassword}
+                      className="rounded border border-tertiary/50 px-6 py-3 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary transition-colors hover:bg-tertiary/10 cursor-pointer disabled:opacity-50"
                     >
-                      Alterar Senha
+                      {isSaving ? "Alterando..." : "Alterar Senha"}
                     </button>
                   </div>
                 </form>
@@ -442,63 +551,12 @@ export default function ConfiguracoesPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-on-surface">Autenticação em Dois Fatores (2FA)</h4>
-                      <p className="text-xs text-on-surface-variant/60">Proteja sua conta adicionando uma etapa extra de login.</p>
+                      <p className="text-xs text-on-surface-variant/60">Adicione uma camada extra de proteção ao seu login.</p>
                     </div>
-                    <button
-                      onClick={() => {
-                        if (profile.multiFactorEnabled) {
-                          saveProfileFields({ multiFactorEnabled: false });
-                        } else {
-                          setShow2FADialog(true);
-                        }
-                      }}
-                      className={`px-4 py-2 rounded text-xs font-semibold uppercase tracking-wide cursor-pointer border ${
-                        profile.multiFactorEnabled
-                          ? "bg-error/10 text-error border-error/30"
-                          : "bg-tertiary/10 text-tertiary border-tertiary/30"
-                      }`}
-                    >
-                      {profile.multiFactorEnabled ? "Desativar 2FA" : "Configurar 2FA"}
-                    </button>
+                    <span className="rounded border border-outline/30 px-3 py-1.5 text-xs text-on-surface-variant/60">
+                      Em breve
+                    </span>
                   </div>
-
-                  {show2FADialog && (
-                    <div className="mt-6 rounded-lg border border-tertiary/20 bg-tertiary/5 p-4 space-y-4">
-                      <p className="text-xs text-on-surface-variant">
-                        Escaneie o QR Code abaixo com seu aplicativo de autenticação (Google Authenticator ou Authy) e digite o código de 6 dígitos gerado:
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <div className="h-24 w-24 bg-white p-2 rounded flex items-center justify-center text-black font-bold">
-                          QR CODE 2FA
-                        </div>
-                        <div className="space-y-2">
-                          <input
-                            type="text"
-                            maxLength={6}
-                            placeholder="000 000"
-                            value={twoFactorCode}
-                            onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ""))}
-                            className="bg-black/40 border border-white/20 px-3 py-2 rounded text-center text-sm font-mono tracking-widest outline-none focus:border-tertiary w-32"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (twoFactorCode.length === 6) {
-                                saveProfileFields({ multiFactorEnabled: true });
-                                setShow2FADialog(false);
-                                setTwoFactorCode("");
-                              } else {
-                                alert("Insira o código de 6 dígitos.");
-                              }
-                            }}
-                            className="block rounded bg-tertiary px-4 py-2 text-xs font-bold text-background hover:bg-tertiary-fixed cursor-pointer"
-                          >
-                            Validar e Ativar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </section>
             )}
@@ -548,45 +606,43 @@ export default function ConfiguracoesPage() {
                 </p>
 
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between rounded-lg border border-transparent bg-surface-container-lowest/50 p-4 hover:border-tertiary/10">
-                    <div className="flex items-center gap-4">
-                      <span className="material-symbols-outlined text-tertiary">lightbulb</span>
-                      <div>
-                        <h4 className="font-semibold text-on-surface">Vela Virtual Acesa</h4>
-                        <p className="text-xs text-on-surface-variant/60">Ser avisado quando um familiar acender uma vela virtual.</p>
+                  {[
+                    {
+                      key: "notifyVelas" as const,
+                      icon: "lightbulb",
+                      title: "Vela Virtual Acesa",
+                      desc: "Ser avisado quando um familiar acender uma vela virtual.",
+                    },
+                    {
+                      key: "notifyTributos" as const,
+                      icon: "chat_bubble",
+                      title: "Novas Homenagens",
+                      desc: "Ser avisado ao receber mensagens de tributo na página.",
+                    },
+                  ].map(({ key, icon, title, desc }) => (
+                    <div
+                      key={key}
+                      className="flex items-center justify-between rounded-lg border border-transparent bg-surface-container-lowest/50 p-4 hover:border-tertiary/10"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="material-symbols-outlined text-tertiary">{icon}</span>
+                        <div>
+                          <h4 className="font-semibold text-on-surface">{title}</h4>
+                          <p className="text-xs text-on-surface-variant/60">{desc}</p>
+                        </div>
                       </div>
+                      <label className="relative inline-flex cursor-pointer items-center">
+                        <input
+                          type="checkbox"
+                          checked={profile[key]}
+                          onChange={(e) => saveProfileFields({ [key]: e.target.checked })}
+                          className="peer sr-only"
+                        />
+                        <div className="h-6 w-11 rounded-full bg-surface-container-highest transition-colors peer-checked:bg-tertiary/80" />
+                        <div className="absolute left-[2px] top-[2px] h-5 w-5 rounded-full bg-on-surface transition-transform peer-checked:translate-x-5 peer-checked:bg-background" />
+                      </label>
                     </div>
-                    <label className="relative inline-flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={profile.notifyVelas}
-                        onChange={(e) => saveProfileFields({ notifyVelas: e.target.checked })}
-                        className="peer sr-only"
-                      />
-                      <div className="h-6 w-11 rounded-full bg-surface-container-highest transition-colors peer-checked:bg-tertiary/80" />
-                      <div className="absolute left-[2px] top-[2px] h-5 w-5 rounded-full bg-on-surface transition-transform peer-checked:translate-x-5 peer-checked:bg-background" />
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-lg border border-transparent bg-surface-container-lowest/50 p-4 hover:border-tertiary/10">
-                    <div className="flex items-center gap-4">
-                      <span className="material-symbols-outlined text-tertiary">chat_bubble</span>
-                      <div>
-                        <h4 className="font-semibold text-on-surface">Novas Homenagens</h4>
-                        <p className="text-xs text-on-surface-variant/60">Ser avisado ao receber mensagens de tributo na página.</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={profile.notifyTributos}
-                        onChange={(e) => saveProfileFields({ notifyTributos: e.target.checked })}
-                        className="peer sr-only"
-                      />
-                      <div className="h-6 w-11 rounded-full bg-surface-container-highest transition-colors peer-checked:bg-tertiary/80" />
-                      <div className="absolute left-[2px] top-[2px] h-5 w-5 rounded-full bg-on-surface transition-transform peer-checked:translate-x-5 peer-checked:bg-background" />
-                    </label>
-                  </div>
+                  ))}
                 </div>
               </section>
             )}
@@ -600,7 +656,7 @@ export default function ConfiguracoesPage() {
                 </h2>
                 <p className="mb-8 text-on-surface-variant/60">Escolha a aparência visual ideal para o gerenciamento de lembranças.</p>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div className="grid grid-cols-2 gap-6 max-w-sm">
                   {themes.map((theme) => {
                     const active = profile.theme === theme.id;
                     return (
@@ -611,18 +667,25 @@ export default function ConfiguracoesPage() {
                       >
                         <div
                           className={`relative mb-3 h-24 overflow-hidden rounded-lg border flex items-center justify-center ${
-                            active ? "border-tertiary bg-tertiary/10 shadow-[0_0_15px_rgba(233,195,73,0.1)]" : "border-surface-container-highest bg-black/40"
+                            active
+                              ? "border-tertiary bg-tertiary/10 shadow-[0_0_15px_rgba(233,195,73,0.1)]"
+                              : "border-surface-container-highest bg-black/40"
                           }`}
                         >
-                          {theme.id === "noturno" && <span className="material-symbols-outlined text-3xl text-tertiary">dark_mode</span>}
-                          {theme.id === "claro" && <span className="material-symbols-outlined text-3xl text-outline">light_mode</span>}
-                          {theme.id === "cinema" && <span className="material-symbols-outlined text-3xl text-amber-500">movie</span>}
-
+                          <span className={`material-symbols-outlined text-3xl ${active ? "text-tertiary" : "text-outline"}`}>
+                            {theme.icon}
+                          </span>
                           {active && (
-                            <span className="absolute bottom-2 right-2 material-symbols-outlined text-sm text-tertiary">check_circle</span>
+                            <span className="absolute bottom-2 right-2 material-symbols-outlined text-sm text-tertiary">
+                              check_circle
+                            </span>
                           )}
                         </div>
-                        <p className={`text-center text-[0.75rem] uppercase tracking-[0.15em] font-medium ${active ? "text-tertiary" : "text-on-surface-variant"}`}>
+                        <p
+                          className={`text-center text-[0.75rem] uppercase tracking-[0.15em] font-medium ${
+                            active ? "text-tertiary" : "text-on-surface-variant"
+                          }`}
+                        >
                           {theme.label}
                         </p>
                       </button>
@@ -682,14 +745,12 @@ export default function ConfiguracoesPage() {
                       stroke="#e9c349"
                       strokeWidth="4"
                       strokeDasharray="283"
-                      strokeDashoffset={profile.multiFactorEnabled ? 0 : 56}
+                      strokeDashoffset="0"
                       className="transition-all duration-700"
                     />
                   </svg>
                   <div className="absolute flex flex-col items-center">
-                    <span className="font-h2 text-[2.5rem] leading-none text-tertiary">
-                      {profile.multiFactorEnabled ? "100%" : "80%"}
-                    </span>
+                    <span className="font-h2 text-[2.5rem] leading-none text-tertiary">100%</span>
                     <span className="text-[0.75rem] uppercase tracking-[0.15em] text-on-surface-variant/60">Protegido</span>
                   </div>
                 </div>
@@ -702,13 +763,16 @@ export default function ConfiguracoesPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-base text-emerald-400">check_circle</span>
-                  Privacidade ativa: {profile.privacy === "public" ? "Pública" : profile.privacy === "protected" ? "Protegida" : "Privada"}
+                  Privacidade:{" "}
+                  {profile.privacy === "public"
+                    ? "Pública"
+                    : profile.privacy === "protected"
+                    ? "Protegida"
+                    : "Privada"}
                 </li>
-                <li className={`flex items-center gap-3 ${profile.multiFactorEnabled ? "" : "text-on-surface-variant/50"}`}>
-                  <span className="material-symbols-outlined text-base">
-                    {profile.multiFactorEnabled ? "check_circle" : "radio_button_unchecked"}
-                  </span>
-                  Autenticação em 2 fatores ({profile.multiFactorEnabled ? "Ativa" : "Inativa"})
+                <li className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-base text-emerald-400">check_circle</span>
+                  Tema: {profile.theme === "claro" ? "Claro" : "Noturno"}
                 </li>
               </ul>
             </div>

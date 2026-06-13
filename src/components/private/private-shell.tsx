@@ -25,7 +25,7 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
     email: string;
     avatarUrl?: string;
     bio?: string;
-    password?: string;
+    theme?: string;
   } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -78,6 +78,12 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
           setFormEmail(dataProfile.profile.email || "");
           setFormAvatarUrl(dataProfile.profile.avatarUrl || "");
           setFormPassword("");
+          const theme = dataProfile.profile.theme || "noturno";
+          if (theme === "claro") {
+            document.documentElement.dataset.theme = "claro";
+          } else {
+            delete document.documentElement.dataset.theme;
+          }
         }
 
         const resStats = await fetch("/api/me/stats");
