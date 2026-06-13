@@ -23,6 +23,7 @@ function toPublicProfile(row: any) {
     timezone: row.timezone ?? "GMT-3",
     globalAudio: row.global_audio ?? true,
     isAdmin: row.is_admin ?? false,
+    isDevAdmin: row.is_dev_admin ?? false,
     avatarUrl: row.avatar_url ?? "",
   };
 }

@@ -16,9 +16,10 @@ type CuratorProfile = {
   timezone: string;
   globalAudio: boolean;
   avatarUrl: string;
+  isDevAdmin: boolean;
 };
 
-const tabs = [
+const BASE_TABS = [
   "Perfil",
   "Conta",
   "Privacidade",
@@ -26,8 +27,9 @@ const tabs = [
   "Memorial",
   "Notificações",
   "Aparência",
-  "Backup e Exportação",
-];
+] as const;
+
+const DEV_ADMIN_TAB = "Backup e Exportação";
 
 const themes = [
   { id: "noturno", label: "Noturno", icon: "dark_mode" },
@@ -57,6 +59,7 @@ export default function ConfiguracoesPage() {
     timezone: "GMT-3",
     globalAudio: true,
     avatarUrl: "",
+    isDevAdmin: false,
   });
 
   const [loading, setLoading] = useState(true);
@@ -189,32 +192,28 @@ export default function ConfiguracoesPage() {
 
   const handleBackupExport = async () => {
     try {
-      const res = await fetch("/api/memorials");
-      const memorialsData = res.ok ? await res.json() : { memorials: [] };
-      const backupObj = {
-        exportedAt: new Date().toISOString(),
-        curator: { name: profile.name, email: profile.email, bio: profile.bio },
-        settings: {
-          theme: profile.theme,
-          privacy: profile.privacy,
-          language: profile.language,
-          timezone: profile.timezone,
-          globalAudio: profile.globalAudio,
-        },
-        memorials: memorialsData.memorials || [],
-      };
+      setIsSaving(true);
+      const res = await fetch("/api/dev/backup");
+      if (!res.ok) {
+        showError("Erro ao gerar backup. Tente novamente.");
+        return;
+      }
+      const backupObj = await res.json();
       const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `legado-digital-backup-${Date.now()}.json`;
+      const date = new Date().toISOString().slice(0, 10);
+      link.download = `preservando-memorias-backup-${date}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      showSuccess("Backup gerado e baixado com sucesso!");
+      showSuccess("Backup completo gerado e baixado com sucesso!");
     } catch {
       showError("Erro ao exportar backup.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -256,7 +255,7 @@ export default function ConfiguracoesPage() {
 
         <nav className="mb-12 overflow-x-auto border-b border-surface-container-highest pb-4 [scrollbar-width:none]">
           <ul className="flex gap-8 whitespace-nowrap">
-            {tabs.map((tab, index) => (
+            {[...BASE_TABS, ...(profile.isDevAdmin ? [DEV_ADMIN_TAB] : [])].map((tab, index) => (
               <li key={tab}>
                 <button
                   onClick={() => setActiveTab(index)}
@@ -695,31 +694,48 @@ export default function ConfiguracoesPage() {
               </section>
             )}
 
-            {/* Aba 7: Backup e Exportação */}
-            {activeTab === 7 && (
+            {/* Aba 7: Backup e Exportação — somente dev admin */}
+            {activeTab === 7 && profile.isDevAdmin && (
               <section className="rounded-xl border border-tertiary/10 bg-[#0a192f]/30 p-8 backdrop-blur-md">
                 <h2 className="mb-6 flex items-center gap-3 font-h3 text-[1.75rem] text-on-surface">
-                  <span className="material-symbols-outlined text-tertiary">download</span>
-                  Preservação e Exportação (Backup)
+                  <span className="material-symbols-outlined text-tertiary">database</span>
+                  Backup Completo da Plataforma
                 </h2>
                 <p className="mb-8 text-on-surface-variant/60">
-                  Faça o download físico de todas as fotos, histórias, biografias e dados de homenagens em formato estruturado (JSON).
+                  Exporta todos os dados da plataforma — memoriais, pedidos, funerárias, perfis, contratos e configurações — em formato JSON estruturado para migração ou armazenamento externo.
                 </p>
 
-                <div className="rounded-lg border border-tertiary/20 bg-tertiary/5 p-6 text-center space-y-6">
-                  <span className="material-symbols-outlined text-5xl text-tertiary">history_edu</span>
+                <div className="space-y-4 mb-8">
+                  {[
+                    { icon: "auto_stories", label: "Memoriais, galerias e linhas do tempo" },
+                    { icon: "volunteer_activism", label: "Velas, tributos e homenagens" },
+                    { icon: "receipt_long", label: "Pedidos e histórico financeiro" },
+                    { icon: "business", label: "Funerárias, serviços e agendamentos" },
+                    { icon: "group", label: "Perfis de usuários (sem senhas)" },
+                    { icon: "description", label: "Contratos e aceitações digitais" },
+                  ].map(({ icon, label }) => (
+                    <div key={label} className="flex items-center gap-3 text-sm text-on-surface-variant">
+                      <span className="material-symbols-outlined text-tertiary text-[18px]">{icon}</span>
+                      {label}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-lg border border-tertiary/20 bg-tertiary/5 p-6 text-center space-y-4">
+                  <span className="material-symbols-outlined text-5xl text-tertiary">cloud_download</span>
                   <div>
-                    <h4 className="font-semibold text-on-surface text-lg">Baixar Legado Digital</h4>
-                    <p className="text-xs text-on-surface-variant/60 max-w-md mx-auto mt-2">
-                      Garante que todo o conteúdo emocional e dados estruturados criados por você fiquem salvos em segurança também no seu computador.
+                    <h4 className="font-semibold text-on-surface text-lg">Baixar Backup Completo</h4>
+                    <p className="text-xs text-on-surface-variant/60 max-w-md mx-auto mt-1">
+                      Arquivo JSON com snapshot de todos os dados do banco. Dados bancários sensíveis são omitidos por segurança.
                     </p>
                   </div>
                   <button
                     onClick={handleBackupExport}
-                    className="inline-flex items-center gap-2 rounded bg-tertiary px-6 py-3 text-sm font-bold text-background hover:bg-tertiary-fixed transition-colors cursor-pointer shadow-lg"
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-2 rounded bg-tertiary px-6 py-3 text-sm font-bold text-background hover:bg-tertiary-fixed transition-colors cursor-pointer shadow-lg disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined text-[18px]">download</span>
-                    Exportar Backup em JSON
+                    {isSaving ? "Gerando backup..." : "Exportar Backup em JSON"}
                   </button>
                 </div>
               </section>
