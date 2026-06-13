@@ -4,6 +4,11 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DeliveryAddress } from "@/src/lib/platform-data";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ptBR } from "date-fns/locale/pt-BR";
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale("pt-BR", ptBR);
 
 type GalleryItem = { title: string; url: string };
 type TimelineEvent = {
@@ -922,14 +927,30 @@ function Field({ label, value, onChange, placeholder, type = "text" }: {
 }
 
 function DateField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const dateObj = value ? new Date(value + "T12:00:00") : null;
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex flex-col gap-1.5 w-full">
       <span className="text-xs uppercase tracking-wider text-[#c4c7c7]/60">{label}</span>
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg border border-white/10 bg-[#0b0f0f]/60 px-3 py-2.5 text-sm text-[#e0e3e2] outline-none transition focus:border-[#e9c349]/40 [color-scheme:dark]"
+      <DatePicker
+        selected={dateObj}
+        onChange={(d: Date | null) => {
+          if (d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            onChange(`${year}-${month}-${day}`);
+          } else {
+            onChange("");
+          }
+        }}
+        dateFormat="dd/MM/yyyy"
+        locale="pt-BR"
+        showYearDropdown
+        scrollableYearDropdown
+        yearDropdownItemNumber={120}
+        maxDate={new Date()}
+        placeholderText="dd/mm/aaaa"
+        className="w-full rounded-lg border border-white/10 bg-[#0b0f0f]/60 px-3 py-2.5 text-sm text-[#e0e3e2] outline-none transition focus:border-[#e9c349]/40"
       />
     </label>
   );

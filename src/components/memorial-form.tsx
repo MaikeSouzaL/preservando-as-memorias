@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import MemorialDesktopPreview from "@/src/components/memorial-desktop-preview";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ptBR } from "date-fns/locale/pt-BR";
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale("pt-BR", ptBR);
 
 export type MemorialFormData = {
   name: string;
@@ -218,19 +223,53 @@ export function MemorialForm({ onSubmit, submitLabel = "Salvar e Criar Memorial"
 
             <div>
               <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Data de Nascimento</label>
-              <input
-                type="date" name="birthDate"
-                value={form.birthDate} onChange={handleChange}
+              <DatePicker
+                selected={form.birthDate ? new Date(form.birthDate + "T12:00:00") : null}
+                onChange={(d: Date | null) => {
+                  if (d) {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    setForm(prev => ({ ...prev, birthDate: `${y}-${m}-${day}` }));
+                  } else {
+                    setForm(prev => ({ ...prev, birthDate: "" }));
+                  }
+                }}
+                dateFormat="dd/MM/yyyy"
+                locale="pt-BR"
+                showYearDropdown
+                scrollableYearDropdown
+                yearDropdownItemNumber={120}
+                maxDate={new Date()}
+                placeholderText="dd/mm/aaaa"
                 className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] focus:border-[#e9c349] focus:outline-none"
+                wrapperClassName="w-full"
               />
             </div>
 
             <div>
               <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Data de Falecimento</label>
-              <input
-                type="date" name="deathDate"
-                value={form.deathDate} onChange={handleChange}
+              <DatePicker
+                selected={form.deathDate ? new Date(form.deathDate + "T12:00:00") : null}
+                onChange={(d: Date | null) => {
+                  if (d) {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    setForm(prev => ({ ...prev, deathDate: `${y}-${m}-${day}` }));
+                  } else {
+                    setForm(prev => ({ ...prev, deathDate: "" }));
+                  }
+                }}
+                dateFormat="dd/MM/yyyy"
+                locale="pt-BR"
+                showYearDropdown
+                scrollableYearDropdown
+                yearDropdownItemNumber={120}
+                maxDate={new Date()}
+                placeholderText="dd/mm/aaaa"
                 className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] focus:border-[#e9c349] focus:outline-none"
+                wrapperClassName="w-full"
               />
             </div>
 

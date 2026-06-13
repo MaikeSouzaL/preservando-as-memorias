@@ -243,7 +243,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="max-w-lg text-[1.08rem] leading-relaxed text-[#c4c7c7]">
-              Transforme saudades em uma celebracao eterna. Conecte geracoes atraves de memoriais digitais acessiveis por QR Code fisico, preservando depoimentos e biografias.
+              Transforme saudades em memória eterna. Conecte gerações através de memoriais digitais acessíveis por QR Code físico, preservando depoimentos e biografias.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
