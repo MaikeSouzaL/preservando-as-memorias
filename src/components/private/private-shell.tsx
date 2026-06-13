@@ -186,15 +186,6 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
             </Link>
           )}
         </nav>
-
-        <div className="p-6">
-          <Link
-            href="/criar-memorial"
-            className="flex w-full items-center justify-center rounded-full border border-tertiary/50 py-3 text-tertiary transition hover:bg-tertiary/5 hover:shadow-[0_0_15px_rgba(233,195,73,0.2)]"
-          >
-            + Novo Memorial
-          </Link>
-        </div>
       </aside>
 
       {mobileOpen ? (
@@ -228,13 +219,6 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <Link
-                href="/memoriais/criar"
-                className="hidden rounded-full border border-tertiary/50 px-5 py-2 text-tertiary transition hover:bg-tertiary/5 md:block"
-              >
-                + Novo Memorial
-              </Link>
-              
               {/* Notificações */}
               <div className="relative">
                 <button
