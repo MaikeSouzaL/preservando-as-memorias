@@ -15,6 +15,7 @@ interface BeforeInstallPromptEvent extends Event {
 export function PwaInstallBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [isIos, setIsIos] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -36,12 +37,18 @@ export function PwaInstallBanner() {
     // Checar se é iOS (Safari iPhone/iPad)
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroidDevice = /android/.test(userAgent);
     
     if (isIosDevice) {
       // eslint-disable-next-line
       setIsIos(true);
       setIsVisible(true);
       return;
+    }
+
+    if (isAndroidDevice) {
+      setIsAndroid(true);
+      setIsVisible(true);
     }
 
     // Para Android/Chrome: interceptar o evento nativo
@@ -89,9 +96,17 @@ export function PwaInstallBanner() {
               <p>
                 Para instalar o app no seu iPhone, toque no botão <strong>Compartilhar</strong> <span className="material-symbols-outlined align-middle text-lg">ios_share</span> abaixo e escolha <strong>&quot;Adicionar à Tela de Início&quot;</strong>.
               </p>
-            ) : (
+            ) : deferredPrompt ? (
               <p>
                 Instale nosso aplicativo para acesso rápido e uma experiência melhor!
+              </p>
+            ) : isAndroid ? (
+              <p>
+                Para instalar no Android, toque nos <strong>3 pontinhos</strong> do navegador e escolha <strong>&quot;Adicionar à tela inicial&quot;</strong>.
+              </p>
+            ) : (
+              <p>
+                Instale o aplicativo para uma experiência melhor.
               </p>
             )}
           </div>
