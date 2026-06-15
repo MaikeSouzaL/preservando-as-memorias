@@ -16,7 +16,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: "Erro ao buscar usuários." }, { status: 500 });
+    return NextResponse.json({ error: "Erro ao buscar usuários: " + error.message }, { status: 500 });
   }
 
   return NextResponse.json({ users: profiles ?? [] });

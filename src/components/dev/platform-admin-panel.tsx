@@ -41,7 +41,12 @@ export function PlatformAdminPanel({ grossRevenueCents, systemCutCents, adminRep
       fetch("/api/dev/users", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([adminData, usersData]) => {
       setAdmin(adminData.admin);
+      if (usersData.error) {
+        setMessage({ text: "Erro da API: " + usersData.error, ok: false });
+      }
       setUsers(usersData.users ?? []);
+    }).catch(err => {
+      setMessage({ text: "Falha na requisição: " + String(err), ok: false });
     }).finally(() => setLoading(false));
   }, []);
 
