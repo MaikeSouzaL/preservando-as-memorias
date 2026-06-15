@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -24,7 +25,7 @@ export async function createClientServer() {
   });
 }
 
-import { createClient } from "@supabase/supabase-js";
+
 
 /** Admin Supabase client with service_role key — bypasses RLS. Use only in trusted server code. */
 export async function createAdminClient() {
