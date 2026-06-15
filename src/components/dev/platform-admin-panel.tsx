@@ -37,8 +37,8 @@ export function PlatformAdminPanel({ grossRevenueCents, systemCutCents, adminRep
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/dev/platform-admin").then((r) => r.json()),
-      fetch("/api/dev/users").then((r) => r.json()),
+      fetch("/api/dev/platform-admin", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/dev/users", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([adminData, usersData]) => {
       setAdmin(adminData.admin);
       setUsers(usersData.users ?? []);
