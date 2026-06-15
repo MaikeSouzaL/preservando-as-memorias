@@ -19,5 +19,12 @@ export async function GET() {
     return NextResponse.json({ error: "Erro ao buscar usuários: " + error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ users: profiles ?? [] });
+  return NextResponse.json({ 
+    users: profiles ?? [],
+    diagnostic: {
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      profilesCount: profiles?.length,
+      timestamp: Date.now()
+    }
+  });
 }
