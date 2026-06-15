@@ -122,7 +122,7 @@ export function AdminShell({ children }: AdminShellProps) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [pathname]);
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();

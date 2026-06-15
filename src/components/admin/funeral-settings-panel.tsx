@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { centsToBRL, cycleLabel, type PlatformConfig, type FuneralPlan } from "@/src/lib/platform-types";
+import { centsToBRL, cycleLabel, type PlatformConfig } from "@/src/lib/platform-types";
 
 const MODULE_LABELS: Record<string, string> = {
   memorials: "Memoriais + QR Code",
@@ -20,14 +20,15 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const funeralPlans = config.funeralPlans ?? [];
+  const funeralPlans = useMemo(() => Array.isArray(config.funeralPlans) ? config.funeralPlans : [], [config.funeralPlans]);
   const selectedPlan = useMemo(
     () => funeralPlans.find((p) => p.id === selectedPlanId) ?? funeralPlans[0],
     [funeralPlans, selectedPlanId]
   );
 
-  const commission = selectedPlan ? Math.round((selectedPlan.priceCents * config.ownerCommissionPercent) / 100) : 0;
-  const operatorRevenue = selectedPlan ? selectedPlan.priceCents - commission : 0;
+  const priceCents = selectedPlan?.priceCents ? Number(selectedPlan.priceCents) : 0;
+  const commission = selectedPlan ? Math.round((priceCents * (config.ownerCommissionPercent ?? 15)) / 100) : 0;
+  const operatorRevenue = selectedPlan ? priceCents - commission : 0;
 
   async function savePlan(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -149,7 +150,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
               type="number"
               min="0"
               step="0.01"
-              defaultValue={(selectedPlan.priceCents / 100).toFixed(2)}
+              defaultValue={(priceCents / 100).toFixed(2)}
               key={`price-${selectedPlan.id}`}
               required
               className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none"
@@ -214,7 +215,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           <div className="mb-4 flex items-baseline justify-between">
             <p className="text-lg font-semibold text-on-surface">{selectedPlan.name}</p>
             <div className="text-right">
-              <p className="text-2xl font-bold text-tertiary">{centsToBRL(selectedPlan.priceCents)}</p>
+              <p className="text-2xl font-bold text-tertiary">{centsToBRL(priceCents)}</p>
               <p className="text-xs text-on-surface-variant">/{cycleLabel(selectedPlan.cycle)}</p>
             </div>
           </div>
@@ -222,7 +223,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           <p className="mb-4 text-sm text-on-surface-variant">{selectedPlan.description}</p>
 
           <ul className="space-y-1.5">
-            {(selectedPlan.features || []).map((f) => (
+            {(Array.isArray(selectedPlan.features) ? selectedPlan.features : []).map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-on-surface-variant">
                 <span className="material-symbols-outlined text-base text-tertiary">check_circle</span>
                 {f}
@@ -236,7 +237,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-on-surface-variant">Valor da assinatura</span>
-              <span className="text-on-surface">{centsToBRL(selectedPlan.priceCents)}</span>
+              <span className="text-on-surface">{centsToBRL(priceCents)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-on-surface-variant">Taxa do sistema ({config.ownerCommissionPercent}%)</span>
