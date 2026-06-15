@@ -160,7 +160,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           <div>
             <p className="mb-2 text-xs uppercase tracking-wide text-on-surface-variant">Módulos incluídos</p>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(selectedPlan.modules).map(([key, enabled]) => (
+              {Object.entries(selectedPlan.modules || {}).map(([key, enabled]) => (
                 <span
                   key={key}
                   className={`rounded-full border px-3 py-1 text-xs ${
@@ -222,7 +222,7 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           <p className="mb-4 text-sm text-on-surface-variant">{selectedPlan.description}</p>
 
           <ul className="space-y-1.5">
-            {selectedPlan.features.map((f) => (
+            {(selectedPlan.features || []).map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-on-surface-variant">
                 <span className="material-symbols-outlined text-base text-tertiary">check_circle</span>
                 {f}
