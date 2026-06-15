@@ -39,6 +39,8 @@ export function PwaInstallBanner() {
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     const isAndroidDevice = /android/.test(userAgent);
     
+    console.log("PwaInstallBanner debug - Agent:", userAgent, "isIos:", isIosDevice, "isAndroid:", isAndroidDevice);
+
     if (isIosDevice) {
       // eslint-disable-next-line
       setIsIos(true);
@@ -53,6 +55,7 @@ export function PwaInstallBanner() {
 
     // Para Android/Chrome: interceptar o evento nativo
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log("PwaInstallBanner: beforeinstallprompt received!");
       // Impede o Chrome de mostrar aquele banner "miniatura" automático na barra inferior (opcional)
       e.preventDefault();
       // Salva o evento para dispararmos depois
@@ -84,7 +87,7 @@ export function PwaInstallBanner() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-[#e9c349] p-3 text-black shadow-lg animate-in slide-in-from-top-full duration-500">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-[#e9c349] p-3 text-black shadow-lg">
       <div className="mx-auto flex max-w-7xl items-start justify-between gap-4">
         
         <div className="flex items-center gap-3">
