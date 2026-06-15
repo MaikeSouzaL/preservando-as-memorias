@@ -24,16 +24,14 @@ export async function createClientServer() {
   });
 }
 
+import { createClient } from "@supabase/supabase-js";
+
 /** Admin Supabase client with service_role key — bypasses RLS. Use only in trusted server code. */
 export async function createAdminClient() {
-  const cookieStore = await cookies();
-  return createServerClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll() {},
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
     },
-    auth: { persistSession: false },
   });
 }
