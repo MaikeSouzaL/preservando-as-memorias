@@ -1,4 +1,6 @@
 import { readPlatformData } from "@/src/lib/platform-data";
+import { generateHeartQr } from "@/src/lib/qr-heart";
+import { QrCodeViewer } from "@/src/components/admin/qr-code-viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +46,7 @@ export default async function AdminQrCodesPage() {
                 <th className="pb-3 font-normal">Total de Scans</th>
                 <th className="pb-3 font-normal">Data de Emissão</th>
                 <th className="pb-3 font-normal">Status</th>
+                <th className="pb-3 font-normal">Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -55,8 +58,46 @@ export default async function AdminQrCodesPage() {
                 </tr>
               ) : (
                 allQrCodes.map((qr) => {
-                  const associatedMemorial = data.memorials.find((m) => m.id === qr.memorialId)?.name || "Desconhecido";
+                  const memorial = data.memorials.find((m) => m.id === qr.memorialId);
+                  const associatedMemorial = memorial?.name || "Desconhecido";
                   const dateStr = qr.createdAt ? new Date(qr.createdAt).toLocaleDateString("pt-BR") : "---";
+
+                  let qrDataUrl = "";
+                  if (memorial) {
+                    const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
+                    
+                    const format = (iso?: string | null) => {
+                      if (!iso) return undefined;
+                      const d = new Date(iso);
+                      if (isNaN(d.getTime())) return undefined;
+                      return [
+                        String(d.getUTCDate()).padStart(2, "0"),
+                        String(d.getUTCMonth() + 1).padStart(2, "0"),
+                        String(d.getUTCFullYear()),
+                      ].join("/");
+                    };
+
+                    const short = (full: string) => {
+                      const t = full.trim();
+                      if (t.length <= 13) return t;
+                      const p = t.split(/\s+/);
+                      if (p.length >= 2) {
+                        const two = `${p[0]} ${p[1]}`;
+                        if (two.length <= 13) return two;
+                      }
+                      return p[0].length <= 13 ? p[0] : p[0].slice(0, 12) + "…";
+                    };
+
+                    qrDataUrl = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${memorial.id}`, {
+                      overlay: {
+                        leftLine1: short(memorial.name),
+                        leftLine2: format(memorial.birthDate) ? `✦ ${format(memorial.birthDate)}` : undefined,
+                        rightLine1: "✝",
+                        rightLine2: format(memorial.deathDate),
+                        color: "#e9c349",
+                      },
+                    });
+                  }
 
                   return (
                     <tr key={qr.id} className="border-b border-outline-variant/20 transition-colors hover:bg-surface-variant/30">
@@ -85,6 +126,11 @@ export default async function AdminQrCodesPage() {
                           <span className={`h-1.5 w-1.5 rounded-full ${qr.status === "ativo" ? "bg-emerald-400" : "bg-outline"}`} />
                           {qr.status === "ativo" ? "Ativo" : "Pausado"}
                         </span>
+                      </td>
+                      <td className="py-4">
+                        {qrDataUrl && (
+                          <QrCodeViewer qrDataUrl={qrDataUrl} memorialName={associatedMemorial} />
+                        )}
                       </td>
                     </tr>
                   );
