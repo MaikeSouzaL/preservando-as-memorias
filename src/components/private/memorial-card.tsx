@@ -11,7 +11,8 @@ type Props = {
   status: "ativo" | "pending_payment" | "rascunho";
   publicUrl: string;
   editUrl: string;
-  qrDataUrl: string | null;
+  qrDataUrlDark: string | null;
+  qrDataUrlLight: string | null;
 };
 
 const statusLabel: Record<string, { text: string; color: string }> = {
@@ -20,10 +21,13 @@ const statusLabel: Record<string, { text: string; color: string }> = {
   rascunho: { text: "Rascunho", color: "text-outline bg-outline/10 border-outline/20" },
 };
 
-export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrl }: Props) {
+export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrlDark, qrDataUrlLight }: Props) {
   const [showQr, setShowQr] = useState(false);
+  const [qrTheme, setQrTheme] = useState<"dark" | "light">("dark");
   const s = statusLabel[status] ?? statusLabel.rascunho;
   const isActive = status === "ativo";
+  const activeQrUrl = qrTheme === "dark" ? qrDataUrlDark : qrDataUrlLight;
+  const hasQr = !!(qrDataUrlDark || qrDataUrlLight);
 
   function handleShare() {
     const url = `${window.location.origin}${publicUrl}`;
@@ -90,7 +94,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
           </a>
 
           {/* QR Code */}
-          {isActive && qrDataUrl && (
+          {isActive && hasQr && (
             <button
               type="button"
               title="Ver QR Code"
@@ -116,50 +120,89 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
       </article>
 
       {/* Modal QR Code */}
-      {showQr && qrDataUrl && (
+      {showQr && hasQr && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
           onClick={() => setShowQr(false)}
         >
           <div
-            className="flex w-full max-w-xs flex-col items-center gap-5 rounded-2xl border border-[var(--pm-border-subtle)] bg-[var(--pm-card-solid)] p-7"
+            className="relative flex w-full max-w-sm flex-col items-center gap-5 rounded-3xl border border-[var(--pm-border-subtle)] bg-[#0a192f] p-8 text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="text-center">
+            <button
+              onClick={() => setShowQr(false)}
+              className="absolute right-4 top-4 text-on-surface-variant transition hover:text-on-surface"
+              aria-label="Fechar"
+            >
+              <span className="material-symbols-outlined text-2xl">close</span>
+            </button>
+
+            <div>
               <p className="text-[0.65rem] uppercase tracking-[0.15em] text-on-surface-variant/50">QR Code</p>
               <h3 className="mt-1 font-semibold text-on-surface">{name}</h3>
             </div>
 
-            {/* Heart QR — SVG already contains white background, no outer box needed */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={qrDataUrl}
-              alt={`QR Code — ${name}`}
-              width={220}
-              height={240}
-              className="mx-auto drop-shadow-[0_4px_24px_rgba(233,195,73,0.15)]"
-            />
+            {/* Dark / Light toggle */}
+            <div className="inline-flex rounded-full border border-outline-variant/40 bg-surface-container/60 p-1">
+              <button
+                onClick={() => setQrTheme("dark")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  qrTheme === "dark"
+                    ? "bg-[#0b1120] text-white shadow"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">dark_mode</span>
+                Escuro
+              </button>
+              <button
+                onClick={() => setQrTheme("light")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  qrTheme === "light"
+                    ? "bg-white text-[#1c1b1b] shadow"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">light_mode</span>
+                Claro
+              </button>
+            </div>
 
-            <p className="text-center text-xs text-on-surface-variant/50">
-              Escaneie com a câmera do celular para abrir o memorial
+            {/* QR preview */}
+            <div
+              className={`mx-auto flex aspect-square w-[240px] items-center justify-center rounded-2xl p-4 shadow-inner transition-colors ${
+                qrTheme === "dark" ? "bg-[#0b1120]" : "bg-white"
+              }`}
+            >
+              {activeQrUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={activeQrUrl}
+                  alt={`QR Code — ${name}`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <p className="text-xs text-on-surface-variant">Não disponível</p>
+              )}
+            </div>
+
+            <p className="text-[0.7rem] text-on-surface-variant">
+              {qrTheme === "dark"
+                ? "Coração branco — ideal para fundo escuro"
+                : "Coração dourado — ideal para impressão em papel"}
             </p>
 
-            <div className="flex w-full gap-3">
-              <a
-                href={qrDataUrl}
-                download={`qrcode-${name.toLowerCase().replace(/\s+/g, "-")}.png`}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#e9c349]/30 py-2.5 text-xs font-semibold text-[#e9c349] transition hover:bg-[#e9c349]/10"
-              >
-                <span className="material-symbols-outlined text-sm">download</span>
-                Baixar
-              </a>
-              <button
-                type="button"
-                onClick={() => setShowQr(false)}
-                className="flex flex-1 items-center justify-center rounded-full border border-[var(--pm-border-subtle)] py-2.5 text-xs text-on-surface-variant/60 transition hover:border-outline/30 hover:text-on-surface"
-              >
-                Fechar
-              </button>
+            <div className="flex w-full justify-center">
+              {activeQrUrl && (
+                <a
+                  href={activeQrUrl}
+                  download={`qrcode-${name.toLowerCase().replace(/\s+/g, "-")}-${qrTheme}.svg`}
+                  className="flex items-center gap-2 rounded-full bg-[#e9c349] px-6 py-2.5 text-sm font-semibold text-[#0d1010] transition hover:bg-[#ffe088] shadow-lg shadow-[#e9c349]/20"
+                >
+                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  Baixar QR ({qrTheme === "dark" ? "Escuro" : "Claro"})
+                </a>
+              )}
             </div>
           </div>
         </div>

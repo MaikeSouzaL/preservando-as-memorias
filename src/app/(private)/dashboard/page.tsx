@@ -44,21 +44,34 @@ export default async function DashboardPage() {
     (m) => m.id !== "default" && (session.isAdmin || session.isDevAdmin || m.ownerId === session.userId || m.ownerId.toLowerCase().trim() === session.email)
   );
 
-  const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
+  const baseUrl = (process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001")
+    .replace("://preservandomemorias.com.br", "://www.preservandomemorias.com.br");
 
-  const qrMap: Record<string, string> = {};
+  const qrMap: Record<string, { dark: string; light: string }> = {};
   for (const m of memorials.filter((m) => m.status === "ativo")) {
     const birth = fmtDate(m.birthDate);
     const death = fmtDate(m.deathDate);
-    qrMap[m.id] = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${m.id}`, {
-      overlay: {
-        leftLine1: shortName(m.name),
-        leftLine2: birth ? `✦ ${birth}` : undefined,
-        rightLine1: "✝",
-        rightLine2: death,
-        color: "#e9c349",
-      },
-    });
+    const qrUrl = `${baseUrl}/memorial-publico?memorial=${m.id}`;
+    const overlayBase = {
+      leftLine1: shortName(m.name),
+      leftLine2: birth ? `✦ ${birth}` : undefined,
+      rightLine1: "✝",
+      rightLine2: death,
+    };
+    qrMap[m.id] = {
+      dark: generateHeartQr(qrUrl, {
+        dark: "#0b0f0f",
+        light: "#ffffff",
+        overlay: { ...overlayBase, color: "#1c1b1b" },
+        bottomUrl: "www.preservandomemorias.com.br",
+      }),
+      light: generateHeartQr(qrUrl, {
+        dark: "#000000",
+        light: "#e9c349",
+        overlay: { ...overlayBase, color: "#1c1b1b" },
+        bottomUrl: "www.preservandomemorias.com.br",
+      }),
+    };
   }
 
   return (
@@ -116,7 +129,8 @@ export default async function DashboardPage() {
                 status={memorial.status as "ativo" | "pending_payment" | "rascunho"}
                 publicUrl={`/memorial-publico?memorial=${memorial.id}`}
                 editUrl={`/memoriais/criar?edit=${memorial.id}`}
-                qrDataUrl={qrMap[memorial.id] ?? null}
+                qrDataUrlDark={qrMap[memorial.id]?.dark ?? null}
+                qrDataUrlLight={qrMap[memorial.id]?.light ?? null}
               />
             );
           })}

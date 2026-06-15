@@ -40,6 +40,8 @@ interface HeartQrOptions {
     /** Accent colour. Default: "#e9c349" (system gold) */
     color?: string;
   };
+  /** Optional URL label shown in small text below the heart (e.g. "www.preservandomemorias.com.br") */
+  bottomUrl?: string;
 }
 
 /** Escape characters that are special inside SVG text content. */
@@ -62,6 +64,7 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
     dark = "#0b0f0f",
     light = "#ffffff",
     overlay,
+    bottomUrl,
   } = opts;
 
   // ── QR module matrix (synchronous) ─────────────────────────────────────────
@@ -97,7 +100,9 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
   const heartHalfW = r / 2 + circleR; // half-width of heart (wider than diamond!)
   const canvasW = Math.round(2 * heartHalfW + pad * 2);
   const topReach = r / 2 + circleR; // distance from diamond centre → top of circles
-  const canvasH = Math.round(topReach + r + pad * 2);
+  const footerFontSize = bottomUrl ? Math.max(8, Math.round(circleR / 11)) : 0;
+  const footerH = bottomUrl ? Math.round(footerFontSize * 2.8) : 0;
+  const canvasH = Math.round(topReach + r + pad * 2 + footerH);
 
   // Diamond centre in canvas space
   const cx = canvasW / 2;
@@ -190,6 +195,15 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
       bumpText(cRx, overlay.rightLine1, overlay.rightLine2);
   }
 
+  const footerSvg = bottomUrl
+    ? `<text x="${cx}" y="${cy + r + pad + footerFontSize}" ` +
+      `text-anchor="middle" dominant-baseline="middle" ` +
+      `font-family="Georgia,'Times New Roman',serif" ` +
+      `font-size="${footerFontSize}" fill="${overlay?.color ?? "#1c1b1b"}" opacity="0.55" letter-spacing="0.3">` +
+      escXml(bottomUrl) +
+      `</text>`
+    : "";
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" \
 width="${canvasW}" height="${canvasH}" \
 viewBox="0 0 ${canvasW} ${canvasH}">
@@ -216,6 +230,9 @@ viewBox="0 0 ${canvasW} ${canvasH}">
 
   <!-- Name / dates in the two bumps (gold accent, Georgia serif) -->
   ${overlayText}
+
+  <!-- Website URL label below the heart -->
+  ${footerSvg}
 </svg>`;
 
   return "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64");

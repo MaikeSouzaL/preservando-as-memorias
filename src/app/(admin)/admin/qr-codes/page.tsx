@@ -65,7 +65,8 @@ export default async function AdminQrCodesPage() {
                   let qrDataUrlDark = "";
                   let qrDataUrlLight = "";
                   if (memorial) {
-                    const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
+                    const baseUrl = (process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001")
+                      .replace("://preservandomemorias.com.br", "://www.preservandomemorias.com.br");
 
                     const format = (iso?: string | null) => {
                       if (!iso) return undefined;
@@ -100,11 +101,13 @@ export default async function AdminQrCodesPage() {
                       dark: "#0b0f0f",
                       light: "#ffffff",
                       overlay: { ...qrOverlayBase, color: "#1c1b1b" },
+                      bottomUrl: "www.preservandomemorias.com.br",
                     });
                     qrDataUrlLight = generateHeartQr(qrUrl, {
                       dark: "#000000",
                       light: "#e9c349",
                       overlay: { ...qrOverlayBase, color: "#1c1b1b" },
+                      bottomUrl: "www.preservandomemorias.com.br",
                     });
                   }
 
