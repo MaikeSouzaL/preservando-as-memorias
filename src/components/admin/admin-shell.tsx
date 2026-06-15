@@ -40,6 +40,7 @@ export function AdminShell({ children }: AdminShellProps) {
   }[]>([]);
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState<string | null>(null);
+  const [hasSignedContract, setHasSignedContract] = useState<boolean | null>(null);
 
   // Estados do perfil e formulário do Admin
   const [profile, setProfile] = useState<{
@@ -97,6 +98,10 @@ export function AdminShell({ children }: AdminShellProps) {
 
         const resContracts = await fetch("/api/admin/contracts");
         const dataContracts = await resContracts.json();
+
+        if (active) {
+          setHasSignedContract(dataContracts.hasSigned);
+        }
 
         if (active && dataContracts.hasSigned === false && !pathname.includes("/admin/contrato")) {
           window.location.href = "/admin/contrato";
@@ -192,6 +197,11 @@ export function AdminShell({ children }: AdminShellProps) {
 
             <nav className="flex flex-col gap-1">
               {adminItems.map((item) => {
+                // Se ainda não assinou o contrato, oculta todas as outras opções exceto "Contrato"
+                if (hasSignedContract === false && item.label !== "Contrato") {
+                  return null;
+                }
+
                 const active = isActive(item.href);
                 const baseClass = `flex items-center gap-3 rounded px-4 py-3 text-sm font-medium transition-colors ${
                   active
