@@ -3,12 +3,17 @@
 import { useState } from "react";
 
 type QrCodeViewerProps = {
-  qrDataUrl: string;
+  qrDataUrlDark: string;
+  qrDataUrlLight: string;
   memorialName: string;
 };
 
-export function QrCodeViewer({ qrDataUrl, memorialName }: QrCodeViewerProps) {
+export function QrCodeViewer({ qrDataUrlDark, qrDataUrlLight, memorialName }: QrCodeViewerProps) {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  const activeUrl = theme === "dark" ? qrDataUrlDark : qrDataUrlLight;
+  const filename = `qrcode-${memorialName.toLowerCase().replace(/\s+/g, "-")}-${theme}.svg`;
 
   return (
     <>
@@ -32,21 +37,58 @@ export function QrCodeViewer({ qrDataUrl, memorialName }: QrCodeViewerProps) {
             </button>
 
             <h4 className="mb-1 font-h3 text-xl text-on-surface">QR Code</h4>
-            <p className="mb-6 text-sm text-on-surface-variant">Memorial: {memorialName}</p>
+            <p className="mb-5 text-sm text-on-surface-variant">Memorial: {memorialName}</p>
 
-            <div className="mx-auto flex aspect-square w-[240px] items-center justify-center rounded-2xl bg-[#0b1120] p-4 shadow-inner">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={qrDataUrl} alt={`QR Code para ${memorialName}`} className="h-full w-full object-contain" />
+            {/* Theme toggle */}
+            <div className="mb-5 inline-flex rounded-full border border-outline-variant/40 bg-surface-container/60 p-1">
+              <button
+                onClick={() => setTheme("dark")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  theme === "dark"
+                    ? "bg-[#0b1120] text-white shadow"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">dark_mode</span>
+                Escuro
+              </button>
+              <button
+                onClick={() => setTheme("light")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                  theme === "light"
+                    ? "bg-white text-[#1c1b1b] shadow"
+                    : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">light_mode</span>
+                Claro
+              </button>
             </div>
 
-            <div className="mt-8 flex justify-center">
+            {/* QR preview */}
+            <div
+              className={`mx-auto flex aspect-square w-[240px] items-center justify-center rounded-2xl p-4 shadow-inner transition-colors ${
+                theme === "dark" ? "bg-[#0b1120]" : "bg-white"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={activeUrl} alt={`QR Code para ${memorialName}`} className="h-full w-full object-contain" />
+            </div>
+
+            <p className="mt-3 text-[0.7rem] text-on-surface-variant">
+              {theme === "dark"
+                ? "Coração branco — ideal para fundo escuro"
+                : "Coração dourado — ideal para impressão em papel"}
+            </p>
+
+            <div className="mt-6 flex justify-center">
               <a
-                href={qrDataUrl}
-                download={`qrcode-${memorialName.toLowerCase().replace(/\s+/g, "-")}.svg`}
+                href={activeUrl}
+                download={filename}
                 className="flex items-center gap-2 rounded-full bg-tertiary px-6 py-2.5 text-sm font-semibold text-background transition hover:bg-tertiary-fixed shadow-lg shadow-tertiary/20"
               >
                 <span className="material-symbols-outlined text-[18px]">download</span>
-                Baixar QR Code
+                Baixar QR ({theme === "dark" ? "Escuro" : "Claro"})
               </a>
             </div>
           </div>

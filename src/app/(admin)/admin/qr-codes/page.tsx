@@ -62,10 +62,11 @@ export default async function AdminQrCodesPage() {
                   const associatedMemorial = memorial?.name || "Desconhecido";
                   const dateStr = qr.createdAt ? new Date(qr.createdAt).toLocaleDateString("pt-BR") : "---";
 
-                  let qrDataUrl = "";
+                  let qrDataUrlDark = "";
+                  let qrDataUrlLight = "";
                   if (memorial) {
                     const baseUrl = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001";
-                    
+
                     const format = (iso?: string | null) => {
                       if (!iso) return undefined;
                       const d = new Date(iso);
@@ -88,14 +89,22 @@ export default async function AdminQrCodesPage() {
                       return p[0].length <= 13 ? p[0] : p[0].slice(0, 12) + "…";
                     };
 
-                    qrDataUrl = generateHeartQr(`${baseUrl}/memorial-publico?memorial=${memorial.id}`, {
-                      overlay: {
-                        leftLine1: short(memorial.name),
-                        leftLine2: format(memorial.birthDate) ? `✦ ${format(memorial.birthDate)}` : undefined,
-                        rightLine1: "✝",
-                        rightLine2: format(memorial.deathDate),
-                        color: "#e9c349",
-                      },
+                    const qrUrl = `${baseUrl}/memorial-publico?memorial=${memorial.id}`;
+                    const qrOverlayBase = {
+                      leftLine1: short(memorial.name),
+                      leftLine2: format(memorial.birthDate) ? `✦ ${format(memorial.birthDate)}` : undefined,
+                      rightLine1: "✝",
+                      rightLine2: format(memorial.deathDate),
+                    };
+                    qrDataUrlDark = generateHeartQr(qrUrl, {
+                      dark: "#0b0f0f",
+                      light: "#ffffff",
+                      overlay: { ...qrOverlayBase, color: "#1c1b1b" },
+                    });
+                    qrDataUrlLight = generateHeartQr(qrUrl, {
+                      dark: "#000000",
+                      light: "#e9c349",
+                      overlay: { ...qrOverlayBase, color: "#1c1b1b" },
                     });
                   }
 
@@ -128,8 +137,12 @@ export default async function AdminQrCodesPage() {
                         </span>
                       </td>
                       <td className="py-4">
-                        {qrDataUrl && (
-                          <QrCodeViewer qrDataUrl={qrDataUrl} memorialName={associatedMemorial} />
+                        {qrDataUrlDark && (
+                          <QrCodeViewer
+                            qrDataUrlDark={qrDataUrlDark}
+                            qrDataUrlLight={qrDataUrlLight}
+                            memorialName={associatedMemorial}
+                          />
                         )}
                       </td>
                     </tr>

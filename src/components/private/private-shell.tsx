@@ -8,6 +8,7 @@ import { UserAvatar } from "@/src/components/ui/user-avatar";
 type PrivateShellProps = {
   children: React.ReactNode;
   isDevAdmin?: boolean;
+  isAdmin?: boolean;
 };
 
 const menuItems = [
@@ -16,7 +17,7 @@ const menuItems = [
   { href: "/configuracoes", label: "Configurações", icon: "settings" },
 ];
 
-export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
+export function PrivateShell({ children, isDevAdmin, isAdmin }: PrivateShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -175,6 +176,17 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
             </Link>
           ))}
 
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              className="flex items-center space-x-4 rounded-lg px-4 py-3 transition-all duration-300 mt-4 border border-tertiary/20 bg-tertiary/5 text-tertiary hover:bg-tertiary/10"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="material-symbols-outlined">admin_panel_settings</span>
+              <span className="text-sm font-semibold">Painel Admin</span>
+            </Link>
+          )}
+
           {isDevAdmin && (
             <Link
               href="/dev"
@@ -271,6 +283,17 @@ export function PrivateShell({ children, isDevAdmin }: PrivateShellProps) {
                         <span className="material-symbols-outlined text-[20px] text-tertiary">settings</span>
                         <span>Configurações</span>
                       </button>
+
+                      {isAdmin && (
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-tertiary hover:bg-tertiary/10 transition-all text-left font-medium"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                          <span>Painel Admin</span>
+                        </Link>
+                      )}
 
                       {isDevAdmin && (
                         <Link

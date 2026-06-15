@@ -13,9 +13,9 @@ export default async function PrivateRootLayout({ children }: PrivateRootLayoutP
     redirect("/login");
   }
 
-  if (session.isAdmin) {
-    redirect("/admin/dashboard");
-  }
-
-  return <PrivateShell isDevAdmin={session.isDevAdmin}>{children}</PrivateShell>;
+  return (
+    <PrivateShell isDevAdmin={session.isDevAdmin} isAdmin={session.isAdmin}>
+      {children}
+    </PrivateShell>
+  );
 }
