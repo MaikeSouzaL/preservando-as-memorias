@@ -247,18 +247,19 @@ export function AdminShell({ children }: AdminShellProps) {
       ) : null}
 
       <div className="min-w-0 flex-1 md:ml-72">
-        <header className="sticky top-0 z-20 border-b border-outline-variant/60 bg-[#0a192fb0] px-6 py-5 backdrop-blur-xl md:px-gutter">
+        <header className="sticky top-0 z-20 border-b border-outline-variant/60 bg-[#0a192fb0] px-4 py-4 md:px-6 md:py-5 backdrop-blur-xl md:px-gutter">
           <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-5">
-            <div>
-              <h2 className="font-h2 text-[2.2rem] leading-[1.2] tracking-[-0.01em] text-on-surface">Painel Administrativo</h2>
-              <p className="text-on-surface-variant">Gerencie clientes, memoriais e assinaturas da plataforma.</p>
+            <div className="flex items-center gap-3 md:gap-0">
+              <button onClick={() => setMobileOpen(true)} className="md:hidden shrink-0 pt-1" aria-label="Abrir menu">
+                <span className="material-symbols-outlined text-on-surface-variant text-[28px]">menu</span>
+              </button>
+              <div>
+                <h2 className="font-h2 text-2xl md:text-[2.2rem] leading-[1.2] tracking-[-0.01em] text-on-surface">Painel Administrativo</h2>
+                <p className="hidden text-on-surface-variant md:block">Gerencie clientes, memoriais e assinaturas da plataforma.</p>
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <button onClick={() => setMobileOpen(true)} className="md:hidden" aria-label="Abrir menu">
-                <span className="material-symbols-outlined text-on-surface-variant">menu</span>
-              </button>
-
               <div className="hidden w-64 items-center rounded-full border border-outline-variant/50 bg-surface-container/60 px-3 py-2 md:flex">
                 <span className="material-symbols-outlined mr-2 text-outline">search</span>
                 <input
