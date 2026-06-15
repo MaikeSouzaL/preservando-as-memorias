@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClientServer } from "@/src/lib/supabase";
+import { createClientServer, createAdminClient } from "@/src/lib/supabase";
 import { checkRateLimit } from "@/src/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -50,8 +50,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não foi possível criar a conta agora." }, { status: 500 });
     }
 
-    // Profile is auto-created by the DB trigger, but update name immediately
-    await supabase.from("profiles").upsert({ id: data.user.id, email, name }, { onConflict: "id" });
+    // Ensure profile is created immediately, bypassing RLS and handling missing DB triggers
+    const supabaseAdmin = await createAdminClient();
+    const { error: profileError } = await supabaseAdmin.from("profiles").upsert(
+      { id: data.user.id, email, name },
+      { onConflict: "id" }
+    );
+    
+    if (profileError) {
+      console.error("Erro ao criar/atualizar profile:", profileError);
+    }
 
     return NextResponse.json(
       {
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (err: any) {
+  } catch (err) {
     console.error("Erro no cadastro:", err);
     return NextResponse.json({ error: "Não foi possível criar a conta agora." }, { status: 500 });
   }
