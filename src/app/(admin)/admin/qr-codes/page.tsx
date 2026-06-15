@@ -16,7 +16,7 @@ export default async function AdminQrCodesPage() {
     .map(m => ({
       id: `qr-virtual-${m.id.substring(0, 8)}`,
       memorialId: m.id,
-      publicPath: `/qr/${m.id}`,
+      publicPath: `/qr-publico?memorial=${m.id}`,
       scans: m.visits,
       status: m.status === "ativo" ? "ativo" : "pausado",
       createdAt: m.createdAt,

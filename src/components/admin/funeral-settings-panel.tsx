@@ -14,11 +14,21 @@ const MODULE_LABELS: Record<string, string> = {
 
 type Props = { initialConfig: PlatformConfig };
 
+const DEFAULT_NEW_PLAN = {
+  name: "",
+  description: "",
+  price: "0,00",
+  cycle: "one_time" as "monthly" | "annual" | "one_time",
+};
+
 export function FuneralSettingsPanel({ initialConfig }: Props) {
   const [config, setConfig] = useState(initialConfig);
   const [selectedPlanId, setSelectedPlanId] = useState(initialConfig.defaultFuneralPlanId);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newPlan, setNewPlan] = useState(DEFAULT_NEW_PLAN);
+  const [creating, setCreating] = useState(false);
 
   const funeralPlans = useMemo(() => Array.isArray(config.funeralPlans) ? config.funeralPlans : [], [config.funeralPlans]);
   const selectedPlan = useMemo(
@@ -29,6 +39,38 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
   const priceCents = selectedPlan?.priceCents ? Number(selectedPlan.priceCents) : 0;
   const commission = selectedPlan ? Math.round((priceCents * (config.ownerCommissionPercent ?? 15)) / 100) : 0;
   const operatorRevenue = selectedPlan ? priceCents - commission : 0;
+
+  async function createPlan(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setCreating(true);
+    const clean = newPlan.price.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(/,/g, ".");
+    const priceCents = Math.round((parseFloat(clean) || 0) * 100);
+    const newId = crypto.randomUUID();
+    const res = await fetch("/api/platform-config", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target: "funeral",
+        planId: newId,
+        name: newPlan.name,
+        description: newPlan.description,
+        price: priceCents / 100,
+        cycle: newPlan.cycle,
+        active: true,
+      }),
+    });
+    const payload = await res.json();
+    setCreating(false);
+    if (!res.ok) {
+      setMessage(payload.error ?? "Não foi possível criar o plano.");
+      return;
+    }
+    setConfig(payload.config);
+    setSelectedPlanId(newId);
+    setShowCreate(false);
+    setNewPlan(DEFAULT_NEW_PLAN);
+    setMessage("Plano criado com sucesso.");
+  }
 
   async function savePlan(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,8 +107,66 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
 
   if (!selectedPlan) {
     return (
-      <div className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6 text-on-surface-variant text-sm">
-        Nenhum plano de funerária configurado.
+      <div className="space-y-4">
+        {message && (
+          <p className={`rounded-lg px-3 py-2 text-sm ${
+            message.includes("sucesso")
+              ? "border border-green-500/20 bg-green-500/10 text-green-300"
+              : "border border-red-400/20 bg-red-500/10 text-red-300"
+          }`}>
+            {message}
+          </p>
+        )}
+        {showCreate ? (
+          <form onSubmit={createPlan} className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6 space-y-4">
+            <h3 className="text-lg font-medium text-on-surface">Criar primeiro plano</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Nome do plano</span>
+                <input required value={newPlan.name} onChange={(e) => setNewPlan((p) => ({ ...p, name: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Recorrência</span>
+                <select value={newPlan.cycle} onChange={(e) => setNewPlan((p) => ({ ...p, cycle: e.target.value as typeof newPlan.cycle }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none">
+                  <option value="monthly">Mensal</option>
+                  <option value="annual">Anual</option>
+                  <option value="one_time">Pagamento único</option>
+                </select>
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Preço (R$)</span>
+                <input type="text" required value={newPlan.price}
+                  onChange={(e) => setNewPlan((p) => ({ ...p, price: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Descrição</span>
+                <input value={newPlan.description} onChange={(e) => setNewPlan((p) => ({ ...p, description: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+            </div>
+            <div className="flex gap-3">
+              <button type="submit" disabled={creating}
+                className="rounded-full bg-tertiary px-6 py-2.5 text-sm font-semibold text-[#1c1b1b] transition hover:bg-[#ffe088] disabled:opacity-50">
+                {creating ? "Criando..." : "Criar plano"}
+              </button>
+              <button type="button" onClick={() => setShowCreate(false)}
+                className="rounded-full border border-outline-variant/40 px-5 py-2.5 text-sm text-on-surface-variant hover:text-on-surface transition">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="rounded-xl border border-dashed border-outline-variant/40 bg-[#0a192f66] p-8 text-center">
+            <p className="mb-4 text-sm text-on-surface-variant">Nenhum plano de funerária configurado.</p>
+            <button onClick={() => setShowCreate(true)}
+              className="rounded-full bg-tertiary px-6 py-2.5 text-sm font-semibold text-[#1c1b1b] transition hover:bg-[#ffe088]">
+              Criar primeiro plano
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -84,14 +184,14 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
         </div>
 
         {/* Plan tabs */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap items-center gap-2">
           {funeralPlans.map((plan) => (
             <button
               key={plan.id}
               type="button"
-              onClick={() => setSelectedPlanId(plan.id)}
+              onClick={() => { setShowCreate(false); setSelectedPlanId(plan.id); }}
               className={`rounded-full border px-4 py-1.5 text-sm transition ${
-                plan.id === selectedPlanId
+                plan.id === selectedPlanId && !showCreate
                   ? "border-tertiary bg-tertiary/10 text-tertiary"
                   : "border-outline-variant/40 text-on-surface-variant hover:border-tertiary/50"
               }`}
@@ -100,7 +200,61 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
               {!plan.active && <span className="ml-1.5 text-xs opacity-60">(inativo)</span>}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setShowCreate(!showCreate)}
+            className={`rounded-full border px-4 py-1.5 text-sm transition ${
+              showCreate
+                ? "border-tertiary bg-tertiary/10 text-tertiary"
+                : "border-dashed border-outline-variant/40 text-on-surface-variant hover:border-tertiary/50"
+            }`}
+          >
+            + Adicionar plano
+          </button>
         </div>
+
+        {showCreate && (
+          <form onSubmit={createPlan} className="mb-6 rounded-xl border border-tertiary/20 bg-[#0a192f99] p-5 space-y-4">
+            <p className="text-sm font-medium text-on-surface">Novo plano</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Nome</span>
+                <input required value={newPlan.name} onChange={(e) => setNewPlan((p) => ({ ...p, name: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Recorrência</span>
+                <select value={newPlan.cycle} onChange={(e) => setNewPlan((p) => ({ ...p, cycle: e.target.value as typeof newPlan.cycle }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none">
+                  <option value="monthly">Mensal</option>
+                  <option value="annual">Anual</option>
+                  <option value="one_time">Pagamento único</option>
+                </select>
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Preço (R$)</span>
+                <input type="text" required value={newPlan.price}
+                  onChange={(e) => setNewPlan((p) => ({ ...p, price: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs uppercase tracking-wide text-on-surface-variant">Descrição</span>
+                <input value={newPlan.description} onChange={(e) => setNewPlan((p) => ({ ...p, description: e.target.value }))}
+                  className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-2 text-sm text-on-surface focus:border-tertiary focus:outline-none" />
+              </label>
+            </div>
+            <div className="flex gap-3">
+              <button type="submit" disabled={creating}
+                className="rounded-full bg-tertiary px-5 py-2 text-sm font-semibold text-[#1c1b1b] transition hover:bg-[#ffe088] disabled:opacity-50">
+                {creating ? "Criando..." : "Criar plano"}
+              </button>
+              <button type="button" onClick={() => { setShowCreate(false); setNewPlan(DEFAULT_NEW_PLAN); }}
+                className="rounded-full border border-outline-variant/40 px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface transition">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
 
         <form onSubmit={savePlan} className="grid gap-4">
           <input type="hidden" name="defaultFuneralPlanId" value={config.defaultFuneralPlanId} />

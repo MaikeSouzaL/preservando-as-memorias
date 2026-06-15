@@ -34,7 +34,7 @@ export function QrCodeViewer({ qrDataUrl, memorialName }: QrCodeViewerProps) {
             <h4 className="mb-1 font-h3 text-xl text-on-surface">QR Code</h4>
             <p className="mb-6 text-sm text-on-surface-variant">Memorial: {memorialName}</p>
 
-            <div className="mx-auto flex aspect-square w-[240px] items-center justify-center rounded-2xl bg-white p-4 shadow-inner">
+            <div className="mx-auto flex aspect-square w-[240px] items-center justify-center rounded-2xl bg-[#0b1120] p-4 shadow-inner">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={qrDataUrl} alt={`QR Code para ${memorialName}`} className="h-full w-full object-contain" />
             </div>

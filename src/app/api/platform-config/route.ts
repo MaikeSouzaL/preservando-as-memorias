@@ -70,22 +70,45 @@ export async function PATCH(request: Request) {
         const planId = String(body.planId ?? "");
         const plans = data.config.funeralPlans ?? [];
         const idx = plans.findIndex((p) => p.id === planId);
-        if (idx === -1) throw new Error("Plano não encontrado.");
 
         const priceCents = Math.round(Number(body.price) * 100);
         if (!Number.isFinite(priceCents) || priceCents < 0)
           throw new Error("Informe um valor de preço válido.");
 
-        plans[idx] = {
-          ...plans[idx],
-          name: String(body.name ?? plans[idx].name).trim(),
-          description: String(body.description ?? plans[idx].description).trim(),
-          priceCents,
-          cycle: ["monthly", "annual", "one_time"].includes(String(body.cycle))
-            ? (body.cycle as "monthly" | "annual" | "one_time")
-            : plans[idx].cycle,
-          active: Boolean(body.active),
-        };
+        const validCycle = ["monthly", "annual", "one_time"].includes(String(body.cycle))
+          ? (body.cycle as "monthly" | "annual" | "one_time")
+          : "one_time";
+
+        if (idx === -1) {
+          if (!planId) throw new Error("ID do plano é obrigatório para criação.");
+          // Create new plan
+          plans.push({
+            id: planId,
+            name: String(body.name ?? "Novo plano").trim() || "Novo plano",
+            description: String(body.description ?? "").trim(),
+            priceCents,
+            cycle: validCycle,
+            active: Boolean(body.active),
+            features: [],
+            modules: {
+              memorials: true,
+              schedules: false,
+              services: false,
+              documents: false,
+              inventory: false,
+              staff: false,
+            },
+          });
+        } else {
+          plans[idx] = {
+            ...plans[idx],
+            name: String(body.name ?? plans[idx].name).trim(),
+            description: String(body.description ?? plans[idx].description).trim(),
+            priceCents,
+            cycle: validCycle,
+            active: Boolean(body.active),
+          };
+        }
 
         data.config.funeralPlans = plans;
 
