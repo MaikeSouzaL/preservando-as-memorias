@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Preservando a Memoria",
-    short_name: "Memoria",
+    name: "Preservando Memórias",
+    short_name: "Preservando Memórias",
     description:
       "Memorial digital com QR Code para visitantes conhecerem historias de entes queridos.",
     start_url: "/",
