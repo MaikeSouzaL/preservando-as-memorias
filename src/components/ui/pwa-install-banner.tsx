@@ -23,7 +23,7 @@ export function PwaInstallBanner() {
     if (typeof window === "undefined") return;
 
     // Se já foi dispensado antes, não mostra
-    if (localStorage.getItem("pwa-banner-dismissed") === "true") {
+    if (localStorage.getItem("pwa-banner-dismissed-v2") === "true") {
       return;
     }
 
@@ -72,7 +72,7 @@ export function PwaInstallBanner() {
 
   function dismiss() {
     setIsVisible(false);
-    localStorage.setItem("pwa-banner-dismissed", "true");
+    localStorage.setItem("pwa-banner-dismissed-v2", "true");
   }
 
   async function handleInstall() {
