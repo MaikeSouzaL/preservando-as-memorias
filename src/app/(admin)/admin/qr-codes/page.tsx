@@ -5,12 +5,31 @@ export const dynamic = "force-dynamic";
 export default async function AdminQrCodesPage() {
   const data = await readPlatformData();
 
+  // Mapeia todos os memoriais que não possuem registro explícito de QR code
+  // e cria um QR code virtual para exibição (pois todos os memoriais têm QR code nativamente no app)
+  const existingQrMemorialIds = new Set(data.qrCodes.map(q => q.memorialId));
+  
+  const virtualQrCodes = data.memorials
+    .filter(m => !existingQrMemorialIds.has(m.id))
+    .map(m => ({
+      id: `qr-virtual-${m.id.substring(0, 8)}`,
+      memorialId: m.id,
+      publicPath: `/qr/${m.id}`,
+      scans: m.visits,
+      status: m.status === "ativo" ? "ativo" : "pausado",
+      createdAt: m.createdAt,
+    }));
+
+  const allQrCodes = [...data.qrCodes, ...virtualQrCodes].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h3 className="font-h3 text-2xl text-on-surface">QR Codes Emitidos</h3>
         <span className="rounded-full bg-tertiary/10 px-4 py-1 text-sm font-semibold text-tertiary">
-          Total: {data.qrCodes.length} QR Codes
+          Total: {allQrCodes.length} QR Codes
         </span>
       </div>
 
@@ -28,21 +47,21 @@ export default async function AdminQrCodesPage() {
               </tr>
             </thead>
             <tbody>
-              {data.qrCodes.length === 0 ? (
+              {allQrCodes.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-outline text-xs uppercase tracking-wider font-semibold">
                     Nenhum QR Code gerado ou associado na plataforma ainda.
                   </td>
                 </tr>
               ) : (
-                data.qrCodes.map((qr) => {
+                allQrCodes.map((qr) => {
                   const associatedMemorial = data.memorials.find((m) => m.id === qr.memorialId)?.name || "Desconhecido";
                   const dateStr = qr.createdAt ? new Date(qr.createdAt).toLocaleDateString("pt-BR") : "---";
 
                   return (
                     <tr key={qr.id} className="border-b border-outline-variant/20 transition-colors hover:bg-surface-variant/30">
                       <td className="py-4 font-mono text-xs text-on-surface-variant">
-                        {qr.id}
+                        {qr.id.replace("qr-virtual-", "")}
                       </td>
                       <td className="py-4 font-medium text-on-surface">
                         {associatedMemorial}

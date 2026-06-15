@@ -95,6 +95,14 @@ export function AdminShell({ children }: AdminShellProps) {
           setFormPassword("");
         }
 
+        const resContracts = await fetch("/api/admin/contracts");
+        const dataContracts = await resContracts.json();
+
+        if (active && dataContracts.hasSigned === false && !pathname.includes("/admin/contrato")) {
+          window.location.href = "/admin/contrato";
+          return;
+        }
+
         const resStats = await fetch("/api/admin/stats");
         const dataStats = await resStats.json();
         if (active) {
