@@ -8,6 +8,7 @@
  *   • Two semicircles are attached to the upper-left and upper-right edges
  *     of the diamond, completing the classic heart silhouette.
  *   • The bumps carry optional text (name + dates) in the system gold colour.
+ *   • Optional solid background colour and a URL label above the heart.
  *
  * The result can be used as `src` on any <img> or downloaded directly.
  */
@@ -21,7 +22,7 @@ interface HeartQrOptions {
   marginModules?: number;
   /** Dark module colour. Default: "#0b0f0f" */
   dark?: string;
-  /** Light module / background colour. Default: "#ffffff" */
+  /** Light module / heart fill colour. Default: "#ffffff" */
   light?: string;
   /**
    * Optional text overlaid inside the two circular heart bumps.
@@ -37,11 +38,15 @@ interface HeartQrOptions {
     rightLine1?: string;
     /** Line 2 in the right bump (e.g. "DD/MM/AAAA") */
     rightLine2?: string;
-    /** Accent colour. Default: "#e9c349" (system gold) */
+    /** Accent colour for bump text. Default: "#e9c349" (system gold) */
     color?: string;
   };
-  /** Optional URL label shown in small text below the heart (e.g. "www.preservandomemorias.com.br") */
+  /** URL label shown at the top of the SVG (e.g. "www.preservandomemorias.com.br") */
   bottomUrl?: string;
+  /** Solid background colour for the entire canvas (e.g. "#0b1120" or "#f9f6ef") */
+  bgColor?: string;
+  /** Colour of the URL text at the top. Default: "#e9c349" */
+  urlColor?: string;
 }
 
 /** Escape characters that are special inside SVG text content. */
@@ -65,10 +70,11 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
     light = "#ffffff",
     overlay,
     bottomUrl,
+    bgColor,
+    urlColor = "#e9c349",
   } = opts;
 
   // ── QR module matrix (synchronous) ─────────────────────────────────────────
-  // QRCode.create is exported by the runtime but not in @types/qrcode; cast needed.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const qr = (QRCode as any).create(url, { errorCorrectionLevel: "M" }) as {
     modules: { size: number; data: Uint8ClampedArray };
@@ -85,34 +91,30 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
   //   Edge = from TOP vertex to LEFT/RIGHT vertex.
   //   Midpoint (upper-left): (cx − r/2,  cy − r/2)
   //   Circle radius = half-edge-length = s/2   (since edge length = s)
-  //
-  // The circle passes EXACTLY through both edge endpoints, so it smoothly
-  // joins the diamond at those vertices — no gap, no overlap artefact.
 
   const s = (size + marginModules * 2) * moduleSize; // QR image side
-  const r = (s * Math.SQRT2) / 2; // half-diagonal of the diamond
-  const circleR = s / 2; // heart-bump circle radius  (= r / √2)
+  const r = (s * Math.SQRT2) / 2;                    // half-diagonal of diamond
+  const circleR = s / 2;                             // heart-bump circle radius
 
-  // Canvas must be wide enough for the widest points of the circles.
-  // Each circle centre is at cx ± r/2, and the circle has radius circleR,
-  // so the extreme x-extents are cx ± (r/2 + circleR).
   const pad = Math.round(moduleSize * 2);
-  const heartHalfW = r / 2 + circleR; // half-width of heart (wider than diamond!)
+  const heartHalfW = r / 2 + circleR;
   const canvasW = Math.round(2 * heartHalfW + pad * 2);
-  const topReach = r / 2 + circleR; // distance from diamond centre → top of circles
-  const footerFontSize = bottomUrl ? Math.max(8, Math.round(circleR / 11)) : 0;
-  const footerH = bottomUrl ? Math.round(footerFontSize * 2.8) : 0;
-  const canvasH = Math.round(topReach + r + pad * 2 + footerH);
+  const topReach = r / 2 + circleR; // distance from diamond centre to top of circles
 
-  // Diamond centre in canvas space
+  // Header strip for URL text above the heart
+  const urlFontSize = bottomUrl ? Math.max(10, Math.round(circleR / 9)) : 0;
+  const headerH = bottomUrl ? Math.round(urlFontSize * 3.5) : 0;
+  const canvasH = Math.round(headerH + topReach + r + pad * 2);
+
+  // Diamond centre in canvas space (shifted down by headerH)
   const cx = canvasW / 2;
-  const cy = topReach + pad;
+  const cy = headerH + topReach + pad;
 
   // Bump circle centres (midpoints of upper-left / upper-right diamond edges)
   const cLx = cx - r / 2;
   const cLy = cy - r / 2;
   const cRx = cx + r / 2;
-  const cRy = cy - r / 2; // same y as cLy
+  const cRy = cy - r / 2;
 
   // ── Dark-module rectangles (run-length merged per row for smaller SVG) ──────
   const marginPx = marginModules * moduleSize;
@@ -122,7 +124,6 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
     let col = 0;
     while (col < size) {
       if (data[row * size + col]) {
-        // Find horizontal run length
         let len = 1;
         while (col + len < size && data[row * size + col + len]) len++;
         const x = col * moduleSize + marginPx;
@@ -140,38 +141,35 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
   // ── SVG assembly ─────────────────────────────────────────────────────────────
   const diamond = `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
 
-  // Transform: translate QR centre to canvas centre, rotate 45 °, then offset
-  // so the top-left of the QR image lands at the right position.
   const transform = `translate(${cx},${cy}) rotate(45) translate(${-s / 2},${-s / 2})`;
 
-  // ── Overlay text inside the bumps ───────────────────────────────────────────
-  // Each bump is the half of a circle that sits ABOVE the diagonal chord
-  // (= upper diamond edge).  The chord passes through each circle centre, so
-  // the visible bump spans exactly circleR pixels above the centre.
-  //
-  // Text is placed at the vertical mid-point of each bump:
-  //   bumpMidY = cLy − circleR × 0.5
-  //
-  // The bump constraint limits the symmetric half-width of horizontally-
-  // centred text to circleR / 2, so font sizes are proportional and the
-  // caller should truncate long names (≈ 13 chars max at moduleSize 8).
+  // ── Background rect ─────────────────────────────────────────────────────────
+  const bgRect = bgColor
+    ? `<rect width="${canvasW}" height="${canvasH}" fill="${escXml(bgColor)}"/>`
+    : "";
 
+  // ── URL label above the heart ───────────────────────────────────────────────
+  const urlSvg = bottomUrl
+    ? `<text x="${cx}" y="${headerH / 2}" ` +
+      `text-anchor="middle" dominant-baseline="middle" ` +
+      `font-family="Georgia,'Times New Roman',serif" ` +
+      `font-size="${urlFontSize}" fill="${escXml(urlColor)}" letter-spacing="0.5">` +
+      escXml(bottomUrl) +
+      `</text>`
+    : "";
+
+  // ── Overlay text inside the bumps ───────────────────────────────────────────
   let overlayText = "";
 
   if (overlay) {
     const textColor = overlay.color ?? "#e9c349";
 
-    // Font sizes proportional to bump radius
-    const fontSize1 = Math.round(circleR / 7.5); // name / symbol   (larger)
-    const fontSize2 = Math.round(circleR / 9.5); // date            (smaller)
+    const fontSize1 = Math.round(circleR / 7.5);
+    const fontSize2 = Math.round(circleR / 9.5);
 
-    // Vertical mid-point of the visible bump (same y for both bumps)
     const bumpMidY = cLy - circleR * 0.5;
-
-    // Half-gap between two lines when both are present
     const halfGap = Math.round(fontSize1 * 0.85);
 
-    /** Returns a <g> with up to two text lines centred at (bx, bumpMidY). */
     function bumpText(bx: number, line1?: string, line2?: string): string {
       if (!line1 && !line2) return "";
       const hasBoth = !!(line1 && line2);
@@ -195,15 +193,6 @@ export function generateHeartQr(url: string, opts: HeartQrOptions = {}): string 
       bumpText(cRx, overlay.rightLine1, overlay.rightLine2);
   }
 
-  const footerSvg = bottomUrl
-    ? `<text x="${cx}" y="${cy + r + pad + footerFontSize}" ` +
-      `text-anchor="middle" dominant-baseline="middle" ` +
-      `font-family="Georgia,'Times New Roman',serif" ` +
-      `font-size="${footerFontSize}" fill="${overlay?.color ?? "#1c1b1b"}" opacity="0.55" letter-spacing="0.3">` +
-      escXml(bottomUrl) +
-      `</text>`
-    : "";
-
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" \
 width="${canvasW}" height="${canvasH}" \
 viewBox="0 0 ${canvasW} ${canvasH}">
@@ -215,7 +204,10 @@ viewBox="0 0 ${canvasW} ${canvasH}">
     </clipPath>
   </defs>
 
-  <!-- Heart background (white) — no stroke; shape is self-defining on dark bg -->
+  ${bgRect}
+  ${urlSvg}
+
+  <!-- Heart background (light fill) -->
   <polygon points="${diamond}" fill="${light}"/>
   <circle cx="${cLx}" cy="${cLy}" r="${circleR}" fill="${light}"/>
   <circle cx="${cRx}" cy="${cRy}" r="${circleR}" fill="${light}"/>
@@ -228,11 +220,8 @@ viewBox="0 0 ${canvasW} ${canvasH}">
     </g>
   </g>
 
-  <!-- Name / dates in the two bumps (gold accent, Georgia serif) -->
+  <!-- Name / dates in the two bumps (accent colour, Georgia serif) -->
   ${overlayText}
-
-  <!-- Website URL label below the heart -->
-  ${footerSvg}
 </svg>`;
 
   return "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64");

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   id: string;
@@ -120,9 +121,9 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
       </article>
 
       {/* Modal QR Code */}
-      {showQr && hasQr && (
+      {showQr && hasQr && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
           onClick={() => setShowQr(false)}
         >
           <div
@@ -206,7 +207,7 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { ManagedMemorial } from "@/src/lib/platform-data";
 
 type FuneralHomeData = {
@@ -47,9 +48,9 @@ function QrModal({
   const activeUrl = theme === "dark" ? qrDark : qrLight;
   const filename = `qrcode-${memorialName.toLowerCase().replace(/\s+/g, "-")}-${theme}.svg`;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -117,7 +118,7 @@ function QrModal({
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 export function FunerariaDashboardClient({ funeralHome, memorials, qrMap }: Props) {

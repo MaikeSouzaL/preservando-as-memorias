@@ -102,12 +102,16 @@ export default async function AdminQrCodesPage() {
                       light: "#ffffff",
                       overlay: { ...qrOverlayBase, color: "#1c1b1b" },
                       bottomUrl: "www.preservandomemorias.com.br",
+                      bgColor: "#0b1120",
+                      urlColor: "#e9c349",
                     });
                     qrDataUrlLight = generateHeartQr(qrUrl, {
                       dark: "#000000",
                       light: "#e9c349",
                       overlay: { ...qrOverlayBase, color: "#1c1b1b" },
                       bottomUrl: "www.preservandomemorias.com.br",
+                      bgColor: "#f9f6ef",
+                      urlColor: "#1c1b1b",
                     });
                   }
 

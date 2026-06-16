@@ -56,12 +56,16 @@ export default async function FunerariaDashboardPage() {
         light: "#ffffff",
         overlay: { ...overlayBase, color: "#1c1b1b" },
         bottomUrl: "www.preservandomemorias.com.br",
+        bgColor: "#0b1120",
+        urlColor: "#e9c349",
       }),
       light: generateHeartQr(qrUrl, {
         dark: "#000000",
         light: "#e9c349",
         overlay: { ...overlayBase, color: "#1c1b1b" },
         bottomUrl: "www.preservandomemorias.com.br",
+        bgColor: "#f9f6ef",
+        urlColor: "#1c1b1b",
       }),
     };
   }

@@ -497,11 +497,21 @@ function OfertasTab() {
 
 function PlanosTab() {
   const [config, setConfig] = useState<PlatformConfig | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    fetch("/api/platform-config").then((r) => r.json()).then((d) => setConfig(d.config));
+    setLoadError(false);
+    fetch("/api/platform-config")
+      .then((r) => r.json())
+      .then((d) => setConfig(d.config ?? null))
+      .catch(() => setLoadError(true));
   }, []);
 
+  if (loadError) return (
+    <p className="py-10 text-center text-red-400 text-sm">
+      Não foi possível carregar os planos. Recarregue a página.
+    </p>
+  );
   if (!config) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
 
   return <FuneralSettingsPanel initialConfig={config} />;
@@ -515,7 +525,8 @@ function QrCodesTab() {
   useEffect(() => {
     fetch("/api/platform-config")
       .then((r) => r.json())
-      .then((d) => setQrMode(d.config?.qrDeliveryMode ?? "self"));
+      .then((d) => setQrMode(d.config?.qrDeliveryMode ?? "self"))
+      .catch(() => setQrMode("self"));
   }, []);
 
   if (qrMode === null) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;

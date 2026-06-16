@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 type QrCodeViewerProps = {
   qrDataUrlDark: string;
@@ -25,9 +26,9 @@ export function QrCodeViewer({ qrDataUrlDark, qrDataUrlLight, memorialName }: Qr
         Visualizar
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-sm rounded-3xl border border-tertiary/20 bg-[#0a192f] p-8 text-center shadow-2xl">
+      {open && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
+          <div className="relative w-full max-w-sm rounded-3xl border border-tertiary/20 bg-[#0a192f] p-8 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setOpen(false)}
               className="absolute right-4 top-4 text-on-surface-variant transition hover:text-on-surface"
@@ -93,7 +94,7 @@ export function QrCodeViewer({ qrDataUrlDark, qrDataUrlLight, memorialName }: Qr
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }
