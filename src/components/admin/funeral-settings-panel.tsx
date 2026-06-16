@@ -276,7 +276,13 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
           </form>
         ) : (
           <div className="rounded-xl border border-dashed border-outline-variant/40 bg-[#0a192f66] p-8 text-center">
-            <p className="mb-4 text-sm text-on-surface-variant">Nenhum plano de funerária configurado.</p>
+            <span className="material-symbols-outlined mb-3 text-4xl text-tertiary/70">subscriptions</span>
+            <p className="mb-1 text-base font-medium text-on-surface">Nenhum plano de assinatura configurado</p>
+            <p className="mx-auto mb-5 max-w-md text-sm text-on-surface-variant">
+              Crie planos mensais para as funerárias. Cada plano define uma cota de memoriais por mês —
+              dentro da cota a funerária cria memoriais sem pagar avulso; acima dela, paga o preço excedente
+              que você definir. Funerárias sem assinatura continuam pagando o preço avulso configurado em Comercial.
+            </p>
             <button onClick={() => setShowCreate(true)}
               className="rounded-full bg-tertiary px-6 py-2.5 text-sm font-semibold text-[#1c1b1b] transition hover:bg-[#ffe088]">
               Criar primeiro plano
