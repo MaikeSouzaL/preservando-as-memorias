@@ -784,6 +784,7 @@ export async function readPlatformData(): Promise<PlatformData> {
     defaultPlanId: cfg.default_plan_id ?? undefined,
     funeralPlans: (Array.isArray(cfg.funeral_plans) ? cfg.funeral_plans : []).filter((p: unknown) => !!p && typeof p === "object"),
     defaultFuneralPlanId: cfg.default_funeral_plan_id ?? undefined,
+    funeralHomeQrDeliveryMode: (cfg.funeral_home_qr_delivery_mode as "admin" | "self") ?? "self",
   };
 
   const settingsMap = Object.fromEntries((settingsRows ?? []).map((r: any) => [r.key, r.value]));
@@ -995,6 +996,7 @@ async function persistChanges(original: PlatformData, updated: PlatformData): Pr
         default_plan_id: updated.config.defaultPlanId ?? null,
         funeral_plans: updated.config.funeralPlans ?? [],
         default_funeral_plan_id: updated.config.defaultFuneralPlanId ?? null,
+        funeral_home_qr_delivery_mode: updated.config.funeralHomeQrDeliveryMode ?? "self",
       }).eq("id", 1)
     );
   }

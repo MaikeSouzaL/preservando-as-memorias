@@ -52,6 +52,18 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ config: updatedQr });
     }
 
+    if (target === "funeral_home_qr_delivery") {
+      const mode = String(body.funeralHomeQrDeliveryMode ?? "");
+      if (mode !== "admin" && mode !== "self") {
+        throw new Error("Modo inválido. Use 'admin' ou 'self'.");
+      }
+      const updatedFhQr = await updatePlatformData((data) => {
+        data.config.funeralHomeQrDeliveryMode = mode as "admin" | "self";
+        return data.config;
+      });
+      return NextResponse.json({ config: updatedFhQr });
+    }
+
     if (target === "funeral_delete") {
       const planId = String(body.planId ?? "");
       if (!planId) throw new Error("ID do plano é obrigatório.");

@@ -695,18 +695,26 @@ function PlanosTab() {
 // ─── Aba QR Codes ─────────────────────────────────────────────────────────────
 
 function QrCodesTab() {
-  const [qrMode, setQrMode] = useState<QrDeliveryMode | null>(null);
+  const [config, setConfig] = useState<{ qrDeliveryMode?: QrDeliveryMode; funeralHomeQrDeliveryMode?: QrDeliveryMode } | null>(null);
 
   useEffect(() => {
     fetch("/api/platform-config")
       .then((r) => r.json())
-      .then((d) => setQrMode(d.config?.qrDeliveryMode ?? "self"))
-      .catch(() => setQrMode("self"));
+      .then((d) => setConfig({
+        qrDeliveryMode: d.config?.qrDeliveryMode ?? "self",
+        funeralHomeQrDeliveryMode: d.config?.funeralHomeQrDeliveryMode ?? "self",
+      }))
+      .catch(() => setConfig({ qrDeliveryMode: "self", funeralHomeQrDeliveryMode: "self" }));
   }, []);
 
-  if (qrMode === null) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
+  if (!config) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
 
-  return <QrDeliveryPanel initialMode={qrMode} />;
+  return (
+    <QrDeliveryPanel
+      initialMode={config.qrDeliveryMode}
+      initialFuneralHomeMode={config.funeralHomeQrDeliveryMode}
+    />
+  );
 }
 
 // ─── Página principal ─────────────────────────────────────────────────────────

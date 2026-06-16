@@ -42,12 +42,17 @@ export type PlatformConfig = {
   funeralHomeMemorialPriceCents: number;
   candlePriceCents: number;
   /**
-   * Modo global de entrega do QR Code:
-   * "admin" → o admin parceiro é responsável por imprimir e enviar o QR ao familiar.
-   *           Famílias PRECISAM preencher endereço de entrega no formulário.
-   * "self"  → a família/funerária imprime o próprio QR (padrão).
+   * Modo global de entrega do QR Code para FAMÍLIAS:
+   * "admin" → o admin parceiro imprime e envia o QR para a família.
+   * "self"  → a família imprime o próprio QR (padrão).
    */
   qrDeliveryMode?: QrDeliveryMode;
+  /**
+   * Modo global de entrega do QR Code para FUNERÁRIAS:
+   * "admin" → o admin parceiro imprime e envia o QR para a funerária.
+   * "self"  → a funerária imprime o próprio QR (padrão).
+   */
+  funeralHomeQrDeliveryMode?: QrDeliveryMode;
   // Legacy plan fields kept for DB backward compatibility
   defaultPlanId?: string;
   plans?: PlatformPlan[];

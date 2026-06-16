@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { QrDeliveryMode, QrDeliveryOverride } from "@/src/lib/platform-types";
+import type { QrDeliveryMode, QrDeliveryOverride, PlatformConfig } from "@/src/lib/platform-types";
 
 type FuneralHomeRow = {
   id: string;
@@ -21,10 +21,19 @@ const MODE_ICONS: Record<QrDeliveryOverride, string> = {
   self: "print",
 };
 
-export function QrDeliveryPanel({ initialMode }: { initialMode?: QrDeliveryMode }) {
+export function QrDeliveryPanel({
+  initialMode,
+  initialFuneralHomeMode,
+}: {
+  initialMode?: QrDeliveryMode;
+  initialFuneralHomeMode?: QrDeliveryMode;
+}) {
   const [globalMode, setGlobalMode] = useState<QrDeliveryMode>(initialMode ?? "self");
+  const [funeralHomeMode, setFuneralHomeMode] = useState<QrDeliveryMode>(initialFuneralHomeMode ?? "self");
   const [saving, setSaving] = useState(false);
+  const [savingFhMode, setSavingFhMode] = useState(false);
   const [savedMsg, setSavedMsg] = useState("");
+  const [savedFhMsg, setSavedFhMsg] = useState("");
 
   const [homes, setHomes] = useState<FuneralHomeRow[]>([]);
   const [loadingHomes, setLoadingHomes] = useState(true);
@@ -51,10 +60,26 @@ export function QrDeliveryPanel({ initialMode }: { initialMode?: QrDeliveryMode 
     });
     if (res.ok) {
       setGlobalMode(mode);
-      setSavedMsg("Configuração global salva.");
+      setSavedMsg("Configuração salva.");
       setTimeout(() => setSavedMsg(""), 3000);
     }
     setSaving(false);
+  }
+
+  async function saveFuneralHomeGlobal(mode: QrDeliveryMode) {
+    setSavingFhMode(true);
+    setSavedFhMsg("");
+    const res = await fetch("/api/platform-config", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target: "funeral_home_qr_delivery", funeralHomeQrDeliveryMode: mode }),
+    });
+    if (res.ok) {
+      setFuneralHomeMode(mode);
+      setSavedFhMsg("Configuração salva.");
+      setTimeout(() => setSavedFhMsg(""), 3000);
+    }
+    setSavingFhMode(false);
   }
 
   async function saveFuneralHome(id: string, mode: QrDeliveryOverride) {
@@ -83,13 +108,13 @@ export function QrDeliveryPanel({ initialMode }: { initialMode?: QrDeliveryMode 
   return (
     <div className="flex flex-col gap-8">
 
-      {/* ── Configuração global ─────────────────────────────────────────── */}
+      {/* ── QR para famílias ────────────────────────────────────────────── */}
       <section className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6">
         <div className="mb-4">
-          <p className="text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Configuração global</p>
-          <h2 className="font-h3 text-xl text-on-surface">Quem entrega o QR Code?</h2>
+          <p className="text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">QR Code — Famílias</p>
+          <h2 className="font-h3 text-xl text-on-surface">Quem entrega o QR para a família?</h2>
           <p className="mt-1 text-sm text-on-surface-variant">
-            Define o comportamento padrão para TODAS as funerárias. Você pode sobrescrever por funerária abaixo.
+            Quando uma <strong className="text-on-surface">família</strong> paga e cria um memorial, quem é responsável por entregar o QR Code físico?
           </p>
         </div>
 
@@ -173,6 +198,98 @@ export function QrDeliveryPanel({ initialMode }: { initialMode?: QrDeliveryMode 
             {globalMode === "admin"
               ? "Modo ativo: as famílias verão um formulário de endereço de entrega ao criar o memorial. Você verá esse endereço no painel de memoriais."
               : "Modo ativo: nenhum formulário de entrega será exibido. A família recebe um link para download do QR Code após o pagamento."}
+          </span>
+        </div>
+      </section>
+
+      {/* ── QR para funerárias ─────────────────────────────────────────── */}
+      <section className="rounded-xl border border-tertiary/10 bg-[#0a192f66] p-6">
+        <div className="mb-4">
+          <p className="text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">QR Code — Funerárias</p>
+          <h2 className="font-h3 text-xl text-on-surface">Quem entrega o QR para a funerária?</h2>
+          <p className="mt-1 text-sm text-on-surface-variant">
+            Quando uma <strong className="text-on-surface">funerária parceira</strong> cria um memorial, quem é responsável por entregar o QR Code físico à família enlutada?
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {/* Opção: Admin envia */}
+          <button
+            onClick={() => saveFuneralHomeGlobal("admin")}
+            disabled={savingFhMode}
+            className={`flex flex-col gap-3 rounded-xl border p-5 text-left transition hover:border-tertiary/40 ${
+              funeralHomeMode === "admin"
+                ? "border-tertiary bg-tertiary/8 shadow-[0_0_16px_rgba(233,195,73,0.08)]"
+                : "border-outline-variant/30 bg-surface-container/30"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${funeralHomeMode === "admin" ? "bg-tertiary/15" : "bg-surface-container/60"}`}>
+                <span className={`material-symbols-outlined text-xl ${funeralHomeMode === "admin" ? "text-tertiary" : "text-on-surface-variant"}`}>
+                  local_shipping
+                </span>
+              </div>
+              <div>
+                <p className={`font-semibold ${funeralHomeMode === "admin" ? "text-tertiary" : "text-on-surface"}`}>
+                  Eu envio para a família
+                </p>
+                {funeralHomeMode === "admin" && (
+                  <span className="text-[10px] uppercase tracking-widest text-tertiary">● Ativo</span>
+                )}
+              </div>
+            </div>
+            <p className="text-xs leading-relaxed text-on-surface-variant">
+              Você (admin parceiro) imprime e entrega o QR Code à família enlutada após o cadastro feito pela funerária.
+            </p>
+          </button>
+
+          {/* Opção: Funerária entrega */}
+          <button
+            onClick={() => saveFuneralHomeGlobal("self")}
+            disabled={savingFhMode}
+            className={`flex flex-col gap-3 rounded-xl border p-5 text-left transition hover:border-tertiary/40 ${
+              funeralHomeMode === "self"
+                ? "border-tertiary bg-tertiary/8 shadow-[0_0_16px_rgba(233,195,73,0.08)]"
+                : "border-outline-variant/30 bg-surface-container/30"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full ${funeralHomeMode === "self" ? "bg-tertiary/15" : "bg-surface-container/60"}`}>
+                <span className={`material-symbols-outlined text-xl ${funeralHomeMode === "self" ? "text-tertiary" : "text-on-surface-variant"}`}>
+                  store
+                </span>
+              </div>
+              <div>
+                <p className={`font-semibold ${funeralHomeMode === "self" ? "text-tertiary" : "text-on-surface"}`}>
+                  A funerária entrega
+                </p>
+                {funeralHomeMode === "self" && (
+                  <span className="text-[10px] uppercase tracking-widest text-tertiary">● Ativo</span>
+                )}
+              </div>
+            </div>
+            <p className="text-xs leading-relaxed text-on-surface-variant">
+              A própria funerária parceira baixa e imprime o QR Code para entregar à família. Você não precisa intervir.
+            </p>
+          </button>
+        </div>
+
+        {savedFhMsg && (
+          <p className="mt-3 text-sm text-emerald-400">{savedFhMsg}</p>
+        )}
+
+        <div className={`mt-4 flex items-start gap-2 rounded-lg border p-3 text-xs ${
+          funeralHomeMode === "admin"
+            ? "border-amber-500/20 bg-amber-500/5 text-amber-300"
+            : "border-emerald-500/20 bg-emerald-500/5 text-emerald-300"
+        }`}>
+          <span className="material-symbols-outlined shrink-0 text-[1rem]">
+            {funeralHomeMode === "admin" ? "info" : "check_circle"}
+          </span>
+          <span>
+            {funeralHomeMode === "admin"
+              ? "Modo ativo: você receberá os dados do memorial para imprimir e enviar o QR à família enlutada."
+              : "Modo ativo: a funerária parceira é responsável por baixar e entregar o QR Code à família."}
           </span>
         </div>
       </section>
