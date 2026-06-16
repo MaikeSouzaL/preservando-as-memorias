@@ -44,6 +44,11 @@ export default async function DashboardPage() {
     (m) => m.id !== "default" && (session.isAdmin || session.isDevAdmin || m.ownerId === session.userId || m.ownerId.toLowerCase().trim() === session.email)
   );
 
+  const tributesByMemorial: Record<string, number> = {};
+  const candlesByMemorial: Record<string, number> = {};
+  for (const t of data.tributes) tributesByMemorial[t.memorialId] = (tributesByMemorial[t.memorialId] ?? 0) + 1;
+  for (const c of data.candles) candlesByMemorial[c.memorialId] = (candlesByMemorial[c.memorialId] ?? 0) + 1;
+
   const baseUrl = (process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001")
     .replace("://preservandomemorias.com.br", "://www.preservandomemorias.com.br");
 
@@ -135,6 +140,10 @@ export default async function DashboardPage() {
                 editUrl={`/memoriais/criar?edit=${memorial.id}`}
                 qrDataUrlDark={qrMap[memorial.id]?.dark ?? null}
                 qrDataUrlLight={qrMap[memorial.id]?.light ?? null}
+                tributeCount={tributesByMemorial[memorial.id] ?? 0}
+                candleCount={candlesByMemorial[memorial.id] ?? 0}
+                flowers={memorial.flowers ?? 0}
+                hearts={memorial.hearts ?? 0}
               />
             );
           })}

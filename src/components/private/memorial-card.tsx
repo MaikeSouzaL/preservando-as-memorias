@@ -14,6 +14,10 @@ type Props = {
   editUrl: string;
   qrDataUrlDark: string | null;
   qrDataUrlLight: string | null;
+  tributeCount?: number;
+  candleCount?: number;
+  flowers?: number;
+  hearts?: number;
 };
 
 const statusLabel: Record<string, { text: string; color: string }> = {
@@ -22,7 +26,7 @@ const statusLabel: Record<string, { text: string; color: string }> = {
   rascunho: { text: "Rascunho", color: "text-outline bg-outline/10 border-outline/20" },
 };
 
-export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrlDark, qrDataUrlLight }: Props) {
+export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrlDark, qrDataUrlLight, tributeCount, candleCount, flowers, hearts }: Props) {
   const [showQr, setShowQr] = useState(false);
   const [qrTheme, setQrTheme] = useState<"dark" | "light">("dark");
   const s = statusLabel[status] ?? statusLabel.rascunho;
@@ -62,6 +66,16 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
             </span>
           </div>
         </div>
+
+        {/* Interações */}
+        {isActive && (
+          <div className="flex items-center gap-3 border-t border-[var(--pm-border-faint)] px-4 py-2 text-xs text-on-surface-variant/60">
+            <span title="Homenagens">🕊️ {tributeCount ?? 0}</span>
+            <span title="Velas">🕯️ {candleCount ?? 0}</span>
+            <span title="Flores">🌸 {flowers ?? 0}</span>
+            <span title="Corações">❤️ {hearts ?? 0}</span>
+          </div>
+        )}
 
         {/* Ações */}
         <div className="flex items-center gap-2 p-3">
