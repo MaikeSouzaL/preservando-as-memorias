@@ -52,6 +52,21 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ config: updatedQr });
     }
 
+    if (target === "funeral_delete") {
+      const planId = String(body.planId ?? "");
+      if (!planId) throw new Error("ID do plano é obrigatório.");
+      const updatedDel = await updatePlatformData((data) => {
+        const plans = (Array.isArray(data.config.funeralPlans) ? data.config.funeralPlans : [])
+          .filter((p) => p && typeof p === "object" && p.id !== planId);
+        data.config.funeralPlans = plans;
+        if (data.config.defaultFuneralPlanId === planId) {
+          data.config.defaultFuneralPlanId = plans[0]?.id ?? undefined;
+        }
+        return data.config;
+      });
+      return NextResponse.json({ config: updatedDel });
+    }
+
     const updated = await updatePlatformData((data) => {
       if (target === "prices") {
         const familyCents = Math.round(Number(body.familyMemorialPriceCents));
