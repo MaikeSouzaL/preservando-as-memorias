@@ -23,7 +23,6 @@ const adminItems: AdminMenuItem[] = [
   { label: "Contrato", icon: "description", href: "/admin/contrato" },
   { label: "Usuários", icon: "group", href: "/admin/usuarios" },
   { label: "Memoriais", icon: "favorite", href: "/admin/memoriais" },
-  { label: "Homenagens", icon: "card_giftcard", href: "/admin/homenagens" },
   { label: "QR Codes", icon: "qr_code_2", href: "/admin/qr-codes" },
   { label: "Denúncias", icon: "warning", href: "/admin/denuncias", danger: true },
 ];
