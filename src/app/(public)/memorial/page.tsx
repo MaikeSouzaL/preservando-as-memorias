@@ -67,7 +67,7 @@ export default function TransicaoQrPage() {
   const [isCandleEternal, setIsCandleEternal] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
   const [heartsCount, setHeartsCount] = useState(0);
-  const [flowersCount, setFlowersCount] = useState(18);
+  const [flowersCount, setFlowersCount] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const [showTributeModal, setShowTributeModal] = useState(false);
@@ -104,6 +104,8 @@ export default function TransicaoQrPage() {
       const payload = await response.json();
       setTributesList(Array.isArray(payload.tributes) ? payload.tributes : []);
       setCandlesList(Array.isArray(payload.candles) ? payload.candles : []);
+      setFlowersCount(payload.flowers ?? 0);
+      setHeartsCount(payload.hearts ?? 0);
     } catch {
       // Keep local fallback data if the interaction endpoint is unavailable.
     }
@@ -332,17 +334,37 @@ export default function TransicaoQrPage() {
     }, 300);
   };
 
-  const handleSendFlower = () => {
-    setFlowersCount((prev) => prev + 1);
+  const handleSendFlower = async () => {
+    if (!memorial || isDemoMode) {
+      setFlowersCount((prev) => prev + 1);
+      setSuccessModal({ isOpen: true, type: "flower" });
+      return;
+    }
+    setFlowersCount((prev) => prev + 1); // optimistic
     setSuccessModal({ isOpen: true, type: "flower" });
+    try {
+      await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "flower" }),
+      });
+    } catch { /* optimistic update already applied */ }
     setTimeout(() => {
       document.getElementById('tributes')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
-  const handleTouchHeart = () => {
+  const handleTouchHeart = async () => {
     heartbeatSoundRef.current?.play('short');
-    setHeartsCount((prev) => prev + 1);
+    setHeartsCount((prev) => prev + 1); // optimistic
+    if (!memorial || isDemoMode) return;
+    try {
+      await fetch(`/api/memorials/${encodeURIComponent(memorial.id)}/interactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "heart" }),
+      });
+    } catch { /* optimistic update already applied */ }
   };
 
   const handleLeaveTribute = async (e?: React.FormEvent) => {

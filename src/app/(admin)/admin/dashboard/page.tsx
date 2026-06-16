@@ -10,6 +10,13 @@ export default async function AdminDashboardPage() {
   const totalMemorialsCount = data.memorials.length;
   const totalQrCodesCount = data.qrCodes.length;
   
+  // Contadores de interações
+  const totalTributesCount = data.tributes.length;
+  const totalCandlesCount = data.candles.length;
+  const totalFlowersCount = data.memorials.reduce((sum, m) => sum + (m.flowers ?? 0), 0);
+  const totalHeartsCount = data.memorials.reduce((sum, m) => sum + (m.hearts ?? 0), 0);
+  const totalInteractionsCount = totalCandlesCount + totalFlowersCount + totalHeartsCount;
+
   // Receita das vendas reais da plataforma
   const realRevenueCents = data.orders.filter(o => o.status === "paid").reduce((sum, o) => sum + o.grossAmountCents, 0);
   const totalRevenueFormatted = (realRevenueCents / 100).toLocaleString("pt-BR", {
@@ -112,6 +119,10 @@ export default async function AdminDashboardPage() {
         <StatCard title="Memoriais Ativos" icon="favorite" value={totalMemorialsCount.toString()} delta={memorialsDelta} />
         <StatCard title="QR Codes Ativos" icon="qr_code_2" value={totalQrCodesCount.toString()} delta={qrCodesDelta} />
         <StatCard title="Receita Real" icon="attach_money" value={totalRevenueFormatted} delta={revenueDelta} />
+      </section>
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <StatCard title="Homenagens" icon="rate_review" value={totalTributesCount.toString()} delta="Mensagens enviadas" />
+        <StatCard title="Interações" icon="insights" value={totalInteractionsCount.toString()} delta={`${totalCandlesCount} velas · ${totalFlowersCount} flores · ${totalHeartsCount} corações`} />
       </section>
  
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

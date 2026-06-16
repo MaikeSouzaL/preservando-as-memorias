@@ -53,6 +53,8 @@ export type ManagedMemorial = {
   funeralHomeId?: string;
   offerLinkId?: string;
   visits: number;
+  flowers?: number;
+  hearts?: number;
   /** Endereço para entrega do QR Code físico — preenchido quando qrDeliveryMode === "admin" */
   deliveryAddress?: DeliveryAddress;
   createdAt: string;
@@ -350,6 +352,8 @@ function mapMemorial(r: any): ManagedMemorial {
     funeralHomeId: r.funeral_home_id ?? undefined,
     offerLinkId: r.offer_link_id ?? undefined,
     visits: r.visits ?? 0,
+    flowers: r.flowers ?? undefined,
+    hearts: r.hearts ?? undefined,
     deliveryAddress: r.delivery_address ?? undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
@@ -379,6 +383,8 @@ function toDbMemorial(m: ManagedMemorial) {
     funeral_home_id: m.funeralHomeId ?? null,
     offer_link_id: m.offerLinkId ?? null,
     visits: m.visits ?? 0,
+    flowers: m.flowers ?? null,
+    hearts: m.hearts ?? null,
     // delivery_address: m.deliveryAddress ?? null, // TODO: Run DB migration to add delivery_address column
   };
 }

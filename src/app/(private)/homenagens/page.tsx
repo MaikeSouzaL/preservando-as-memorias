@@ -22,6 +22,8 @@ export default async function HomenagensPage() {
 
   const totalTributes = tributes.length;
   const totalCandles = candles.length;
+  const totalFlowers = memorials.reduce((sum, m) => sum + (m.flowers ?? 0), 0);
+  const totalHearts = memorials.reduce((sum, m) => sum + (m.hearts ?? 0), 0);
   const featuredTribute = tributes[0];
 
   return (
@@ -115,6 +117,14 @@ export default async function HomenagensPage() {
               <div className="flex items-center justify-between">
                 <span className="text-on-surface-variant">Velas Acesas (Visitas)</span>
                 <span className="font-h3 text-2xl text-on-surface">{totalCandles}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-on-surface-variant">Flores Enviadas</span>
+                <span className="font-h3 text-2xl text-on-surface">{totalFlowers}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-on-surface-variant">Corações Tocados</span>
+                <span className="font-h3 text-2xl text-on-surface">{totalHearts}</span>
               </div>
             </div>
           </div>
