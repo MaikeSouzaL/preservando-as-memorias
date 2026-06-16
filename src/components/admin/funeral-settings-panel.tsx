@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { centsToBRL, cycleLabel, type PlatformConfig } from "@/src/lib/platform-types";
+import { centsToBRL, cycleLabel, type FuneralPlan, type PlatformConfig } from "@/src/lib/platform-types";
 
 const MODULE_LABELS: Record<string, string> = {
   memorials: "Memoriais + QR Code",
@@ -30,7 +30,10 @@ export function FuneralSettingsPanel({ initialConfig }: Props) {
   const [newPlan, setNewPlan] = useState(DEFAULT_NEW_PLAN);
   const [creating, setCreating] = useState(false);
 
-  const funeralPlans = useMemo(() => Array.isArray(config.funeralPlans) ? config.funeralPlans : [], [config.funeralPlans]);
+  const funeralPlans = useMemo(
+    () => (Array.isArray(config.funeralPlans) ? config.funeralPlans : []).filter((p): p is FuneralPlan => !!p && typeof p === "object" && "id" in p),
+    [config.funeralPlans]
+  );
   const selectedPlan = useMemo(
     () => funeralPlans.find((p) => p.id === selectedPlanId) ?? funeralPlans[0],
     [funeralPlans, selectedPlanId]

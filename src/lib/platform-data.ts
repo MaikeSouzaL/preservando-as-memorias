@@ -767,7 +767,7 @@ export async function readPlatformData(): Promise<PlatformData> {
     candlePriceCents: cfg.candle_price_cents ?? 100,
     plans: Array.isArray(cfg.plans) ? cfg.plans : [],
     defaultPlanId: cfg.default_plan_id ?? undefined,
-    funeralPlans: Array.isArray(cfg.funeral_plans) ? cfg.funeral_plans : [],
+    funeralPlans: (Array.isArray(cfg.funeral_plans) ? cfg.funeral_plans : []).filter((p: unknown) => !!p && typeof p === "object"),
     defaultFuneralPlanId: cfg.default_funeral_plan_id ?? undefined,
   };
 
