@@ -31,7 +31,6 @@ export function QrDeliveryPanel({ initialMode }: { initialMode?: QrDeliveryMode 
   const [savingFh, setSavingFh] = useState<string | null>(null);
 
   const loadHomes = useCallback(async () => {
-    setLoadingHomes(true);
     const res = await fetch("/api/admin/funeral-homes");
     if (res.ok) {
       const d = await res.json();

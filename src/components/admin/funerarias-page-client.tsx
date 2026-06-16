@@ -1,12 +1,50 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Component, type ReactNode, useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FuneralSettingsPanel } from "@/src/components/admin/funeral-settings-panel";
 import { QrDeliveryPanel } from "@/src/components/admin/qr-delivery-panel";
 import { centsToBRL, cycleLabel, type PlatformConfig, type QrDeliveryMode } from "@/src/lib/platform-types";
 import { type FuneralHomeOfferLink } from "@/src/lib/platform-data";
 
 type Tab = "cadastros" | "planos" | "ofertas" | "qrcodes";
+
+// ─── Error Boundary ───────────────────────────────────────────────────────────
+
+class TabErrorBoundary extends Component<
+  { children: ReactNode; tabName: string },
+  { hasError: boolean; error: string }
+> {
+  constructor(props: { children: ReactNode; tabName: string }) {
+    super(props);
+    this.state = { hasError: false, error: "" };
+  }
+
+  static getDerivedStateFromError(err: Error) {
+    return { hasError: true, error: err.message };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center gap-4 rounded-xl border border-red-500/20 bg-red-500/5 py-12 text-center">
+          <span className="material-symbols-outlined text-4xl text-red-400">error</span>
+          <div>
+            <p className="font-semibold text-red-300">Erro ao carregar: {this.props.tabName}</p>
+            <p className="mt-1 max-w-sm text-sm text-red-400/70">{this.state.error}</p>
+          </div>
+          <button
+            onClick={() => this.setState({ hasError: false, error: "" })}
+            className="rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-300 transition hover:bg-red-500/10"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 type FuneralHome = {
   id: string;
@@ -33,7 +71,6 @@ function CadastrosTab() {
   const [commissionValue, setCommissionValue] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
-    setLoading(true);
     const res = await fetch("/api/admin/funeral-homes");
     if (res.ok) {
       const data = await res.json();
@@ -42,7 +79,12 @@ function CadastrosTab() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const init = async () => {
+      await load();
+    };
+    init();
+  }, [load]);
 
   async function act(id: string, action: "approve" | "reject") {
     setActing(id);
@@ -51,6 +93,7 @@ function CadastrosTab() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
     });
+    setLoading(true);
     await load();
     setActing(null);
   }
@@ -65,6 +108,7 @@ function CadastrosTab() {
       body: JSON.stringify({ action: "set_commission", adminCommissionPercent: val }),
     });
     setCommissionEditing(null);
+    setLoading(true);
     await load();
     setActing(null);
   }
@@ -288,7 +332,6 @@ function OfertasTab() {
   const [priceInput, setPriceInput] = useState("99,00");
 
   const load = useCallback(async () => {
-    setLoading(true);
     const res = await fetch("/api/admin/offer-links");
     if (res.ok) {
       const d = await res.json();
@@ -298,7 +341,12 @@ function OfertasTab() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const init = async () => {
+      await load();
+    };
+    init();
+  }, [load]);
 
   function handlePriceChange(val: string) {
     setPriceInput(val);
@@ -500,7 +548,6 @@ function PlanosTab() {
   const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    setLoadError(false);
     fetch("/api/platform-config")
       .then((r) => r.json())
       .then((d) => setConfig(d.config ?? null))
@@ -544,7 +591,16 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 ];
 
 export function FunerariasPageClient() {
-  const [tab, setTab] = useState<Tab>("cadastros");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const rawTab = searchParams.get("tab") as Tab | null;
+  const tab: Tab = rawTab && ["cadastros", "planos", "ofertas", "qrcodes"].includes(rawTab) ? rawTab : "cadastros";
+
+  function setTab(id: Tab) {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set("tab", id);
+    router.push(`?${params.toString()}`);
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -557,14 +613,14 @@ export function FunerariasPageClient() {
       </header>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-xl border border-outline-variant/30 bg-surface-container/40 p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-outline-variant/30 bg-surface-container/40 p-1">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+            className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition ${
               tab === t.id
-                ? "bg-tertiary/10 text-tertiary border border-tertiary/20"
+                ? "border border-tertiary/20 bg-tertiary/10 text-tertiary"
                 : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
@@ -574,10 +630,27 @@ export function FunerariasPageClient() {
         ))}
       </div>
 
-      {tab === "cadastros" && <CadastrosTab />}
-      {tab === "planos" && <PlanosTab />}
-      {tab === "ofertas" && <OfertasTab />}
-      {tab === "qrcodes" && <QrCodesTab />}
+      {/* Conteúdo das tabs — cada uma isolada por ErrorBoundary */}
+      {tab === "cadastros" && (
+        <TabErrorBoundary tabName="Cadastros">
+          <CadastrosTab />
+        </TabErrorBoundary>
+      )}
+      {tab === "planos" && (
+        <TabErrorBoundary tabName="Planos de assinatura">
+          <PlanosTab />
+        </TabErrorBoundary>
+      )}
+      {tab === "ofertas" && (
+        <TabErrorBoundary tabName="Ofertas (links)">
+          <OfertasTab />
+        </TabErrorBoundary>
+      )}
+      {tab === "qrcodes" && (
+        <TabErrorBoundary tabName="Entrega de QR Code">
+          <QrCodesTab />
+        </TabErrorBoundary>
+      )}
     </div>
   );
 }
