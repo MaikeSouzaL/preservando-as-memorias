@@ -19,6 +19,10 @@ export type FuneralPlan = {
   priceCents: number;
   active: boolean;
   features: string[];
+  /** Quantos memoriais a funerária pode criar por mês. null = ilimitado. */
+  memorialLimit?: number | null;
+  /** Preço em centavos por memorial adicional acima do limite mensal. */
+  extraMemorialPriceCents?: number;
   modules: {
     memorials: boolean;
     schedules: boolean;

@@ -79,9 +79,18 @@ export async function PATCH(request: Request) {
           ? (body.cycle as "monthly" | "annual" | "one_time")
           : "one_time";
 
+        const memorialLimit = body.memorialLimit === null || body.memorialLimit === "unlimited"
+          ? null
+          : body.memorialLimit !== undefined
+            ? Math.max(0, Math.round(Number(body.memorialLimit)))
+            : undefined;
+
+        const extraMemorialPriceCents = body.extraMemorialPriceCents !== undefined
+          ? Math.max(0, Math.round(Number(body.extraMemorialPriceCents) * 100))
+          : undefined;
+
         if (idx === -1) {
           if (!planId) throw new Error("ID do plano é obrigatório para criação.");
-          // Create new plan
           plans.push({
             id: planId,
             name: String(body.name ?? "Novo plano").trim() || "Novo plano",
@@ -90,6 +99,8 @@ export async function PATCH(request: Request) {
             cycle: validCycle,
             active: Boolean(body.active),
             features: [],
+            memorialLimit: memorialLimit ?? null,
+            extraMemorialPriceCents: extraMemorialPriceCents ?? 0,
             modules: {
               memorials: true,
               schedules: false,
@@ -107,6 +118,8 @@ export async function PATCH(request: Request) {
             priceCents,
             cycle: validCycle,
             active: Boolean(body.active),
+            ...(memorialLimit !== undefined ? { memorialLimit } : {}),
+            ...(extraMemorialPriceCents !== undefined ? { extraMemorialPriceCents } : {}),
           };
         }
 
