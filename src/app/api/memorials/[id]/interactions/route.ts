@@ -30,6 +30,8 @@ export async function GET(_request: Request, context: MemorialInteractionsContex
     return NextResponse.json({
       tributes: data.tributes.filter((tribute) => tribute.memorialId === id && tribute.status === "aprovada"),
       candles: data.candles.filter((candle) => candle.memorialId === id),
+      flowers: memorial.flowers ?? 0,
+      hearts: memorial.hearts ?? 0,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Não foi possível carregar as interações.";
@@ -65,7 +67,7 @@ export async function POST(request: Request, context: MemorialInteractionsContex
           author,
           message,
           tag: limitText(asString(body.tag), 40) || undefined,
-          status: (isPinned ? "aprovada" : "pendente") as "aprovada" | "pendente",
+          status: "aprovada" as "aprovada" | "pendente",
           isPinned,
           createdAt: new Date().toISOString(),
         };
@@ -90,6 +92,20 @@ export async function POST(request: Request, context: MemorialInteractionsContex
 
         data.candles.unshift(candle);
         return { candle };
+      }
+
+      if (type === "flower") {
+        const memorial = data.memorials.find((m) => m.id === id);
+        if (!memorial) throw new Error("Memorial não encontrado.");
+        memorial.flowers = (memorial.flowers ?? 0) + 1;
+        return { flowers: memorial.flowers };
+      }
+
+      if (type === "heart") {
+        const memorial = data.memorials.find((m) => m.id === id);
+        if (!memorial) throw new Error("Memorial não encontrado.");
+        memorial.hearts = (memorial.hearts ?? 0) + 1;
+        return { hearts: memorial.hearts };
       }
 
       throw new Error("Tipo de interação inválido.");

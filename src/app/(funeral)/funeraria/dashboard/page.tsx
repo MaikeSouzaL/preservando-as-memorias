@@ -38,6 +38,12 @@ export default async function FunerariaDashboardPage() {
 
   const memorials = data.memorials.filter((m) => m.funeralHomeId === funeralHome.id);
 
+  const enrichedMemorials = memorials.map((m) => ({
+    ...m,
+    tributeCount: data.tributes.filter((t) => t.memorialId === m.id).length,
+    candleCount: data.candles.filter((c) => c.memorialId === m.id).length,
+  }));
+
   const baseUrl = (process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001")
     .replace("://preservandomemorias.com.br", "://www.preservandomemorias.com.br");
 
@@ -82,7 +88,7 @@ export default async function FunerariaDashboardPage() {
         city: funeralHome.city,
         state: funeralHome.state,
       }}
-      memorials={memorials}
+      memorials={enrichedMemorials}
       qrMap={qrMap}
     />
   );

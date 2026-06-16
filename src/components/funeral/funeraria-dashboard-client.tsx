@@ -18,9 +18,11 @@ type FuneralHomeData = {
   state?: string;
 };
 
+type EnrichedMemorial = ManagedMemorial & { tributeCount?: number; candleCount?: number };
+
 type Props = {
   funeralHome: FuneralHomeData;
-  memorials: ManagedMemorial[];
+  memorials: EnrichedMemorial[];
   qrMap: Record<string, { dark: string; light: string }>;
 };
 
@@ -246,6 +248,15 @@ export function FunerariaDashboardClient({ funeralHome, memorials, qrMap }: Prop
                     >
                       {status.text}
                     </span>
+
+                    {memorial.status === "ativo" && (
+                      <div className="flex items-center gap-3 text-xs text-[#c4c7c7]/60">
+                        <span title="Homenagens">🕊️ {memorial.tributeCount ?? 0}</span>
+                        <span title="Velas">🕯️ {memorial.candleCount ?? 0}</span>
+                        <span title="Flores">🌸 {memorial.flowers ?? 0}</span>
+                        <span title="Corações">❤️ {memorial.hearts ?? 0}</span>
+                      </div>
+                    )}
 
                     <div className="mt-auto flex gap-2">
                       {memorial.status === "ativo" ? (
