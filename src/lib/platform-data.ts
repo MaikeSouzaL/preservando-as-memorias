@@ -163,6 +163,16 @@ export type FuneralHome = {
    * "self"    → clientes desta funerária imprimem o próprio QR
    */
   qrDeliveryMode?: QrDeliveryOverride;
+  /** ID do plano de assinatura mensal ativo (referência a PlatformConfig.funeralPlans[].id) */
+  activePlanId?: string;
+  /** Quando a assinatura foi iniciada */
+  planStartedAt?: string;
+  /** Quando a assinatura renova (ou expira) */
+  planRenewsAt?: string;
+  /** Quantos memoriais foram criados no ciclo atual */
+  memorialCountMonth?: number;
+  /** Quando o contador mensal foi resetado pela última vez */
+  memorialCountResetAt?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -558,6 +568,11 @@ function mapFuneralHome(r: any): FuneralHome {
     bankHolderName: r.bank_holder_name ?? undefined,
     bankCpfCnpj: r.bank_cpf_cnpj ?? undefined,
     qrDeliveryMode: (r.qr_delivery_mode as QrDeliveryOverride) ?? "inherit",
+    activePlanId: r.active_plan_id ?? undefined,
+    planStartedAt: r.plan_started_at ?? undefined,
+    planRenewsAt: r.plan_renews_at ?? undefined,
+    memorialCountMonth: r.memorial_count_month ?? 0,
+    memorialCountResetAt: r.memorial_count_reset_at ?? undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -917,6 +932,12 @@ async function persistChanges(original: PlatformData, updated: PlatformData): Pr
           bank_pix_key: fh.bankPixKey ?? null,
           bank_holder_name: fh.bankHolderName ?? null,
           bank_cpf_cnpj: fh.bankCpfCnpj ?? null,
+          qr_delivery_mode: fh.qrDeliveryMode ?? "inherit",
+          active_plan_id: fh.activePlanId ?? null,
+          plan_started_at: fh.planStartedAt ?? null,
+          plan_renews_at: fh.planRenewsAt ?? null,
+          memorial_count_month: fh.memorialCountMonth ?? 0,
+          memorial_count_reset_at: fh.memorialCountResetAt ?? null,
         })
         .eq("id", fh.id)
     );

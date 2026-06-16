@@ -18,12 +18,24 @@ type FuneralHomeData = {
   state?: string;
 };
 
+type ActivePlan = {
+  id: string;
+  name: string;
+  memorialLimit: number | null;
+  extraMemorialPriceCents: number;
+  priceCents: number;
+};
+
 type EnrichedMemorial = ManagedMemorial & { tributeCount?: number; candleCount?: number };
 
 type Props = {
   funeralHome: FuneralHomeData;
   memorials: EnrichedMemorial[];
   qrMap: Record<string, { dark: string; light: string }>;
+  activePlan: ActivePlan | null;
+  memorialCountMonth: number;
+  subscriptionRenewsAt: string | null;
+  subscriptionExpired: boolean;
 };
 
 const statusLabel: Record<string, { text: string; color: string }> = {
@@ -123,17 +135,48 @@ function QrModal({
   , document.body);
 }
 
-export function FunerariaDashboardClient({ funeralHome, memorials, qrMap }: Props) {
+export function FunerariaDashboardClient({
+  funeralHome, memorials, qrMap,
+  activePlan, memorialCountMonth, subscriptionRenewsAt, subscriptionExpired,
+}: Props) {
   const router = useRouter();
   const [qrModal, setQrModal] = useState<{ name: string; dark: string; light: string } | null>(null);
+  const [publishing, setPublishing] = useState<string | null>(null);
 
   async function handleLogout() {
     await fetch("/api/funeral-auth/logout", { method: "POST" });
     router.push("/funeraria/login");
   }
 
+  async function handlePublishWithQuota(memorialId: string) {
+    setPublishing(memorialId);
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: funeralHome.contactName,
+        email: funeralHome.email,
+        cpf: "00000000000",
+        phone: "00000000000",
+        paymentMethod: "pix",
+        memorialId,
+        payerType: "funeral_home",
+        source: "funeral_home",
+      }),
+    });
+    if (res.ok) {
+      router.refresh();
+    }
+    setPublishing(null);
+  }
+
   const publishedCount = memorials.filter((m) => m.status === "ativo").length;
   const pendingCount = memorials.filter((m) => m.status === "pending_payment").length;
+
+  const quotaUsed = memorialCountMonth;
+  const quotaLimit = activePlan?.memorialLimit ?? null;
+  const quotaRemaining = quotaLimit !== null ? Math.max(0, quotaLimit - quotaUsed) : null;
+  const withinQuota = activePlan && !subscriptionExpired && (quotaLimit === null || quotaUsed < quotaLimit);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a192f] to-[#0b0f0f]">
@@ -166,6 +209,56 @@ export function FunerariaDashboardClient({ funeralHome, memorials, qrMap }: Prop
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
+
+        {/* Card do plano de assinatura */}
+        {activePlan && (
+          <div className={`mb-6 rounded-xl border p-4 ${
+            subscriptionExpired
+              ? "border-red-500/30 bg-red-500/5"
+              : "border-[#e9c349]/20 bg-[#e9c349]/5"
+          }`}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[0.65rem] font-semibold uppercase tracking-widest text-[#e9c349]">
+                  {subscriptionExpired ? "Assinatura expirada" : "Plano ativo"}
+                </p>
+                <p className="font-semibold text-white">{activePlan.name}</p>
+                {subscriptionRenewsAt && (
+                  <p className="text-xs text-white/50">
+                    {subscriptionExpired ? "Expirou em " : "Renova em "}
+                    {new Date(subscriptionRenewsAt).toLocaleDateString("pt-BR")}
+                  </p>
+                )}
+              </div>
+              {!subscriptionExpired && (
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">
+                      {quotaLimit === null ? "∞" : `${quotaUsed}/${quotaLimit}`}
+                    </p>
+                    <p className="text-[0.65rem] text-white/50 uppercase tracking-wider">
+                      {quotaLimit === null ? "Ilimitado" : "Memoriais este mês"}
+                    </p>
+                  </div>
+                  {quotaLimit !== null && (
+                    <div className="w-32">
+                      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-[#e9c349] transition-all"
+                          style={{ width: `${Math.min(100, (quotaUsed / quotaLimit) * 100)}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[0.6rem] text-white/40 text-right">
+                        {quotaRemaining} restantes
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Stats row */}
         <div className="mb-8 grid grid-cols-3 gap-4">
           {[
@@ -269,6 +362,18 @@ export function FunerariaDashboardClient({ funeralHome, memorials, qrMap }: Prop
                           <span className="material-symbols-outlined text-sm">visibility</span>
                           Ver memorial
                         </a>
+                      ) : withinQuota ? (
+                        <button
+                          type="button"
+                          disabled={publishing === memorial.id}
+                          onClick={() => handlePublishWithQuota(memorial.id)}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#e9c349] py-2 text-xs font-bold uppercase tracking-wide text-[#101414] transition hover:bg-[#ffe28a] disabled:opacity-60"
+                        >
+                          <span className="material-symbols-outlined text-sm">
+                            {publishing === memorial.id ? "progress_activity" : "check_circle"}
+                          </span>
+                          {publishing === memorial.id ? "Publicando..." : "Publicar (plano)"}
+                        </button>
                       ) : (
                         <a
                           href={`/checkout?memorialId=${memorial.id}&payerType=funeral_home`}

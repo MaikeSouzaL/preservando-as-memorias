@@ -22,8 +22,13 @@ export async function GET() {
     isActive: fh.isActive,
     approvalStatus: fh.approvalStatus ?? "approved",
     adminCommissionPercent: fh.adminCommissionPercent ?? 20,
+    activePlanId: fh.activePlanId ?? null,
+    planRenewsAt: fh.planRenewsAt ?? null,
+    memorialCountMonth: fh.memorialCountMonth ?? 0,
     createdAt: fh.createdAt,
   }));
 
-  return NextResponse.json({ funeralHomes });
+  const funeralPlans = data.config.funeralPlans ?? [];
+
+  return NextResponse.json({ funeralHomes, funeralPlans });
 }

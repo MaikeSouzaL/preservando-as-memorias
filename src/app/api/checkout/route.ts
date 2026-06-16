@@ -54,6 +54,8 @@ export async function POST(request: Request) {
 
     const gateway = process.env.NEXT_PUBLIC_PAYMENT_GATEWAY || "sandbox";
 
+    let autoPublishWithinQuota = false;
+
     const order = await updatePlatformData((data) => {
       let priceCents: number;
       let actualPlanId: string;
@@ -61,19 +63,72 @@ export async function POST(request: Request) {
       let funeralHomeStripeAccountId: string | undefined;
 
       if (isMemorialFlow) {
-        priceCents =
-          payerType === "family"
-            ? data.config.familyMemorialPriceCents
-            : data.config.funeralHomeMemorialPriceCents;
-        actualPlanId = payerType === "family" ? "memorial_familia" : "memorial_funeraria";
-        productName = "Memorial Digital — Preservando Memórias";
-
         if (payerType === "funeral_home" && memorialId) {
           const memorial = data.memorials.find((m) => m.id === memorialId);
           const funeralHome = memorial?.funeralHomeId
             ? data.funeralHomes.find((fh) => fh.id === memorial.funeralHomeId)
             : undefined;
           funeralHomeStripeAccountId = funeralHome?.stripeAccountId;
+
+          // Verificar plano de assinatura ativo
+          if (funeralHome?.activePlanId) {
+            const activePlan = data.config.funeralPlans?.find(
+              (p) => p.id === funeralHome.activePlanId && p.active
+            );
+            const now = new Date();
+            const renewsAt = funeralHome.planRenewsAt ? new Date(funeralHome.planRenewsAt) : null;
+            const subscriptionValid = !renewsAt || renewsAt > now;
+
+            if (activePlan && subscriptionValid) {
+              // Resetar contador se mudou o mês
+              const resetAt = funeralHome.memorialCountResetAt
+                ? new Date(funeralHome.memorialCountResetAt)
+                : null;
+              const needsReset =
+                !resetAt ||
+                resetAt.getMonth() !== now.getMonth() ||
+                resetAt.getFullYear() !== now.getFullYear();
+
+              if (needsReset) {
+                funeralHome.memorialCountMonth = 0;
+                funeralHome.memorialCountResetAt = now.toISOString();
+              }
+
+              const currentCount = funeralHome.memorialCountMonth ?? 0;
+              const limit = activePlan.memorialLimit ?? null;
+
+              if (limit === null || currentCount < limit) {
+                // Dentro da cota — publicar gratuitamente
+                priceCents = 0;
+                actualPlanId = `subscription_${activePlan.id}`;
+                productName = `Memorial (plano ${activePlan.name})`;
+                funeralHome.memorialCountMonth = currentCount + 1;
+                funeralHome.updatedAt = now.toISOString();
+                autoPublishWithinQuota = true;
+              } else {
+                // Acima da cota — cobrar preço de excedente
+                priceCents =
+                  activePlan.extraMemorialPriceCents ??
+                  data.config.funeralHomeMemorialPriceCents;
+                actualPlanId = `overage_${activePlan.id}`;
+                productName = `Memorial excedente (plano ${activePlan.name})`;
+              }
+            } else {
+              // Assinatura expirada — cobrar avulso
+              priceCents = data.config.funeralHomeMemorialPriceCents;
+              actualPlanId = "memorial_funeraria";
+              productName = "Memorial Digital — Preservando Memórias";
+            }
+          } else {
+            // Sem plano — cobrar avulso
+            priceCents = data.config.funeralHomeMemorialPriceCents;
+            actualPlanId = "memorial_funeraria";
+            productName = "Memorial Digital — Preservando Memórias";
+          }
+        } else {
+          priceCents = data.config.familyMemorialPriceCents;
+          actualPlanId = "memorial_familia";
+          productName = "Memorial Digital — Preservando Memórias";
         }
       } else if (isOfferFlow) {
         const offer = data.offerLinks.find((o) => o.id === offerLinkId);
@@ -97,7 +152,7 @@ export async function POST(request: Request) {
         productName = `Plano ${plan.name}`;
       }
 
-      if (priceCents === 0) {
+      if (priceCents === 0 && !autoPublishWithinQuota) {
         throw new Error(
           "O administrador da plataforma ainda não configurou o preço dos memoriais. Entre em contato antes de prosseguir."
         );
@@ -186,6 +241,18 @@ export async function POST(request: Request) {
 
       return nextOrder;
     });
+
+    if (autoPublishWithinQuota) {
+      return NextResponse.json(
+        {
+          order,
+          gateway: "subscription",
+          paymentDetails: { success: true, withinQuota: true },
+          message: "Memorial publicado pela cota do plano!",
+        },
+        { status: 201 }
+      );
+    }
 
     if (gateway === "sandbox") {
       return NextResponse.json(

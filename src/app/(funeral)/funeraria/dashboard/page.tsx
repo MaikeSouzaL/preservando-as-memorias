@@ -76,6 +76,24 @@ export default async function FunerariaDashboardPage() {
     };
   }
 
+  // Resolver plano ativo
+  const activePlan = funeralHome.activePlanId
+    ? (data.config.funeralPlans ?? []).find((p) => p.id === funeralHome.activePlanId && p.active) ?? null
+    : null;
+
+  // Verificar se contador precisa ser resetado (mudança de mês)
+  const now = new Date();
+  const resetAt = funeralHome.memorialCountResetAt ? new Date(funeralHome.memorialCountResetAt) : null;
+  const memorialCountMonth =
+    resetAt &&
+    resetAt.getMonth() === now.getMonth() &&
+    resetAt.getFullYear() === now.getFullYear()
+      ? (funeralHome.memorialCountMonth ?? 0)
+      : 0;
+
+  const subscriptionRenewsAt = funeralHome.planRenewsAt ?? null;
+  const subscriptionExpired = subscriptionRenewsAt ? new Date(subscriptionRenewsAt) <= now : false;
+
   return (
     <FunerariaDashboardClient
       funeralHome={{
@@ -90,6 +108,16 @@ export default async function FunerariaDashboardPage() {
       }}
       memorials={enrichedMemorials}
       qrMap={qrMap}
+      activePlan={activePlan ? {
+        id: activePlan.id,
+        name: activePlan.name,
+        memorialLimit: activePlan.memorialLimit ?? null,
+        extraMemorialPriceCents: activePlan.extraMemorialPriceCents ?? 0,
+        priceCents: activePlan.priceCents,
+      } : null}
+      memorialCountMonth={memorialCountMonth}
+      subscriptionRenewsAt={subscriptionRenewsAt}
+      subscriptionExpired={subscriptionExpired}
     />
   );
 }

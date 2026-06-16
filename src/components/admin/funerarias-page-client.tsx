@@ -58,23 +58,37 @@ type FuneralHome = {
   isActive: boolean;
   approvalStatus: "pending" | "approved" | "rejected";
   adminCommissionPercent: number;
+  activePlanId: string | null;
+  planRenewsAt: string | null;
+  memorialCountMonth: number;
   createdAt: string;
+};
+
+type FuneralPlanSummary = {
+  id: string;
+  name: string;
+  priceCents: number;
+  memorialLimit: number | null;
 };
 
 // ─── Aba Cadastros ────────────────────────────────────────────────────────────
 
 function CadastrosTab() {
   const [homes, setHomes] = useState<FuneralHome[]>([]);
+  const [funeralPlans, setFuneralPlans] = useState<FuneralPlanSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
   const [commissionEditing, setCommissionEditing] = useState<string | null>(null);
   const [commissionValue, setCommissionValue] = useState<Record<string, string>>({});
+  const [planEditing, setPlanEditing] = useState<string | null>(null);
+  const [planRenewsAt, setPlanRenewsAt] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/funeral-homes");
     if (res.ok) {
       const data = await res.json();
       setHomes(data.funeralHomes ?? []);
+      setFuneralPlans(data.funeralPlans ?? []);
     }
     setLoading(false);
   }, []);
@@ -93,6 +107,20 @@ function CadastrosTab() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
     });
+    setLoading(true);
+    await load();
+    setActing(null);
+  }
+
+  async function savePlan(id: string, planId: string | null) {
+    setActing(id);
+    const renewsAt = planId ? (planRenewsAt[id] || null) : null;
+    await fetch(`/api/admin/funeral-homes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "set_plan", planId, planRenewsAt: renewsAt }),
+    });
+    setPlanEditing(null);
     setLoading(true);
     await load();
     setActing(null);
@@ -168,6 +196,13 @@ function CadastrosTab() {
                 onCommissionChange={(id, val) => setCommissionValue((p) => ({ ...p, [id]: val }))}
                 onCommissionSave={saveCommission}
                 onCommissionCancel={() => setCommissionEditing(null)}
+                funeralPlans={funeralPlans}
+                planEditing={planEditing}
+                planRenewsAtValue={planRenewsAt[fh.id] ?? ""}
+                onPlanEdit={(id) => setPlanEditing(id)}
+                onPlanRenewsAtChange={(id, val) => setPlanRenewsAt((p) => ({ ...p, [id]: val }))}
+                onPlanSave={savePlan}
+                onPlanCancel={() => setPlanEditing(null)}
               />
             ))}
           </div>
@@ -208,6 +243,7 @@ function Metric({ label, value, color }: { label: string; value: number; color: 
 function FuneralCard({
   fh, acting, onAct, showActions, showReject, showApprove,
   commissionEditing, commissionValue, onCommissionEdit, onCommissionChange, onCommissionSave, onCommissionCancel,
+  funeralPlans, planEditing, planRenewsAtValue, onPlanEdit, onPlanRenewsAtChange, onPlanSave, onPlanCancel,
 }: {
   fh: FuneralHome;
   acting: string | null;
@@ -221,8 +257,17 @@ function FuneralCard({
   onCommissionChange?: (id: string, val: string) => void;
   onCommissionSave?: (id: string) => void;
   onCommissionCancel?: () => void;
+  funeralPlans?: FuneralPlanSummary[];
+  planEditing?: string | null;
+  planRenewsAtValue?: string;
+  onPlanEdit?: (id: string) => void;
+  onPlanRenewsAtChange?: (id: string, val: string) => void;
+  onPlanSave?: (id: string, planId: string | null) => void;
+  onPlanCancel?: () => void;
 }) {
   const isEditingCommission = commissionEditing === fh.id;
+  const isEditingPlan = planEditing === fh.id;
+  const activePlan = funeralPlans?.find((p) => p.id === fh.activePlanId);
 
   return (
     <div className="rounded-xl border border-outline-variant/30 bg-surface-container/40 p-5 space-y-3">
@@ -260,6 +305,89 @@ function FuneralCard({
           )}
         </div>
       </div>
+
+      {/* Plano de assinatura — só para funerárias aprovadas */}
+      {onPlanEdit && funeralPlans && (
+        <div className="border-t border-outline-variant/20 pt-3">
+          {isEditingPlan ? (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+                  Plano:
+                  <select
+                    defaultValue={fh.activePlanId ?? ""}
+                    id={`plan-select-${fh.id}`}
+                    className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-1.5 text-sm text-on-surface focus:border-tertiary focus:outline-none"
+                  >
+                    <option value="">Sem plano (avulso)</option>
+                    {funeralPlans.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} — {centsToBRL(p.priceCents)}/mês
+                        {p.memorialLimit !== null ? `, ${p.memorialLimit} memoriais` : ", ilimitado"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+                  Renova em:
+                  <input
+                    type="date"
+                    value={planRenewsAtValue}
+                    onChange={(e) => onPlanRenewsAtChange?.(fh.id, e.target.value)}
+                    className="rounded-lg border border-outline-variant/40 bg-surface-container-low/70 px-3 py-1.5 text-sm text-on-surface focus:border-tertiary focus:outline-none"
+                  />
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  disabled={acting === fh.id}
+                  onClick={() => {
+                    const sel = document.getElementById(`plan-select-${fh.id}`) as HTMLSelectElement;
+                    onPlanSave?.(fh.id, sel.value || null);
+                  }}
+                  className="rounded-lg bg-tertiary/20 px-3 py-1.5 text-xs font-semibold text-tertiary hover:bg-tertiary/30 disabled:opacity-50"
+                >
+                  {acting === fh.id ? "..." : "Salvar plano"}
+                </button>
+                <button
+                  onClick={onPlanCancel}
+                  className="rounded-lg px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-on-surface-variant">
+                Plano:{" "}
+                {activePlan ? (
+                  <>
+                    <span className="font-semibold text-tertiary">{activePlan.name}</span>
+                    {fh.planRenewsAt && (
+                      <span className="ml-1 text-outline">
+                        · renova {new Date(fh.planRenewsAt).toLocaleDateString("pt-BR")}
+                      </span>
+                    )}
+                    <span className="ml-2 rounded bg-tertiary/10 px-1.5 py-0.5 text-[0.6rem] font-bold text-tertiary uppercase tracking-wider">
+                      {fh.memorialCountMonth ?? 0}
+                      {activePlan.memorialLimit !== null ? `/${activePlan.memorialLimit}` : ""} memo
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-outline">Sem plano (avulso)</span>
+                )}
+              </p>
+              <button
+                onClick={() => onPlanEdit(fh.id)}
+                className="rounded-lg px-3 py-1 text-xs text-on-surface-variant border border-outline-variant/30 hover:border-outline-variant/60 transition"
+              >
+                {activePlan ? "Alterar" : "Atribuir plano"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Comissão — só para funerárias aprovadas */}
       {onCommissionEdit && (

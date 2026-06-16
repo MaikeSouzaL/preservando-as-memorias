@@ -30,6 +30,43 @@ export async function PATCH(
     return NextResponse.json({ success: true, funeralHome: updated });
   }
 
+  if (action === "set_plan") {
+    const planId = body.planId as string | null;
+    const renewsAt = body.planRenewsAt as string | null;
+
+    const updated = await updatePlatformData((data) => {
+      const fh = data.funeralHomes.find((f) => f.id === id);
+      if (!fh) throw new Error("Funerária não encontrada.");
+
+      if (!planId) {
+        // Remover plano
+        fh.activePlanId = undefined;
+        fh.planStartedAt = undefined;
+        fh.planRenewsAt = undefined;
+        fh.memorialCountMonth = 0;
+        fh.memorialCountResetAt = undefined;
+      } else {
+        const plan = data.config.funeralPlans?.find((p) => p.id === planId);
+        if (!plan) throw new Error("Plano não encontrado.");
+        const now = new Date().toISOString();
+        fh.activePlanId = planId;
+        fh.planStartedAt = now;
+        fh.planRenewsAt = renewsAt ?? undefined;
+        fh.memorialCountMonth = 0;
+        fh.memorialCountResetAt = now;
+      }
+
+      fh.updatedAt = new Date().toISOString();
+      return {
+        id: fh.id,
+        name: fh.name,
+        activePlanId: fh.activePlanId ?? null,
+        planRenewsAt: fh.planRenewsAt ?? null,
+      };
+    });
+    return NextResponse.json({ success: true, funeralHome: updated });
+  }
+
   if (action === "set_commission") {
     const percent = Number(body.adminCommissionPercent);
     if (isNaN(percent) || percent < 0 || percent > 100) {
