@@ -57,6 +57,8 @@ export type ManagedMemorial = {
   hearts?: number;
   /** Endereço para entrega do QR Code físico — preenchido quando qrDeliveryMode === "admin" */
   deliveryAddress?: DeliveryAddress;
+  /** Quando o admin enviou fisicamente o QR Code. null = envio pendente */
+  qrSentAt?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -365,6 +367,7 @@ function mapMemorial(r: any): ManagedMemorial {
     flowers: r.flowers ?? undefined,
     hearts: r.hearts ?? undefined,
     deliveryAddress: r.delivery_address ?? undefined,
+    qrSentAt: r.qr_sent_at ?? undefined,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -396,6 +399,7 @@ function toDbMemorial(m: ManagedMemorial) {
     flowers: m.flowers ?? null,
     hearts: m.hearts ?? null,
     delivery_address: m.deliveryAddress ?? null,
+    qr_sent_at: m.qrSentAt ?? null,
   };
 }
 

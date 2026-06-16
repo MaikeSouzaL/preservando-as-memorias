@@ -25,10 +25,30 @@ export async function GET() {
         createdAt: fh.createdAt,
       }));
 
+    // Memoriais com endereço de entrega que o admin ainda não enviou
+    const pendingDeliveries = data.memorials
+      .filter((m) => m.deliveryAddress?.recipientName && !m.qrSentAt)
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        source: m.source ?? "customer",
+        recipientName: m.deliveryAddress!.recipientName,
+        cidade: m.deliveryAddress!.cidade,
+        estado: m.deliveryAddress!.estado,
+        logradouro: m.deliveryAddress!.logradouro,
+        numero: m.deliveryAddress!.numero,
+        complemento: m.deliveryAddress!.complemento,
+        bairro: m.deliveryAddress!.bairro,
+        cep: m.deliveryAddress!.cep,
+        createdAt: m.createdAt,
+      }));
+
     return NextResponse.json({
-      hasNotifications: pendingFuneralHomes.length > 0,
+      hasNotifications: pendingFuneralHomes.length > 0 || pendingDeliveries.length > 0,
       pendingFuneralHomes,
       pendingCount: pendingFuneralHomes.length,
+      pendingDeliveries,
+      pendingDeliveriesCount: pendingDeliveries.length,
       ordersCount: data.orders.length,
       memorialsCount: data.memorials.length,
     });

@@ -1,9 +1,15 @@
 import { readPlatformData } from "@/src/lib/platform-data";
+import { MarkSentButton } from "@/src/components/admin/mark-sent-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const data = await readPlatformData();
+
+  // Memoriais com endereço de entrega que o admin ainda não enviou
+  const pendingDeliveries = data.memorials.filter(
+    (m) => m.deliveryAddress?.recipientName && !m.qrSentAt
+  );
 
   // 1. Cálculos de estatísticas reais
   const totalUsersCount = new Set(data.orders.map((o) => o.userEmail)).size;
@@ -114,6 +120,45 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      {/* Alerta de entregas pendentes — permanece até o admin enviar todos os QR Codes */}
+      {pendingDeliveries.length > 0 && (
+        <section className="overflow-hidden rounded-xl border border-amber-500/40 bg-amber-500/8 shadow-[0_0_24px_rgba(245,158,11,0.12)]">
+          <div className="flex items-center gap-3 border-b border-amber-500/20 bg-amber-500/10 px-5 py-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/20 shadow-[0_0_16px_rgba(245,158,11,0.5)]">
+              <span className="material-symbols-outlined text-[20px] text-amber-400">local_shipping</span>
+            </span>
+            <div className="flex-1">
+              <p className="font-semibold text-amber-300">
+                {pendingDeliveries.length === 1
+                  ? "Você tem 1 QR Code para enviar"
+                  : `Você tem ${pendingDeliveries.length} QR Codes para enviar`}
+              </p>
+              <p className="text-xs text-amber-400/70">
+                Envie o QR Code físico e marque como enviado em cada memorial.
+              </p>
+            </div>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-black shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse">
+              {pendingDeliveries.length}
+            </span>
+          </div>
+          <ul className="divide-y divide-amber-500/10">
+            {pendingDeliveries.map((m) => (
+              <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 hover:bg-amber-500/5">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-on-surface">{m.name}</p>
+                  <p className="text-xs text-amber-300/80">Para: {m.deliveryAddress!.recipientName}</p>
+                  <p className="truncate text-xs text-on-surface-variant">
+                    {m.deliveryAddress!.logradouro}, {m.deliveryAddress!.numero}
+                    {m.deliveryAddress!.complemento ? ` — ${m.deliveryAddress!.complemento}` : ""} · {m.deliveryAddress!.bairro} · {m.deliveryAddress!.cidade}/{m.deliveryAddress!.estado} · CEP {m.deliveryAddress!.cep}
+                  </p>
+                </div>
+                <MarkSentButton memorialId={m.id} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatCard title="Usuários Ativos" icon="group" value={totalUsersCount.toString()} delta={usersDelta} glow />
         <StatCard title="Memoriais Ativos" icon="favorite" value={totalMemorialsCount.toString()} delta={memorialsDelta} />

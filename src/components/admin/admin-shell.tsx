@@ -37,6 +37,13 @@ export function AdminShell({ children }: AdminShellProps) {
   const [pendingFuneralHomes, setPendingFuneralHomes] = useState<{
     id: string; name: string; email: string; contactName: string; city?: string; state?: string; createdAt: string;
   }[]>([]);
+  const [pendingDeliveries, setPendingDeliveries] = useState<{
+    id: string; name: string; source: string;
+    recipientName: string; cidade: string; estado: string;
+    logradouro: string; numero: string; complemento?: string; bairro: string; cep: string;
+    createdAt: string;
+  }[]>([]);
+  const [markingSent, setMarkingSent] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState<string | null>(null);
   const [hasSignedContract, setHasSignedContract] = useState<boolean | null>(null);
@@ -112,6 +119,7 @@ export function AdminShell({ children }: AdminShellProps) {
         if (active) {
           setHasNotifications(dataStats.hasNotifications === true);
           setPendingFuneralHomes(dataStats.pendingFuneralHomes ?? []);
+          setPendingDeliveries(dataStats.pendingDeliveries ?? []);
         }
       } catch {}
     }
@@ -147,6 +155,20 @@ export function AdminShell({ children }: AdminShellProps) {
       }
     } catch {}
     setSaving(false);
+  };
+
+  const handleMarkSent = async (id: string) => {
+    setMarkingSent(id);
+    try {
+      const res = await fetch(`/api/admin/memorial/${id}/delivery`, { method: "PATCH" });
+      if (res.ok) {
+        const remaining = pendingDeliveries.filter((d) => d.id !== id);
+        setPendingDeliveries(remaining);
+        setHasNotifications(remaining.length > 0 || pendingFuneralHomes.length > 0);
+      }
+    } finally {
+      setMarkingSent(null);
+    }
   };
 
   const handleApproval = async (id: string, action: "approve" | "reject") => {
@@ -285,51 +307,96 @@ export function AdminShell({ children }: AdminShellProps) {
                     <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
                     <div className="absolute right-0 top-10 z-50 w-80 rounded-xl border border-outline-variant bg-[#0b162a]/95 shadow-2xl backdrop-blur-xl">
                       <div className="flex items-center justify-between border-b border-outline-variant/30 px-4 py-3">
-                        <p className="text-sm font-semibold text-on-surface">Aprovações pendentes</p>
-                        {pendingFuneralHomes.length > 0 && (
+                        <p className="text-sm font-semibold text-on-surface">Pendências</p>
+                        {(pendingFuneralHomes.length + pendingDeliveries.length) > 0 && (
                           <span className="rounded-full bg-tertiary/15 px-2 py-0.5 text-xs font-bold text-tertiary">
-                            {pendingFuneralHomes.length}
+                            {pendingFuneralHomes.length + pendingDeliveries.length}
                           </span>
                         )}
                       </div>
 
-                      {pendingFuneralHomes.length === 0 ? (
+                      {pendingFuneralHomes.length === 0 && pendingDeliveries.length === 0 ? (
                         <div className="px-4 py-6 text-center">
                           <span className="material-symbols-outlined text-3xl text-on-surface-variant">check_circle</span>
                           <p className="mt-2 text-sm text-on-surface-variant">Sem pendências no momento.</p>
                         </div>
                       ) : (
-                        <ul className="max-h-96 divide-y divide-outline-variant/20 overflow-y-auto">
-                          {pendingFuneralHomes.map((fh) => (
-                            <li key={fh.id} className="px-4 py-3">
-                              <div className="mb-2">
-                                <p className="font-medium text-on-surface text-sm">{fh.name}</p>
-                                <p className="text-xs text-on-surface-variant">{fh.contactName} · {fh.email}</p>
-                                {fh.city && (
-                                  <p className="text-xs text-on-surface-variant">{fh.city}{fh.state ? `, ${fh.state}` : ""}</p>
-                                )}
-                                <p className="mt-0.5 text-[0.65rem] text-outline">
-                                  {new Date(fh.createdAt).toLocaleDateString("pt-BR")}
+                        <ul className="max-h-[28rem] divide-y divide-outline-variant/20 overflow-y-auto">
+                          {/* Seção: Entregas de QR Code */}
+                          {pendingDeliveries.length > 0 && (
+                            <>
+                              <li className="bg-amber-500/5 px-4 py-2">
+                                <p className="flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-amber-400">
+                                  <span className="material-symbols-outlined text-[14px]">local_shipping</span>
+                                  Entregas de QR Code ({pendingDeliveries.length})
                                 </p>
-                              </div>
-                              <div className="flex gap-2">
-                                <button
-                                  disabled={approving === fh.id}
-                                  onClick={() => handleApproval(fh.id, "approve")}
-                                  className="flex-1 rounded-lg bg-green-600/20 border border-green-500/30 py-1.5 text-xs font-semibold text-green-300 transition hover:bg-green-600/30 disabled:opacity-50"
-                                >
-                                  {approving === fh.id ? "..." : "Aprovar"}
-                                </button>
-                                <button
-                                  disabled={approving === fh.id}
-                                  onClick={() => handleApproval(fh.id, "reject")}
-                                  className="flex-1 rounded-lg bg-red-600/10 border border-red-500/20 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-600/20 disabled:opacity-50"
-                                >
-                                  {approving === fh.id ? "..." : "Rejeitar"}
-                                </button>
-                              </div>
-                            </li>
-                          ))}
+                              </li>
+                              {pendingDeliveries.map((d) => (
+                                <li key={d.id} className="px-4 py-3">
+                                  <div className="mb-2">
+                                    <p className="font-medium text-on-surface text-sm">{d.name}</p>
+                                    <p className="text-xs text-amber-300/80">Para: {d.recipientName}</p>
+                                    <p className="text-xs text-on-surface-variant">
+                                      {d.logradouro}, {d.numero}{d.complemento ? ` — ${d.complemento}` : ""} · {d.bairro}
+                                    </p>
+                                    <p className="text-xs text-on-surface-variant">{d.cidade} – {d.estado} · CEP {d.cep}</p>
+                                    <p className="mt-0.5 text-[0.65rem] text-outline">
+                                      {new Date(d.createdAt).toLocaleDateString("pt-BR")} · {d.source === "funeral_home" ? "Funerária" : "Família"}
+                                    </p>
+                                  </div>
+                                  <button
+                                    disabled={markingSent === d.id}
+                                    onClick={() => handleMarkSent(d.id)}
+                                    className="w-full rounded-lg bg-amber-500/15 border border-amber-500/30 py-1.5 text-xs font-semibold text-amber-300 transition hover:bg-amber-500/25 disabled:opacity-50"
+                                  >
+                                    {markingSent === d.id ? "Registrando..." : "Marcar como enviado"}
+                                  </button>
+                                </li>
+                              ))}
+                            </>
+                          )}
+
+                          {/* Seção: Aprovações de funerárias */}
+                          {pendingFuneralHomes.length > 0 && (
+                            <>
+                              <li className="bg-surface-variant/10 px-4 py-2">
+                                <p className="flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-outline">
+                                  <span className="material-symbols-outlined text-[14px]">store</span>
+                                  Aprovações de Funerárias ({pendingFuneralHomes.length})
+                                </p>
+                              </li>
+                              {pendingFuneralHomes.map((fh) => (
+                                <li key={fh.id} className="px-4 py-3">
+                                  <div className="mb-2">
+                                    <p className="font-medium text-on-surface text-sm">{fh.name}</p>
+                                    <p className="text-xs text-on-surface-variant">{fh.contactName} · {fh.email}</p>
+                                    {fh.city && (
+                                      <p className="text-xs text-on-surface-variant">{fh.city}{fh.state ? `, ${fh.state}` : ""}</p>
+                                    )}
+                                    <p className="mt-0.5 text-[0.65rem] text-outline">
+                                      {new Date(fh.createdAt).toLocaleDateString("pt-BR")}
+                                    </p>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button
+                                      disabled={approving === fh.id}
+                                      onClick={() => handleApproval(fh.id, "approve")}
+                                      className="flex-1 rounded-lg bg-green-600/20 border border-green-500/30 py-1.5 text-xs font-semibold text-green-300 transition hover:bg-green-600/30 disabled:opacity-50"
+                                    >
+                                      {approving === fh.id ? "..." : "Aprovar"}
+                                    </button>
+                                    <button
+                                      disabled={approving === fh.id}
+                                      onClick={() => handleApproval(fh.id, "reject")}
+                                      className="flex-1 rounded-lg bg-red-600/10 border border-red-500/20 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-600/20 disabled:opacity-50"
+                                    >
+                                      {approving === fh.id ? "..." : "Rejeitar"}
+                                    </button>
+                                  </div>
+                                </li>
+                              ))}
+                            </>
+                          )}
                         </ul>
                       )}
                     </div>
@@ -389,6 +456,35 @@ export function AdminShell({ children }: AdminShellProps) {
             </div>
           </div>
         </header>
+
+        {/* Banner de entregas pendentes — permanece até o admin marcar todos como enviados */}
+        {pendingDeliveries.length > 0 && (
+          <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-3 md:px-6">
+            <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.4)]">
+                  <span className="material-symbols-outlined text-[18px] text-amber-400">local_shipping</span>
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-300">
+                    {pendingDeliveries.length === 1
+                      ? "1 QR Code aguardando envio físico"
+                      : `${pendingDeliveries.length} QR Codes aguardando envio físico`}
+                  </p>
+                  <p className="text-xs text-amber-400/70">
+                    Destinatário{pendingDeliveries.length > 1 ? "s" : ""}: {pendingDeliveries.slice(0, 2).map((d) => d.recipientName).join(", ")}{pendingDeliveries.length > 2 ? ` e mais ${pendingDeliveries.length - 2}` : ""}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setNotifOpen(true)}
+                className="shrink-0 rounded-full border border-amber-500/40 bg-amber-500/15 px-4 py-1.5 text-xs font-semibold text-amber-300 transition hover:bg-amber-500/25"
+              >
+                Ver detalhes
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mx-auto w-full max-w-[1200px] px-gutter py-gutter">{children}</div>
       </div>
