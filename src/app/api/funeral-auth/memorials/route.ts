@@ -114,6 +114,7 @@ export async function POST(request: Request) {
         source: "funeral_home",
         funeralHomeId: funeralHome.id,
         visits: 0,
+        deliveryAddress: body.deliveryAddress?.recipientName ? body.deliveryAddress : undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };

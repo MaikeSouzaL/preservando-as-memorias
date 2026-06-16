@@ -115,6 +115,7 @@ export async function POST(request: Request) {
       qrUnlocked: isAdmin ? true : false,
       source: "customer" as const,
       visits: 0,
+      deliveryAddress: body.deliveryAddress?.recipientName ? body.deliveryAddress : undefined,
       createdAt: now,
       updatedAt: now,
     };

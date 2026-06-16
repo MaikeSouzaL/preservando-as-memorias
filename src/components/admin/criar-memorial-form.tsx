@@ -11,6 +11,11 @@ registerLocale("pt-BR", ptBR);
 type GalleryItem = { title: string; url: string };
 type TimelineEvent = { year: string; title: string; description: string; longStory: string; imageUrl: string };
 
+type DeliveryAddress = {
+  recipientName: string; cep: string; logradouro: string; numero: string;
+  complemento?: string; bairro: string; cidade: string; estado: string;
+};
+
 type FormData = {
   name: string;
   nickname: string;
@@ -24,7 +29,7 @@ type FormData = {
   videoUrl: string;
   gallery: GalleryItem[];
   timelineEvents: TimelineEvent[];
-  contactEmail: string; // e-mail do responsável (opcional)
+  contactEmail: string;
 };
 
 const STEPS = [
@@ -36,12 +41,18 @@ const STEPS = [
   { id: 6, label: "Áudio" },
   { id: 7, label: "Vídeo" },
   { id: 8, label: "Responsável" },
+  { id: 9, label: "Endereço" },
 ];
 
 const EMPTY: FormData = {
   name: "", nickname: "", birthDate: "", deathDate: "", city: "",
   epitaph: "", biography: "", imageUrl: "", audioUrl: "", videoUrl: "",
   gallery: [], timelineEvents: [], contactEmail: "",
+};
+
+const EMPTY_ADDR: DeliveryAddress = {
+  recipientName: "", cep: "", logradouro: "", numero: "",
+  complemento: "", bairro: "", cidade: "", estado: "",
 };
 
 type Props = {
@@ -52,6 +63,7 @@ type Props = {
 export function CriarMemorialForm({ onClose }: Props) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY);
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>(EMPTY_ADDR);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -95,7 +107,11 @@ export function CriarMemorialForm({ onClose }: Props) {
       const res = await fetch("/api/admin/memorial", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, videoUrl: form.videoUrl || undefined }),
+        body: JSON.stringify({
+          ...form,
+          videoUrl: form.videoUrl || undefined,
+          deliveryAddress: deliveryAddress.recipientName ? deliveryAddress : undefined,
+        }),
       });
       const payload = await res.json();
       if (!res.ok) { setError(payload.error ?? "Não foi possível criar o memorial."); return; }
@@ -239,6 +255,43 @@ export function CriarMemorialForm({ onClose }: Props) {
             <p className="mt-3 text-xs text-on-surface-variant/60">
               Deixe em branco para vincular ao seu próprio acesso.
             </p>
+          </StepWrapper>
+        )}
+        {step === 9 && (
+          <StepWrapper title="Endereço de entrega" subtitle="Onde o QR Code físico deve ser enviado. Preencha mesmo que a impressão seja feita pela família — o endereço fica salvo para uso futuro.">
+            <div className="flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/8 p-3 text-xs text-amber-300 mb-4">
+              <span className="material-symbols-outlined shrink-0 text-sm">local_shipping</span>
+              <span>Registre o endereço de entrega independente do modo de envio configurado.</span>
+            </div>
+            <div className="grid gap-4">
+              <Field label="Nome do destinatário" value={deliveryAddress.recipientName} onChange={(v) => setDeliveryAddress((p) => ({ ...p, recipientName: v }))} placeholder="Quem vai receber o QR Code" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs uppercase tracking-wider text-on-surface-variant/60">CEP</span>
+                  <input
+                    type="text" maxLength={9}
+                    value={deliveryAddress.cep}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                      const fmt = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
+                      setDeliveryAddress((p) => ({ ...p, cep: fmt }));
+                    }}
+                    placeholder="00000-000"
+                    className="rounded-lg border border-outline-variant/30 bg-surface-container/40 px-3 py-2.5 text-sm text-on-surface placeholder-outline/40 outline-none focus:border-tertiary/50"
+                  />
+                </label>
+                <Field label="Estado (UF)" value={deliveryAddress.estado} onChange={(v) => setDeliveryAddress((p) => ({ ...p, estado: v.toUpperCase().slice(0, 2) }))} placeholder="SP" />
+              </div>
+              <Field label="Logradouro (rua, avenida…)" value={deliveryAddress.logradouro} onChange={(v) => setDeliveryAddress((p) => ({ ...p, logradouro: v }))} placeholder="Ex: Rua das Flores" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Número" value={deliveryAddress.numero} onChange={(v) => setDeliveryAddress((p) => ({ ...p, numero: v }))} placeholder="Ex: 123" />
+                <Field label="Complemento (opcional)" value={deliveryAddress.complemento ?? ""} onChange={(v) => setDeliveryAddress((p) => ({ ...p, complemento: v }))} placeholder="Apto, bloco…" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Bairro" value={deliveryAddress.bairro} onChange={(v) => setDeliveryAddress((p) => ({ ...p, bairro: v }))} placeholder="Ex: Centro" />
+                <Field label="Cidade" value={deliveryAddress.cidade} onChange={(v) => setDeliveryAddress((p) => ({ ...p, cidade: v }))} placeholder="Ex: São Paulo" />
+              </div>
+            </div>
           </StepWrapper>
         )}
       </div>

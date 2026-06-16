@@ -8,6 +8,17 @@ import "react-datepicker/dist/react-datepicker.css";
 
 registerLocale("pt-BR", ptBR);
 
+export type DeliveryAddressData = {
+  recipientName: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+};
+
 export type MemorialFormData = {
   name: string;
   nickname: string;
@@ -21,6 +32,7 @@ export type MemorialFormData = {
   videoUrl: string;
   gallery: Array<{ title: string; url: string }>;
   timelineEvents: Array<{ year: string; title: string; description: string; imageUrl: string }>;
+  deliveryAddress?: DeliveryAddressData;
 };
 
 const INITIAL_DATA: MemorialFormData = {
@@ -49,6 +61,10 @@ export function MemorialForm({ onSubmit, submitLabel = "Salvar e Criar Memorial"
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddressData>({
+    recipientName: "", cep: "", logradouro: "", numero: "",
+    complemento: "", bairro: "", cidade: "", estado: "",
+  });
 
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
@@ -150,7 +166,10 @@ export function MemorialForm({ onSubmit, submitLabel = "Salvar e Criar Memorial"
     setError(null);
     setIsSubmitting(true);
     try {
-      await onSubmit(form);
+      await onSubmit({
+        ...form,
+        deliveryAddress: deliveryAddress.recipientName ? deliveryAddress : undefined,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao salvar memorial.");
     } finally {
@@ -516,6 +535,106 @@ export function MemorialForm({ onSubmit, submitLabel = "Salvar e Criar Memorial"
               <span className="material-symbols-outlined text-sm font-bold">add</span>
               Adicionar Capítulo à Linha do Tempo
             </button>
+          </div>
+        </section>
+
+        {/* ── Endereço de Entrega ── */}
+        <section className="space-y-5 border-t border-white/5 pt-6">
+          <div className="flex items-center gap-3 border-b border-[#e9c349]/10 pb-2">
+            <span className="material-symbols-outlined text-base text-[#e9c349]">local_shipping</span>
+            <h3 className="text-base font-semibold uppercase tracking-wider text-[#e9c349]">Endereço de Entrega do QR Code</h3>
+          </div>
+          <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 p-4 text-xs text-amber-300">
+            <span className="material-symbols-outlined shrink-0 text-base">info</span>
+            <span>Preencha o endereço para onde o QR Code físico deve ser enviado. Se a funerária ou família for imprimir por conta própria, ainda assim registre o endereço para uso futuro.</span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Nome do Destinatário *</label>
+              <input
+                type="text"
+                value={deliveryAddress.recipientName}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, recipientName: e.target.value }))}
+                placeholder="Quem vai receber o QR Code"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">CEP</label>
+              <input
+                type="text"
+                maxLength={9}
+                value={deliveryAddress.cep}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                  const fmt = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
+                  setDeliveryAddress((p) => ({ ...p, cep: fmt }));
+                }}
+                placeholder="00000-000"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Estado (UF)</label>
+              <input
+                type="text"
+                maxLength={2}
+                value={deliveryAddress.estado}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, estado: e.target.value.toUpperCase().slice(0, 2) }))}
+                placeholder="SP"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Logradouro (rua, avenida…)</label>
+              <input
+                type="text"
+                value={deliveryAddress.logradouro}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, logradouro: e.target.value }))}
+                placeholder="Ex: Rua das Flores"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Número</label>
+              <input
+                type="text"
+                value={deliveryAddress.numero}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, numero: e.target.value }))}
+                placeholder="Ex: 123"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Complemento (opcional)</label>
+              <input
+                type="text"
+                value={deliveryAddress.complemento ?? ""}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, complemento: e.target.value }))}
+                placeholder="Apto, bloco…"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Bairro</label>
+              <input
+                type="text"
+                value={deliveryAddress.bairro}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, bairro: e.target.value }))}
+                placeholder="Ex: Centro"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs uppercase tracking-wider text-[#c4c7c7]/70">Cidade</label>
+              <input
+                type="text"
+                value={deliveryAddress.cidade}
+                onChange={(e) => setDeliveryAddress((p) => ({ ...p, cidade: e.target.value }))}
+                placeholder="Ex: São Paulo"
+                className="w-full rounded-lg border border-white/10 bg-[#0a192f66] px-4 py-2.5 text-[#e0e3e2] placeholder-white/20 focus:border-[#e9c349] focus:outline-none"
+              />
+            </div>
           </div>
         </section>
 

@@ -395,7 +395,7 @@ function toDbMemorial(m: ManagedMemorial) {
     visits: m.visits ?? 0,
     flowers: m.flowers ?? null,
     hearts: m.hearts ?? null,
-    // delivery_address: m.deliveryAddress ?? null, // TODO: Run DB migration to add delivery_address column
+    delivery_address: m.deliveryAddress ?? null,
   };
 }
 
