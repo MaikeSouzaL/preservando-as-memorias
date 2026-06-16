@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     const cnpj = asString(body.cnpj);
     const city = asString(body.city);
     const state = asString(body.state);
+    const inviteSlug = asString(body.inviteSlug);
 
     if (!name || !email || !password || !contactName || !phone) {
       return NextResponse.json(
@@ -56,6 +57,34 @@ export async function POST(request: Request) {
         .replace(/^-+|-+$/g, "")
         .slice(0, 40) + "-" + Date.now().toString(36).slice(-4);
 
+      // Resolve invite terms (commission %, plan, renewsAt)
+      let adminCommissionPercent = 0;
+      let activePlanId: string | undefined;
+      let planStartedAt: string | undefined;
+      let planRenewsAt: string | undefined;
+      let memorialCountResetAt: string | undefined;
+
+      if (inviteSlug) {
+        const invite = (data.config.funeralHomeInvites ?? []).find(
+          (i) => i.slug === inviteSlug && i.status === "active"
+        );
+        if (invite) {
+          if (invite.adminCommissionPercent !== undefined) {
+            adminCommissionPercent = invite.adminCommissionPercent;
+          }
+          if (invite.activePlanId) {
+            activePlanId = invite.activePlanId;
+            planStartedAt = new Date().toISOString();
+            planRenewsAt = invite.planRenewsAt ?? undefined;
+            memorialCountResetAt = new Date().toISOString();
+          }
+          // Mark invite as used
+          invite.status = "used";
+          invite.usedAt = new Date().toISOString();
+        }
+      }
+
+      const now = new Date().toISOString();
       const newFuneralHome = {
         id: `fh_${Date.now().toString(36)}`,
         name,
@@ -67,11 +96,16 @@ export async function POST(request: Request) {
         city: city || undefined,
         state: state || undefined,
         passwordHash: hashPassword(password),
-        adminCommissionPercent: 0,
+        adminCommissionPercent,
         isActive: false,
         approvalStatus: "pending" as const,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        activePlanId,
+        planStartedAt,
+        planRenewsAt,
+        memorialCountMonth: activePlanId ? 0 : undefined,
+        memorialCountResetAt,
+        createdAt: now,
+        updatedAt: now,
       };
 
       data.funeralHomes.push(newFuneralHome);

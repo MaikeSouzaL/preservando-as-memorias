@@ -106,9 +106,7 @@ export default function CriarMemorialPage() {
   }, []);
 
   const filteredStepsBase = isAdmin ? STEPS_BASE.filter(s => s.id !== 8) : STEPS_BASE;
-  const STEPS = qrDeliveryMode === "admin"
-    ? [...filteredStepsBase, STEP_ENTREGA]
-    : filteredStepsBase;
+  const STEPS = [...filteredStepsBase, STEP_ENTREGA];
 
   const currentStepId = STEPS[step - 1]?.id;
 
@@ -177,7 +175,7 @@ export default function CriarMemorialPage() {
         body: JSON.stringify({
           ...form,
           videoUrl: form.videoUrl || undefined,
-          deliveryAddress: qrDeliveryMode === "admin" ? deliveryAddress : undefined,
+          deliveryAddress,
         }),
       });
       const payload = await res.json();
@@ -353,7 +351,7 @@ export default function CriarMemorialPage() {
             />
           )}
 
-          {currentStepId === 9 && qrDeliveryMode === "admin" && (
+          {currentStepId === 9 && (
             <StepEntrega
               address={deliveryAddress}
               onChange={(field, value) =>
@@ -809,14 +807,14 @@ function StepEntrega({
   return (
     <StepWrapper
       title="Endereço de entrega"
-      subtitle="O QR Code físico será enviado para este endereço pelo administrador da plataforma."
+      subtitle="Salvaremos este endereço para entrega do QR Code físico, se necessário."
     >
       {/* Aviso informativo */}
       <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/8 p-4 text-xs text-amber-300">
         <span className="material-symbols-outlined shrink-0 text-[1.1rem]">local_shipping</span>
         <span>
-          O administrador é responsável pela impressão e entrega do QR Code. Preencha o endereço
-          completo para que o envio chegue corretamente.
+          O endereço é usado caso o QR Code físico precise ser enviado a você. Preencha com
+          cuidado para garantir a entrega correta.
         </span>
       </div>
 

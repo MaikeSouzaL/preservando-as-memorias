@@ -36,6 +36,23 @@ export type FuneralPlan = {
 export type QrDeliveryMode = "admin" | "self";
 export type QrDeliveryOverride = "inherit" | "admin" | "self";
 
+export type FuneralHomeInvite = {
+  id: string;
+  slug: string;
+  label: string;
+  /** % da comissão do Admin Parceiro sobre esta funerária (sobrepõe o padrão) */
+  adminCommissionPercent?: number;
+  /** ID do plano pré-atribuído ao se cadastrar via este link */
+  activePlanId?: string | null;
+  /** Data de renovação do plano pré-atribuído */
+  planRenewsAt?: string | null;
+  notes?: string;
+  status: "active" | "used" | "expired";
+  createdAt: string;
+  usedByFuneralHomeId?: string | null;
+  usedAt?: string | null;
+};
+
 export type PlatformConfig = {
   ownerCommissionPercent: number;
   familyMemorialPriceCents: number;
@@ -58,6 +75,7 @@ export type PlatformConfig = {
   plans?: PlatformPlan[];
   defaultFuneralPlanId?: string;
   funeralPlans?: FuneralPlan[];
+  funeralHomeInvites?: FuneralHomeInvite[];
 };
 
 export type PaymentMethod = "pix" | "card" | "boleto";

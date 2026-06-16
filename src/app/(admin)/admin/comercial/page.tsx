@@ -29,29 +29,34 @@ export default async function AdminCommercialPage(props: { searchParams?: Promis
         </p>
       </header>
 
-      <nav className="flex gap-6 border-b border-outline-variant/30 text-sm font-semibold uppercase tracking-wider overflow-x-auto">
-        <Link 
-          href="?tab=visao-geral" 
-          className={`whitespace-nowrap pb-3 transition-colors ${activeTab === "visao-geral" ? "border-b-2 border-tertiary text-tertiary" : "text-outline hover:text-on-surface"}`}
-        >
-          Visão Geral
-        </Link>
-        <Link 
-          href="?tab=banco" 
-          className={`whitespace-nowrap pb-3 transition-colors ${activeTab === "banco" ? "border-b-2 border-tertiary text-tertiary" : "text-outline hover:text-on-surface"}`}
-        >
-          Dados Bancários
-        </Link>
-        <Link 
-          href="?tab=planos" 
-          className={`whitespace-nowrap pb-3 transition-colors ${activeTab === "planos" ? "border-b-2 border-tertiary text-tertiary" : "text-outline hover:text-on-surface"}`}
-        >
-          Planos e Preços
-        </Link>
-      </nav>
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-outline-variant/30 bg-surface-container/40 p-1">
+        {([
+          { id: "visao-geral", label: "Visão Geral", icon: "bar_chart" },
+          { id: "banco", label: "Dados Bancários", icon: "account_balance" },
+          { id: "planos", label: "Planos e Preços", icon: "sell" },
+        ] as const).map((t) => (
+          <Link
+            key={t.id}
+            href={`?tab=${t.id}`}
+            className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+              activeTab === t.id
+                ? "border border-tertiary/20 bg-tertiary/10 text-tertiary"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">{t.icon}</span>
+            <span className="hidden sm:inline">{t.label}</span>
+          </Link>
+        ))}
+      </div>
 
       {activeTab === "visao-geral" && (
         <div className="flex flex-col gap-8 animate-in fade-in duration-500">
+          <CommercialTabInfo
+            icon="bar_chart"
+            title="Visão geral financeira"
+            description="Resumo de todos os pedidos pagos na plataforma. A receita bruta é o total cobrado dos clientes. A taxa do sistema é retida pela plataforma (Preservando Memórias). Seu repasse é o valor que você recebe após a dedução da taxa."
+          />
           <section className="grid gap-5 md:grid-cols-4">
             <Metric label="Pedidos pagos" value={paidOrders.length.toString()} />
             <Metric label="Receita bruta" value={formatBRL(grossRevenue)} />
@@ -109,7 +114,12 @@ export default async function AdminCommercialPage(props: { searchParams?: Promis
       )}
 
       {activeTab === "banco" && (
-        <div className="animate-in fade-in duration-500">
+        <div className="animate-in fade-in duration-500 flex flex-col gap-6">
+          <CommercialTabInfo
+            icon="account_balance"
+            title="Dados bancários para repasse"
+            description="Cadastre a conta ou chave PIX para onde os repasses devem ser realizados. O Dev Admin (Maike) usa estas informações para fazer a transferência manual do seu saldo após cada período de pagamento."
+          />
           <BankDataPanel
             grossRevenueCents={grossRevenue}
             platformCommissionCents={commissionRevenue}
@@ -118,10 +128,29 @@ export default async function AdminCommercialPage(props: { searchParams?: Promis
       )}
 
       {activeTab === "planos" && (
-        <div className="animate-in fade-in duration-500">
+        <div className="animate-in fade-in duration-500 flex flex-col gap-6">
+          <CommercialTabInfo
+            icon="sell"
+            title="Preços e planos da plataforma"
+            description="Configure o preço avulso cobrado de famílias e de funerárias sem plano ativo. Também é aqui onde você define os planos de assinatura mensais para funerárias — cada plano tem uma cota de memoriais e um valor de excedente quando ultrapassar a cota."
+            tip="Os planos criados aqui ficam disponíveis para atribuição em Funerárias → Planos de assinatura."
+          />
           <PriceConfigPanel initialConfig={data.config} />
         </div>
       )}
+    </div>
+  );
+}
+
+function CommercialTabInfo({ icon, title, description, tip }: { icon: string; title: string; description: string; tip?: string }) {
+  return (
+    <div className="flex items-start gap-4 rounded-xl border border-outline-variant/20 bg-surface-variant/20 px-5 py-4">
+      <span className="material-symbols-outlined mt-0.5 shrink-0 text-xl text-tertiary">{icon}</span>
+      <div className="flex flex-col gap-0.5">
+        <p className="text-sm font-semibold text-on-surface">{title}</p>
+        <p className="text-xs text-on-surface-variant leading-relaxed">{description}</p>
+        {tip && <p className="mt-1 text-xs text-tertiary/70">💡 {tip}</p>}
+      </div>
     </div>
   );
 }

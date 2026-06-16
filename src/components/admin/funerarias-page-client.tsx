@@ -71,6 +71,23 @@ type FuneralPlanSummary = {
   memorialLimit: number | null;
 };
 
+// ─── Tab info banner ──────────────────────────────────────────────────────────
+
+function TabInfo({ icon, title, description, tip }: { icon: string; title: string; description: string; tip?: string }) {
+  return (
+    <div className="flex items-start gap-4 rounded-xl border border-outline-variant/20 bg-surface-variant/20 px-5 py-4">
+      <span className="material-symbols-outlined mt-0.5 shrink-0 text-xl text-tertiary">{icon}</span>
+      <div className="flex flex-col gap-0.5">
+        <p className="text-sm font-semibold text-on-surface">{title}</p>
+        <p className="text-xs text-on-surface-variant leading-relaxed">{description}</p>
+        {tip && (
+          <p className="mt-1 text-xs text-tertiary/70">💡 {tip}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Aba Cadastros ────────────────────────────────────────────────────────────
 
 function CadastrosTab() {
@@ -149,6 +166,12 @@ function CadastrosTab() {
 
   return (
     <div className="space-y-8">
+      <TabInfo
+        icon="store"
+        title="Gerenciamento de funerárias parceiras"
+        description="Aqui ficam todas as funerárias cadastradas na plataforma. Aprove ou rejeite novos cadastros, defina a comissão (%) que você cobra de cada uma e atribua um plano de assinatura mensal. Funerárias aprovadas podem criar memoriais diretamente pelo painel delas."
+        tip="A comissão configurada aqui determina o percentual retido de cada memorial pago criado por esta funerária."
+      />
       {/* Métricas */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Metric label="Pendentes" value={pending.length} color="yellow" />
@@ -525,6 +548,12 @@ function OfertasTab() {
 
   return (
     <div className="space-y-6">
+      <TabInfo
+        icon="link"
+        title="Links de oferta para famílias"
+        description="Cada funerária parceira pode ter links personalizados com preço próprio para oferecer memoriais às famílias enlutadas. A família acessa o link, paga o memorial e o sistema registra a conversão vinculada à funerária. Use para campanhas e parcerias com preço diferenciado."
+        tip="Os endereços de entrega preenchidos pelas famílias ficam salvos em cada memorial — acesse em Memoriais para ver os dados de envio."
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         <article className="rounded-xl border border-tertiary/10 bg-surface-container/40 p-5">
           <p className="text-xs uppercase tracking-wider text-outline">Ativas</p>
@@ -689,7 +718,17 @@ function PlanosTab() {
   );
   if (!config) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
 
-  return <FuneralSettingsPanel initialConfig={config} />;
+  return (
+    <div className="flex flex-col gap-6">
+      <TabInfo
+        icon="subscriptions"
+        title="Planos de assinatura para funerárias"
+        description="Crie planos mensais com cota de memoriais. Uma funerária com plano ativo cria memoriais sem custo individual até atingir o limite mensal do plano — a partir daí, cobra-se o valor de excedente configurado. Funerárias sem plano pagam o preço avulso definido em Comercial."
+        tip="Atribua o plano a cada funerária na aba Cadastros. O contador de memoriais reseta automaticamente todo mês."
+      />
+      <FuneralSettingsPanel initialConfig={config} />
+    </div>
+  );
 }
 
 // ─── Aba QR Codes ─────────────────────────────────────────────────────────────
@@ -710,10 +749,18 @@ function QrCodesTab() {
   if (!config) return <p className="py-10 text-center text-on-surface-variant">Carregando...</p>;
 
   return (
-    <QrDeliveryPanel
-      initialMode={config.qrDeliveryMode}
-      initialFuneralHomeMode={config.funeralHomeQrDeliveryMode}
-    />
+    <div className="flex flex-col gap-6">
+      <TabInfo
+        icon="local_shipping"
+        title="Configuração de entrega do QR Code físico"
+        description="Define quem é responsável por imprimir e entregar o QR Code físico após o pagamento. Você pode configurar separadamente para famílias e funerárias. Quando você é o responsável (modo 'Eu envio'), o endereço de entrega é coletado durante o cadastro do memorial e fica salvo no registro — acesse em Memoriais para ver os dados de envio de cada pedido."
+        tip="Os endereços ficam visíveis na página Memoriais → coluna de ações de cada memorial, com ícone de localização."
+      />
+      <QrDeliveryPanel
+        initialMode={config.qrDeliveryMode}
+        initialFuneralHomeMode={config.funeralHomeQrDeliveryMode}
+      />
+    </div>
   );
 }
 

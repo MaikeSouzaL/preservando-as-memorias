@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { CriarMemorialForm } from "@/src/components/admin/criar-memorial-form";
-import type { ManagedMemorial } from "@/src/lib/platform-data";
+import type { ManagedMemorial, DeliveryAddress } from "@/src/lib/platform-data";
 
 type Props = {
   memorials: ManagedMemorial[];
@@ -98,15 +98,26 @@ function MemorialTable({ rows, emptyLabel }: { rows: ManagedMemorial[]; emptyLab
                     </span>
                   </td>
                   <td className="py-4">
-                    <a
-                      href={`/memorial-publico?memorial=${memorial.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-xs text-on-surface-variant transition hover:text-[#e9c349]"
-                    >
-                      <span className="material-symbols-outlined text-sm">open_in_new</span>
-                      Ver
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/memorial-publico?memorial=${memorial.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs text-on-surface-variant transition hover:text-[#e9c349]"
+                      >
+                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                        Ver
+                      </a>
+                      {memorial.deliveryAddress?.recipientName && (
+                        <span
+                          title={`Endereço: ${memorial.deliveryAddress.logradouro}, ${memorial.deliveryAddress.numero} — ${memorial.deliveryAddress.cidade}/${memorial.deliveryAddress.estado}`}
+                          className="flex items-center gap-0.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-1.5 py-0.5 text-[0.6rem] text-amber-300"
+                        >
+                          <span className="material-symbols-outlined text-[0.75rem]">local_shipping</span>
+                          Entrega
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -115,6 +126,70 @@ function MemorialTable({ rows, emptyLabel }: { rows: ManagedMemorial[]; emptyLab
         </tbody>
       </table>
     </div>
+  );
+}
+
+function AddressCard({ memorial }: { memorial: ManagedMemorial & { deliveryAddress: DeliveryAddress } }) {
+  const addr = memorial.deliveryAddress;
+  const fullAddress = [
+    `${addr.logradouro}, ${addr.numero}`,
+    addr.complemento || null,
+    addr.bairro,
+    `${addr.cidade} / ${addr.estado}`,
+    addr.cep,
+  ].filter(Boolean).join(" — ");
+
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-amber-400/15 bg-amber-400/5 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
+            {memorial.name}
+          </p>
+          <p className="mt-0.5 font-medium text-on-surface">{addr.recipientName}</p>
+        </div>
+        <a
+          href={`/memorial-publico?memorial=${memorial.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 flex items-center gap-1 text-xs text-on-surface-variant transition hover:text-[#e9c349]"
+        >
+          <span className="material-symbols-outlined text-sm">open_in_new</span>
+          Ver memorial
+        </a>
+      </div>
+      <p className="text-sm text-on-surface-variant">{fullAddress}</p>
+    </div>
+  );
+}
+
+function EntregasSection({ memorials }: { memorials: ManagedMemorial[] }) {
+  const withAddress = memorials.filter(
+    (m): m is ManagedMemorial & { deliveryAddress: DeliveryAddress } =>
+      !!m.deliveryAddress?.recipientName
+  );
+
+  if (withAddress.length === 0) return null;
+
+  return (
+    <section>
+      <div className="mb-3 flex items-center gap-3">
+        <span className="material-symbols-outlined text-[18px] text-amber-300">local_shipping</span>
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-amber-300">
+          Endereços de entrega ({withAddress.length})
+        </h4>
+      </div>
+      <div className="rounded-xl border border-amber-400/10 bg-[#0a192f66] p-6 backdrop-blur-md">
+        <p className="mb-4 text-xs text-on-surface-variant">
+          Memoriais com endereço de entrega preenchido. Use estes dados para enviar o QR Code físico.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {withAddress.map((m) => (
+            <AddressCard key={m.id} memorial={m} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -191,6 +266,9 @@ export function MemoriaisPageClient({ memorials, adminUserId }: Props) {
           />
         </div>
       </section>
+
+      {/* Seção: Endereços de entrega */}
+      <EntregasSection memorials={list} />
 
       {/* Modal: Criar Memorial */}
       {showForm && (

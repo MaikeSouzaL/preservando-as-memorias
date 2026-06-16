@@ -494,6 +494,7 @@ function CadastroContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isPendente = searchParams.get("status") === "pendente";
+  const inviteSlug = searchParams.get("invite") ?? "";
 
   const [step, setStep] = useState(0);
 
@@ -530,6 +531,7 @@ function CadastroContent() {
           state: company?.state || "",
           password,
           confirmPassword,
+          inviteSlug: inviteSlug || undefined,
         }),
       });
       const payload = await res.json();
@@ -560,6 +562,16 @@ function CadastroContent() {
             Cadastro de Funerária
           </h1>
         </div>
+
+        {inviteSlug && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#e9c349]/20 bg-[#e9c349]/5 px-4 py-3">
+            <span className="material-symbols-outlined text-[#e9c349]">handshake</span>
+            <p className="text-xs text-[#c4c7c7]/80">
+              Cadastro via <strong className="text-[#e9c349]">convite exclusivo</strong> — condições
+              comerciais pré-configuradas serão aplicadas automaticamente ao finalizar.
+            </p>
+          </div>
+        )}
 
         <StepBar current={step} />
 
