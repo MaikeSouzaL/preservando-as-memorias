@@ -4,10 +4,11 @@ import { Component, type ReactNode, useCallback, useEffect, useState } from "rea
 import { useRouter, useSearchParams } from "next/navigation";
 import { FuneralSettingsPanel } from "@/src/components/admin/funeral-settings-panel";
 import { QrDeliveryPanel } from "@/src/components/admin/qr-delivery-panel";
+import { ConvitesPageClient } from "@/src/components/admin/convites-page-client";
 import { centsToBRL, cycleLabel, type PlatformConfig, type QrDeliveryMode } from "@/src/lib/platform-types";
 import { type FuneralHomeOfferLink } from "@/src/lib/platform-data";
 
-type Tab = "cadastros" | "planos" | "ofertas" | "qrcodes";
+type Tab = "cadastros" | "planos" | "ofertas" | "convites" | "qrcodes";
 
 // ─── Error Boundary ───────────────────────────────────────────────────────────
 
@@ -764,12 +765,29 @@ function QrCodesTab() {
   );
 }
 
+// ─── Aba Convites ─────────────────────────────────────────────────────────────
+
+function ConvitesTab() {
+  return (
+    <div className="flex flex-col gap-6">
+      <TabInfo
+        icon="handshake"
+        title="Links de convite para funerárias"
+        description="Crie links personalizados para convidar funerárias a se cadastrar na plataforma com condições comerciais pré-configuradas: comissão %, plano de assinatura e data de renovação. Ao clicar no link, a funerária vê os termos e se registra automaticamente com esses valores aplicados."
+        tip="Use um convite diferente para cada funerária ou parceria — assim você rastreia quem veio por qual canal e com quais condições."
+      />
+      <ConvitesPageClient />
+    </div>
+  );
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "cadastros", label: "Cadastros", icon: "store" },
   { id: "planos", label: "Planos de assinatura", icon: "subscriptions" },
-  { id: "ofertas", label: "Ofertas (links)", icon: "link" },
+  { id: "ofertas", label: "Ofertas (links)", icon: "sell" },
+  { id: "convites", label: "Convites", icon: "handshake" },
   { id: "qrcodes", label: "Entrega de QR Code", icon: "qr_code_2" },
 ];
 
@@ -777,7 +795,7 @@ export function FunerariasPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const rawTab = searchParams.get("tab") as Tab | null;
-  const tab: Tab = rawTab && ["cadastros", "planos", "ofertas", "qrcodes"].includes(rawTab) ? rawTab : "cadastros";
+  const tab: Tab = rawTab && ["cadastros", "planos", "ofertas", "convites", "qrcodes"].includes(rawTab) ? rawTab : "cadastros";
 
   function setTab(id: Tab) {
     const params = new URLSearchParams(Array.from(searchParams.entries()));
@@ -827,6 +845,11 @@ export function FunerariasPageClient() {
       {tab === "ofertas" && (
         <TabErrorBoundary tabName="Ofertas (links)">
           <OfertasTab />
+        </TabErrorBoundary>
+      )}
+      {tab === "convites" && (
+        <TabErrorBoundary tabName="Convites">
+          <ConvitesTab />
         </TabErrorBoundary>
       )}
       {tab === "qrcodes" && (

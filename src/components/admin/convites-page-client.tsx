@@ -113,23 +113,15 @@ export function ConvitesPageClient() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <p className="mb-2 text-[0.75rem] uppercase tracking-[0.15em] text-tertiary">Admin</p>
-          <h1 className="font-h2 text-[clamp(2rem,4vw,3rem)] text-on-surface">Links de Convite</h1>
-          <p className="mt-2 max-w-2xl text-on-surface-variant text-sm">
-            Crie links personalizados para funerárias se cadastrarem com termos pré-configurados
-            (comissão %, plano de assinatura, data de renovação).
-          </p>
-        </div>
+      <div className="flex justify-end">
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="shrink-0 flex items-center gap-2 rounded-xl bg-[#e9c349] px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-[#0d1010] transition hover:bg-[#ffe28a]"
+          className="flex items-center gap-2 rounded-xl bg-[#e9c349] px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-[#0d1010] transition hover:bg-[#ffe28a]"
         >
           <span className="material-symbols-outlined text-sm">add</span>
           Novo convite
         </button>
-      </header>
+      </div>
 
       {error && (
         <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>
