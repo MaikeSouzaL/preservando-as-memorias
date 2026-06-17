@@ -44,6 +44,10 @@ export function AdminShell({ children }: AdminShellProps) {
     createdAt: string;
   }[]>([]);
   const [markingSent, setMarkingSent] = useState<string | null>(null);
+  const [isDevAdmin, setIsDevAdmin] = useState(false);
+  const [adminPartners, setAdminPartners] = useState<{
+    id: string; name: string; email: string; lastSeenAt: string | null;
+  }[]>([]);
   const [saving, setSaving] = useState(false);
   const [approving, setApproving] = useState<string | null>(null);
   const [hasSignedContract, setHasSignedContract] = useState<boolean | null>(null);
@@ -100,6 +104,12 @@ export function AdminShell({ children }: AdminShellProps) {
           setFormEmail(dataProfile.profile.email || "");
           setFormAvatarUrl(dataProfile.profile.avatarUrl || "");
           setFormPassword("");
+          setIsDevAdmin(dataProfile.profile.isDevAdmin === true);
+
+          // Registra o acesso do admin parceiro (silenciosamente, só se não for devAdmin)
+          if (dataProfile.profile.isAdmin && !dataProfile.profile.isDevAdmin) {
+            fetch("/api/admin/ping", { method: "POST" }).catch(() => undefined);
+          }
         }
 
         const resContracts = await fetch("/api/admin/contracts");
@@ -120,6 +130,7 @@ export function AdminShell({ children }: AdminShellProps) {
           setHasNotifications(dataStats.hasNotifications === true);
           setPendingFuneralHomes(dataStats.pendingFuneralHomes ?? []);
           setPendingDeliveries(dataStats.pendingDeliveries ?? []);
+          setAdminPartners(dataStats.adminPartners ?? []);
         }
       } catch {}
     }
@@ -314,6 +325,49 @@ export function AdminShell({ children }: AdminShellProps) {
                           </span>
                         )}
                       </div>
+
+                      {/* Atividade dos parceiros — visível apenas para o dev admin */}
+                      {isDevAdmin && adminPartners.length > 0 && (
+                        <div className="border-b border-outline-variant/20">
+                          <div className="bg-surface-variant/10 px-4 py-2">
+                            <p className="flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-outline">
+                              <span className="material-symbols-outlined text-[14px]">person_check</span>
+                              Acesso dos Parceiros
+                            </p>
+                          </div>
+                          <ul className="divide-y divide-outline-variant/10">
+                            {adminPartners.map((p) => {
+                              const lastSeen = p.lastSeenAt ? new Date(p.lastSeenAt) : null;
+                              const diffMs = lastSeen ? Date.now() - lastSeen.getTime() : null;
+                              const diffH = diffMs != null ? Math.floor(diffMs / 3_600_000) : null;
+                              const diffD = diffMs != null ? Math.floor(diffMs / 86_400_000) : null;
+                              const label = lastSeen == null
+                                ? "Nunca acessou"
+                                : diffH! < 1 ? "Agora há pouco"
+                                : diffH! < 24 ? `Há ${diffH}h`
+                                : diffD === 1 ? "Ontem"
+                                : `Há ${diffD} dias`;
+                              const isStale = diffD == null || diffD >= 3;
+                              return (
+                                <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                                  <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium text-on-surface">{p.name}</p>
+                                    <p className="truncate text-xs text-on-surface-variant">{p.email}</p>
+                                  </div>
+                                  <span className={`shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.65rem] font-semibold ${
+                                    isStale
+                                      ? "bg-error/10 text-error/80 border border-error/20"
+                                      : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                  }`}>
+                                    <span className={`h-1.5 w-1.5 rounded-full ${isStale ? "bg-error/70" : "bg-emerald-400"}`} />
+                                    {label}
+                                  </span>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
 
                       {pendingFuneralHomes.length === 0 && pendingDeliveries.length === 0 ? (
                         <div className="px-4 py-6 text-center">

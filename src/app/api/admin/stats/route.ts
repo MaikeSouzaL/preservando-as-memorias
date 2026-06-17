@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/src/lib/api-auth";
 import { readPlatformData } from "@/src/lib/platform-data";
+import { createAdminClient } from "@/src/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -43,12 +44,30 @@ export async function GET() {
         createdAt: m.createdAt,
       }));
 
+    // Atividade dos admins parceiros — só retornado para o dev admin
+    let adminPartners: { id: string; name: string; email: string; lastSeenAt: string | null }[] = [];
+    if (admin.session?.isDevAdmin) {
+      const supabase = await createAdminClient();
+      const { data: partnerRows } = await supabase
+        .from("profiles")
+        .select("id, name, email, last_seen_at")
+        .eq("is_admin", true)
+        .eq("is_dev_admin", false);
+      adminPartners = (partnerRows ?? []).map((r) => ({
+        id: r.id,
+        name: r.name ?? r.email,
+        email: r.email,
+        lastSeenAt: r.last_seen_at ?? null,
+      }));
+    }
+
     return NextResponse.json({
       hasNotifications: pendingFuneralHomes.length > 0 || pendingDeliveries.length > 0,
       pendingFuneralHomes,
       pendingCount: pendingFuneralHomes.length,
       pendingDeliveries,
       pendingDeliveriesCount: pendingDeliveries.length,
+      adminPartners,
       ordersCount: data.orders.length,
       memorialsCount: data.memorials.length,
     });
