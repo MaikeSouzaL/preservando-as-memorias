@@ -1,60 +1,59 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-const CONSENT_KEY = "pm_cookie_consent";
+type CookieConsent = 'all' | 'essential' | null;
 
-export function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+const STORAGE_KEY = 'aurora_cookie_consent';
+
+function useCookieConsent() {
+  const [consent, setConsent] = useState<CookieConsent>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem(CONSENT_KEY)) {
-      setVisible(true);
+    const stored = localStorage.getItem(STORAGE_KEY) as CookieConsent | null;
+    if (stored === 'all' || stored === 'essential') {
+      setConsent(stored);
     }
   }, []);
 
-  function accept(level: "all" | "essential") {
-    localStorage.setItem(CONSENT_KEY, level);
-    setVisible(false);
-  }
+  const accept = (type: 'all' | 'essential') => {
+    localStorage.setItem(STORAGE_KEY, type);
+    setConsent(type);
+  };
 
-  if (!visible) return null;
+  return { consent, accept };
+}
+
+export default function CookieBanner() {
+  const { consent, accept } = useCookieConsent();
+
+  if (consent !== null) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999] border-t border-[#e9c349]/10 bg-[#0a1628]/95 px-4 py-4 backdrop-blur-xl sm:px-6">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1 space-y-1">
-          <p className="text-sm font-semibold text-[#e0e3e2]">
-            Usamos cookies para melhorar sua experiência
-          </p>
-          <p className="text-xs text-[#e0e3e2]/60 leading-relaxed">
-            Em conformidade com a{" "}
-            <strong className="text-[#e0e3e2]/80">LGPD (Lei 13.709/2018)</strong>,
-            utilizamos cookies essenciais para o funcionamento do site e,
-            com seu consentimento, cookies analíticos para melhorar nossos serviços.
-            Consulte nossa{" "}
-            <Link href="/politica-privacidade" className="text-[#e9c349] hover:underline">
-              Política de Privacidade
-            </Link>{" "}
-            e nossos{" "}
-            <Link href="/termos-uso" className="text-[#e9c349] hover:underline">
-              Termos de Uso
-            </Link>
-            .
-          </p>
-        </div>
-
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 text-white p-4 shadow-lg">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="text-sm text-gray-300">
+          Usamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa{' '}
+          <Link href="/politica-privacidade" className="underline hover:text-white">
+            Política de Privacidade
+          </Link>{' '}
+          e{' '}
+          <Link href="/termos-de-uso" className="underline hover:text-white">
+            Termos de Uso
+          </Link>
+          . Com seu consentimento, cookies analíticos para melhorar nossos serviços.
+        </p>
+        <div className="flex gap-3 shrink-0">
           <button
-            onClick={() => accept("essential")}
-            className="rounded-full border border-[#e0e3e2]/20 px-5 py-2 text-xs font-medium text-[#e0e3e2]/70 transition hover:border-[#e0e3e2]/40 hover:text-[#e0e3e2]"
+            onClick={() => accept('essential')}
+            className="px-4 py-2 text-sm border border-gray-600 rounded hover:bg-gray-800 transition-colors"
           >
             Apenas essenciais
           </button>
           <button
-            onClick={() => accept("all")}
-            className="rounded-full bg-[#e9c349] px-5 py-2 text-xs font-semibold text-[#0d1010] transition hover:bg-[#e9c349]/90"
+            onClick={() => accept('all')}
+            className="px-4 py-2 text-sm bg-blue-600 rounded hover:bg-blue-700 transition-colors"
           >
             Aceitar todos
           </button>

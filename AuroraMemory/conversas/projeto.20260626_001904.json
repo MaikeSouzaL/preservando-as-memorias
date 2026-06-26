@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "olá"
+  },
+  {
+    "role": "assistant",
+    "content": "Olá! 👋 Como Arquiteto de Software, estou aqui para ajudar com o que você precisar no projeto.\n\nPelo que vejo no mapa, este é um projeto com:\n\n- **252 arquivos indexados**\n- Skills de agentes (como `grill-me` e `supabase-postgres-best-practices`)\n- Uma pasta `public/audio/` com um README sobre música de fundo\n- Estrutura de memorial com controle de áudio\n\n**Como posso ajudar?** Me diga o que você gostaria de fazer:\n\n1. **Conhecer melhor o projeto** — posso listar arquivos, ler código, entender a arquitetura\n2. **Fazer mudanças** — criar/editar arquivos, refatorar, adicionar funcionalidades\n3. **Rodar testes** — executar pytest ou scripts\n4. **Diagnosticar problemas** — analisar código, sugerir melhorias estruturais\n\nO que você precisa?"
+  }
+]

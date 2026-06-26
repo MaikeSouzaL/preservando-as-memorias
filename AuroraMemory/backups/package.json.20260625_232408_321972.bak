@@ -1,0 +1,42 @@
+{
+  "name": "preservando-memorias",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.1",
+    "@types/howler": "^2.2.12",
+    "@types/qrcode": "^1.5.6",
+    "@types/react-datepicker": "^6.2.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "date-fns": "^4.4.0",
+    "howler": "^2.2.4",
+    "next": "16.2.5",
+    "qrcode": "^1.5.4",
+    "react": "19.2.4",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "19.2.4",
+    "resend": "^6.12.4",
+    "stripe": "^22.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.5",
+    "pg": "^8.21.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
