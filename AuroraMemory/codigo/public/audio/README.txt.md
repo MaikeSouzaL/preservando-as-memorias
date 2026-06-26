@@ -1,7 +1,7 @@
 ---
 origem: public/audio/README.txt
 origem_hash: c77a508caa17a0071c5f9604a53a5e80509aabe6
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `public/audio/README.txt`

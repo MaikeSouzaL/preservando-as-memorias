@@ -1,7 +1,7 @@
 ---
 origem: src/app/globals.css
 origem_hash: 4ab46426f7222dcf66210ef7db7a0cf1994ddc27
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/globals.css`

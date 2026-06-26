@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/homenagens/page.tsx
 origem_hash: c7c0f94a8bddc3e974cbc8ef6dfd97a8d8b69909
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/homenagens/page.tsx`

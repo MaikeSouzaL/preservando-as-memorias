@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/profile/route.ts
 origem_hash: 547b9eb28fa2dce5d2c303dbed1bc5f39bf59401
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/profile/route.ts`

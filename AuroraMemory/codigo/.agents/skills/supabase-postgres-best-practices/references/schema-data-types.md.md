@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-data-types.md
 origem_hash: 3bf1ac02415c27fc1f16114ac165e522adef5f1d
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-data-types.md`

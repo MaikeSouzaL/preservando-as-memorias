@@ -1,7 +1,7 @@
 ---
 origem: src/app/(funeral)/funeraria/dashboard/novo-memorial/page.tsx
 origem_hash: 7fe0e65f64b48629be0b67dac8aef84ed79abe8d
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(funeral)/funeraria/dashboard/novo-memorial/page.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/pwa-register.tsx
 origem_hash: 4b70ce7c8e5408872a7ee8136c2b652e04b80f80
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/pwa-register.tsx`

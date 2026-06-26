@@ -1,7 +1,7 @@
 ---
 origem: src/components/ui/user-avatar.tsx
 origem_hash: fbc5886b42374b8b8d481361fba72f0115496b0a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/ui/user-avatar.tsx`

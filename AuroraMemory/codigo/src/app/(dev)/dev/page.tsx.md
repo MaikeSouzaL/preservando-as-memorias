@@ -1,7 +1,7 @@
 ---
 origem: src/app/(dev)/dev/page.tsx
 origem_hash: 0b25704e8b6e34a57fcf7ffed002cf00363660f7
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(dev)/dev/page.tsx`

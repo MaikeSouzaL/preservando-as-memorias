@@ -1,7 +1,7 @@
 ---
 origem: .claude/launch.json
 origem_hash: 05c90935fb959a52a8b67fa327735c9f4b5a069b
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.claude/launch.json`

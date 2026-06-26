@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/price-config-panel.tsx
 origem_hash: 20a7e787d68c49f62e48e7c29526f95470bf02a3
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/price-config-panel.tsx`

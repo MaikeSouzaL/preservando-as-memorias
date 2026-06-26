@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/dashboard/page.tsx
 origem_hash: 77453ff2602aab9f35dbd52cee9c1d7aa6122c3a
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/dashboard/page.tsx`

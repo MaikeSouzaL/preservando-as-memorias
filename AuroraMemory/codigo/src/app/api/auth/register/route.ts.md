@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/auth/register/route.ts
 origem_hash: 357da8875a5c89d52cc738402a8c673047d75cfd
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/auth/register/route.ts`

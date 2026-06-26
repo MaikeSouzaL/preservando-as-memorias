@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/ping/route.ts
 origem_hash: 18071f3b6383671d3bcc1a00132248c8b5bb943e
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/ping/route.ts`

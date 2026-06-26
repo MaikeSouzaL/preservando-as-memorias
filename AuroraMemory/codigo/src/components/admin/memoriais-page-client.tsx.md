@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/memoriais-page-client.tsx
 origem_hash: d78b5c57ea22cc43963d1fb49f521c5157170a19
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/memoriais-page-client.tsx`

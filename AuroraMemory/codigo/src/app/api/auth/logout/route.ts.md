@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/auth/logout/route.ts
 origem_hash: f45b327f0dfec375c7e47044953958504d5e95b5
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/auth/logout/route.ts`

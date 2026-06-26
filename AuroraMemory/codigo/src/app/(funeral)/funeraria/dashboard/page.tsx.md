@@ -1,7 +1,7 @@
 ---
 origem: src/app/(funeral)/funeraria/dashboard/page.tsx
 origem_hash: 1eb9941d79b4ee5f3d55aadead6cdd1240ad81b4
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(funeral)/funeraria/dashboard/page.tsx`

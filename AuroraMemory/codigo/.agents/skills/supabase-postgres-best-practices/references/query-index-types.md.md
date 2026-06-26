@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/query-index-types.md
 origem_hash: 3c36dc8dcbb70b53b7429a7cdfed37c1eba991e0
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/query-index-types.md`

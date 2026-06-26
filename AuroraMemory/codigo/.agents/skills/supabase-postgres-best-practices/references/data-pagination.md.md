@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/data-pagination.md
 origem_hash: d0e57f660b06c0c25d554ecab0430b0b6473273f
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/data-pagination.md`

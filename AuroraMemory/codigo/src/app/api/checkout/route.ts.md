@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/checkout/route.ts
 origem_hash: 4f69db3a61c6951c0491483981d6418385429bee
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/checkout/route.ts`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/oferta/[slug]/page.tsx
 origem_hash: f6057fb4430ba40720dd150e0bbe3d2e3df5ae91
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/oferta/[slug]/page.tsx`

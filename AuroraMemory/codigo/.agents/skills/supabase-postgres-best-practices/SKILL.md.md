@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/SKILL.md
 origem_hash: 987cbcc4d91984a6465b23acce79b9af2d85a474
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/SKILL.md`

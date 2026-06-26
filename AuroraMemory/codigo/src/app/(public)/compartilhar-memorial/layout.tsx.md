@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/compartilhar-memorial/layout.tsx
 origem_hash: 7d7570e77b86b3b20ca5839109f4742163dbdc1e
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/compartilhar-memorial/layout.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: postcss.config.mjs
 origem_hash: a6cba5e494fcd184e50b1894c95e9799e0753dfd
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `postcss.config.mjs`

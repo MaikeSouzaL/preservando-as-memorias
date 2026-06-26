@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md
 origem_hash: 6089ab56c11e68181fed0bbf47585f325d45e44f
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md`

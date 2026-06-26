@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/recuperar-senha/layout.tsx
 origem_hash: 2fbe6cd49e327eb8d657f690c0c8dd0b2e891624
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/recuperar-senha/layout.tsx`

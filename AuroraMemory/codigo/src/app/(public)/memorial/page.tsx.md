@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/memorial/page.tsx
 origem_hash: b27090971a8772fd34cad90dca60d31d16603881
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/memorial/page.tsx`
@@ -42,8 +42,7 @@ Página pública de memorial interativo com transição cinematográfica, exibin
 ## 🔗 Importa
 - [[success-modal.tsx]] — `src/components/success-modal.tsx`
 - [[platform-data.ts]] — `src/lib/platform-data.ts`
-- [[database.ts]] — `src/mock-db/database.ts`
-- **Externos/APIs:** ) === , howler, next/link, react
+- **Externos/APIs:** ) === , @/src/mock-db/database, howler, next/link, react
 
 ## 📤 Exporta
 `TransicaoQrPage`, `default`
@@ -67,7 +66,4 @@ useCallback, useEffect, useRef, useState
 - `handleSubmitCandle()` → encodeURIComponent, fetch, getElementById, json, now, play, preventDefault, scrollIntoView, setCandlesList, setIsCandleAnonymous, setIsCandleEternal, setNewCandleName, setShowCandleModal, setSuccessModal, setTimeout, stringify, toISOString
 - `handleTouchHeart()` → encodeURIComponent, fetch, play, setHeartsCount, stringify
 - `scrollCarousel()` → scrollBy
-
-## 🔁 Chama (arquivos)
-- [[database.ts]] — `src/mock-db/database.ts`
 

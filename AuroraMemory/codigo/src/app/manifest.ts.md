@@ -1,7 +1,7 @@
 ---
 origem: src/app/manifest.ts
 origem_hash: 16a818525b36267aa7376debf0f3ede37075290c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/manifest.ts`

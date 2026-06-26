@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/layout.tsx
 origem_hash: ff977bd22fca09e3f38964474ef501b1c4e82cbf
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/layout.tsx`

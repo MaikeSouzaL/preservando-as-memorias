@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/usuarios/page.tsx
 origem_hash: 5821c4a9aa9b5c0ec60a9a45dc65246e6cc119a6
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/usuarios/page.tsx`

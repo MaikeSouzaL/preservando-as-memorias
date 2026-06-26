@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md
 origem_hash: e1b9226b1bad4fee5bb72e6b0e9a473ff4164050
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md`

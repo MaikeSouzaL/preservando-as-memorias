@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/qr-delivery-panel.tsx
 origem_hash: 801519076e1afc67a0a8b10e086802b8abcabbdc
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/qr-delivery-panel.tsx`

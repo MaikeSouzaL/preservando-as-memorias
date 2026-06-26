@@ -1,7 +1,7 @@
 ---
 origem: public/sw.js
 origem_hash: c8fda0060a177c3bbe33bf06b110156cb50e1ab7
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `public/sw.js`

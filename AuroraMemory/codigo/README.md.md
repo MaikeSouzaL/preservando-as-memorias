@@ -1,7 +1,7 @@
 ---
 origem: README.md
 origem_hash: 63b937a14ba080106c1384909b230d2b2a8cbc02
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `README.md`

@@ -1,7 +1,7 @@
 ---
 origem: next-env.d.ts
 origem_hash: 0786eeaad75eb6ce9300cb054056c4da5329e1fa
-gerado_em: 2026-06-25T23:37:19
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `next-env.d.ts`

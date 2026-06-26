@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md
 origem_hash: 1346763fc8f7435608fbdf964d915ef1bc5a29c5
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/denuncias/page.tsx
 origem_hash: 1423a813d4759e3565e16ec900e74cb5a1baafc8
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/denuncias/page.tsx`

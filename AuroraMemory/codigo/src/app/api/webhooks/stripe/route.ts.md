@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/webhooks/stripe/route.ts
 origem_hash: 86a63014822ec1167f34d046712c7e82afde1394
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/webhooks/stripe/route.ts`

@@ -1,7 +1,7 @@
 ---
 origem: src/lib/email.ts
 origem_hash: ce5b691c85a5840b9aa292e822b33d5edb251294
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/email.ts`

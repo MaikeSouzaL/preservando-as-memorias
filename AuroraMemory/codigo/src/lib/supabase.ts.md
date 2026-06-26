@@ -1,7 +1,7 @@
 ---
 origem: src/lib/supabase.ts
 origem_hash: d61f0098413749424e541ed95f991a73187af99a
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/supabase.ts`

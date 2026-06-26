@@ -1,7 +1,7 @@
 ---
 origem: alter-db.ts
 origem_hash: b51d4871148a93f46128afa34bd5e1940275db76
-gerado_em: 2026-06-25T23:37:13
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `alter-db.ts`

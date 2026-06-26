@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/nova-senha/page.tsx
 origem_hash: e36a453b78c823d369367d15c101164b7b2dcfff
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/nova-senha/page.tsx`

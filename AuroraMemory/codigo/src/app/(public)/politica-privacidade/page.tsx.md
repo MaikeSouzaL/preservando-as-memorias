@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/politica-privacidade/page.tsx
 origem_hash: d601e203002cef08a3fc8876da40af18ef1b74c9
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/politica-privacidade/page.tsx`

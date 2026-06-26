@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase/CHANGELOG.md
 origem_hash: e660f253f1f875e39d0d6aacd6c3535c07ae728b
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase/CHANGELOG.md`

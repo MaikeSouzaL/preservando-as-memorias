@@ -1,7 +1,7 @@
 ---
 origem: src/app/memorial-publico/page.tsx
 origem_hash: f93a2c2b31eba09884b98f9d483e4195c4e5f2b7
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/memorial-publico/page.tsx`
@@ -39,8 +39,7 @@ gerado_em: 2026-06-25T23:37:29
 ## 🔗 Importa
 - [[success-modal.tsx]] — `src/components/success-modal.tsx`
 - [[platform-data.ts]] — `src/lib/platform-data.ts`
-- [[database.ts]] — `src/mock-db/database.ts`
-- **Externos/APIs:** ) === , howler, next/link, react
+- **Externos/APIs:** ) === , @/src/mock-db/database, howler, next/link, react
 
 ## 📤 Exporta
 `MemorialPublicoPage`, `default`

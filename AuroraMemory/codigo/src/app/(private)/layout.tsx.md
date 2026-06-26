@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/layout.tsx
 origem_hash: 3c90ab47a3a66e0c2daa3d4bdb607c286790d935
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/layout.tsx`

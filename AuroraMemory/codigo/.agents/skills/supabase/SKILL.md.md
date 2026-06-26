@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase/SKILL.md
 origem_hash: 3148500fef52fe014fc51cd9b4f1668a6ff32025
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase/SKILL.md`

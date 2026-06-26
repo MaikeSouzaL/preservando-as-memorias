@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md
 origem_hash: 627f5234ff9d6ee69d0d29b95d4b6f50d5fac891
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md`

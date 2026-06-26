@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/homenagens-publicas/layout.tsx
 origem_hash: 04e9f414f46aed751834d9f849342022f068ac40
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/homenagens-publicas/layout.tsx`

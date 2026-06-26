@@ -1,7 +1,7 @@
 ---
 origem: src/components/dev/criar-memorial-button.tsx
 origem_hash: 1c2b915b218644a4bd66df78737dd1a2c9cfa3f7
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/dev/criar-memorial-button.tsx`

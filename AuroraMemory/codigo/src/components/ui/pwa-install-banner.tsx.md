@@ -1,7 +1,7 @@
 ---
 origem: src/components/ui/pwa-install-banner.tsx
 origem_hash: eee329005624125ae859abcc6c3b3fb9cf23c284
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/ui/pwa-install-banner.tsx`

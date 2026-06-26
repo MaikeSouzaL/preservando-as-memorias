@@ -1,7 +1,7 @@
 ---
 origem: src/lib/supabase-browser.ts
 origem_hash: 5e73d18c622c76a4c7fe49474d0ec9f83827a2f7
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/supabase-browser.ts`

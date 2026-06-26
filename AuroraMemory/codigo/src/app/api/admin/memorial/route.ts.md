@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/memorial/route.ts
 origem_hash: 24e673112dd1707298b44d02d56cbe30c20c903a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/memorial/route.ts`

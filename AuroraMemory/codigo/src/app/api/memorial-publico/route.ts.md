@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/memorial-publico/route.ts
 origem_hash: 671da27bbb1714b7f8a89b48994b5239882e783f
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/memorial-publico/route.ts`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(funeral)/layout.tsx
 origem_hash: 41ee7ed2e798ce70407e74c634b867c5769b7b01
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(funeral)/layout.tsx`

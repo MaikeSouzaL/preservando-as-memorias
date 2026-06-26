@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/contrato/page.tsx
 origem_hash: ab1ee9d958a6f6ad5c4854577eb5bc9e402f4423
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/contrato/page.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/lib/funeral-auth.ts
 origem_hash: d1ae1e466506fdbc23138348da8be923b7920a1a
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/funeral-auth.ts`

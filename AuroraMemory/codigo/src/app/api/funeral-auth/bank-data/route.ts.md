@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/funeral-auth/bank-data/route.ts
 origem_hash: 773d27eac99bcd038279122802ce53051f8fbffd
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/funeral-auth/bank-data/route.ts`

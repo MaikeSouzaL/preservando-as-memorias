@@ -1,7 +1,7 @@
 ---
 origem: src/components/dev/platform-admin-panel.tsx
 origem_hash: 58b87aa8518111993ba9997e8e799ced08587948
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/dev/platform-admin-panel.tsx`

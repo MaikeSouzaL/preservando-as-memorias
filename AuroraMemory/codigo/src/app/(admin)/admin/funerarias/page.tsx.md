@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/funerarias/page.tsx
 origem_hash: d7fcd275fc0062bc799a87ec439c2505438047d4
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/funerarias/page.tsx`

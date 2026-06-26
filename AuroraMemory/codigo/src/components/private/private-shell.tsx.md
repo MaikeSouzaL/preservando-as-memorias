@@ -1,7 +1,7 @@
 ---
 origem: src/components/private/private-shell.tsx
 origem_hash: 5aa3a16de0c9797477d3b55a1a6be6c1809619ae
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/private/private-shell.tsx`

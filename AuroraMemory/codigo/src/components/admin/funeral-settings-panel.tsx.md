@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/funeral-settings-panel.tsx
 origem_hash: 879743857f0af239c92e13b0a4f94f9cfbd8d514
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/funeral-settings-panel.tsx`

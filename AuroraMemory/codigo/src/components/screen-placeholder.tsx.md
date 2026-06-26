@@ -1,7 +1,7 @@
 ---
 origem: src/components/screen-placeholder.tsx
 origem_hash: 2a5df1671c77104a419c373e0bf4d5c7a5872bd6
-gerado_em: 2026-06-25T23:37:25
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/screen-placeholder.tsx`

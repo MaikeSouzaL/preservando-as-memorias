@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/mark-sent-button.tsx
 origem_hash: 34da40e9d7f58f68d8e12dfbf34e1c72163eb4d0
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/mark-sent-button.tsx`

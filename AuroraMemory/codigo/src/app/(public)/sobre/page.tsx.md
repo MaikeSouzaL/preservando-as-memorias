@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/sobre/page.tsx
 origem_hash: a48ad95b597badc40ce34598e98a643b5d3d01e9
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/sobre/page.tsx`
@@ -31,8 +31,7 @@ Página "Sobre" pública da plataforma, apresentando a história, missão e valo
 <!-- aurora:relacoes -->
 
 ## 🔗 Importa
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
-- **Externos/APIs:** next/link
+- **Externos/APIs:** @/src/mock-db/public-content, next/link
 
 ## 📤 Exporta
 `SobrePage`, `default`
@@ -45,7 +44,4 @@ Link
 
 ## 📞 O que cada função chama
 - `SobrePage()` → map
-
-## 🔁 Chama (arquivos)
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
 

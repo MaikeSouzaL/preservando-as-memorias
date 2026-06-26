@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/auth/reset-password/confirm/route.ts
 origem_hash: a007f8960b54c51419ba102d79fb18fe0e1b6658
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/auth/reset-password/confirm/route.ts`

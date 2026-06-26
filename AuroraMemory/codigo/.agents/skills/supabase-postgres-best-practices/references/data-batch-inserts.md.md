@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md
 origem_hash: 1c0f8213b7db2e122dc3c77794b50f171ec5425c
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md`

@@ -1,7 +1,7 @@
 ---
 origem: check-exact.ts
 origem_hash: bd8f47dfbb14a98dd5afcfa956431ad2ebd986a3
-gerado_em: 2026-06-25T23:37:13
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `check-exact.ts`

@@ -2,7 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { publicContent } from "@/src/mock-db/public-content";
+
+const faqItems = [
+  {
+    question: "Como funciona o QR Code do memorial?",
+    answer: "Ao gerar o memorial, a plataforma cria um QR Code exclusivo. Ao escanear, visitantes acessam a página pública com histórias, fotos e homenagens.",
+  },
+  {
+    question: "Posso controlar quem deixa homenagens?",
+    answer: "Sim. No painel da família, você define se homenagens são publicadas automaticamente ou passam por moderação.",
+  },
+  {
+    question: "Meus dados e mídias estão seguros?",
+    answer: "Sim. A arquitetura foi pensada para privacidade e controle de acesso, com configurações granulares de visibilidade.",
+  },
+  {
+    question: "Existe plano para mais de um memorial?",
+    answer: "Sim. O plano Família permite memoriais ilimitados com gestão centralizada em um único painel.",
+  },
+  {
+    question: "Posso cancelar quando quiser?",
+    answer: "Sim. O cancelamento pode ser feito no painel de assinaturas, respeitando regras de faturamento do período vigente.",
+  },
+];
 
 export default function FaqPage() {
   const [openIndex, setOpenIndex] = useState<number>(0);
@@ -22,7 +44,7 @@ export default function FaqPage() {
       </header>
 
       <section className="grid gap-3">
-        {publicContent.faq.map((item, index) => {
+        {faqItems.map((item, index) => {
           const isOpen = openIndex === index;
           return (
             <article key={item.question} className="rounded-xl border border-outline-variant/35 bg-surface-container/70 p-5">

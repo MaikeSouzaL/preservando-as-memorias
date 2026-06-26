@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/qr-code-viewer.tsx
 origem_hash: b7bfc3b5577aae74ff43ea35a09c799c4d7f3687
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/qr-code-viewer.tsx`

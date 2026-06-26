@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/contracts/route.ts
 origem_hash: ce50e95e9a3acffbc5a99ead4623ff682a8fc972
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/contracts/route.ts`

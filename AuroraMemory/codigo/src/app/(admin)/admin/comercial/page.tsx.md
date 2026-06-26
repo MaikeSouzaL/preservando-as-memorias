@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/comercial/page.tsx
 origem_hash: 6c61caea6c624760093ae5a1b772bb0626c5f6bb
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/comercial/page.tsx`

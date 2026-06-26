@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/upload/route.ts
 origem_hash: ddb33807aadbe935b13166c423c3beb29f4d14ba
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/upload/route.ts`

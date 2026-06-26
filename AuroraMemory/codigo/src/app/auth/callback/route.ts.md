@@ -1,7 +1,7 @@
 ---
 origem: src/app/auth/callback/route.ts
 origem_hash: d5d44d7ebefff02b0151de45330b4f0256ef731f
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/auth/callback/route.ts`

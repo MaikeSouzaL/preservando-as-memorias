@@ -1,7 +1,7 @@
 ---
 origem: next.config.ts
 origem_hash: deb12e66bb42b3213e944232bc937811de724fb5
-gerado_em: 2026-06-25T23:37:19
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `next.config.ts`

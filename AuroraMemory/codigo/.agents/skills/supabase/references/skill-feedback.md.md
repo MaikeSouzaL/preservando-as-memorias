@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase/references/skill-feedback.md
 origem_hash: 6d64e2f5d684322547a180ee16902153e4322907
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase/references/skill-feedback.md`

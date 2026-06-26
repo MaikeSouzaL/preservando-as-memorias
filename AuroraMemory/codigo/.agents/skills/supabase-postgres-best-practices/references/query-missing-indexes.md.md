@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md
 origem_hash: 28fceef4ca2c16bae3e41501856300c39155c60a
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md`

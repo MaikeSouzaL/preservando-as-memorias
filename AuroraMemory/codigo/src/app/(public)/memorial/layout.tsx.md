@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/memorial/layout.tsx
 origem_hash: 6986fdc9443f89d350790629b2ebbd7af336b80c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/memorial/layout.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/dashboard/layout.tsx
 origem_hash: d6509b9babca105047d38cc50a5205773a2824a2
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/dashboard/layout.tsx`

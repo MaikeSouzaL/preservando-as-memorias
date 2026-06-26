@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/dev/backup/route.ts
 origem_hash: de2e3d2ed6c03d73b186f65628e431315272b478
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/dev/backup/route.ts`

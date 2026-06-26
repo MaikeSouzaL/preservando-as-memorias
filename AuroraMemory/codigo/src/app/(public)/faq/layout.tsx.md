@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/faq/layout.tsx
 origem_hash: b1f48ea58e7395c6e1bc4a5138c58d036c746c6c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/faq/layout.tsx`

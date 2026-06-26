@@ -1,7 +1,7 @@
 ---
 origem: src/components/dev/repasse-panel.tsx
 origem_hash: 10f6d68c910968f8e32169758525c5e4528de418
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/dev/repasse-panel.tsx`

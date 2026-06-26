@@ -1,34 +1,38 @@
 ---
 origem: src/app/(public)/contato/page.tsx
-origem_hash: 22425bfb84bb9a9d1c08582f9e06aaa529dea45a
-gerado_em: 2026-06-25T23:37:29
+origem_hash: 1880b62d8eae432e677ffa4d7b46c51f7a8bf480
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/contato/page.tsx`
 
-# Página de Contato
+# `src/app/(public)/contato/page.tsx`
 
 ## Responsabilidade
-Página pública de contato/suporte com formulário de mensagem e canais de atendimento.
+Página de contato pública do "Preservando a Memória", exibindo formulário de mensagem e canais de atendimento.
 
 ## Componentes
 
-- **`ContatoPage`** (default export): Página principal com layout responsivo (grid 2 colunas em desktop)
-  - Seção "Enviar mensagem": formulário com campos Nome, E-mail, Assunto e Mensagem
-  - Seção "Canais de atendimento": lista dinâmica de canais via `publicContent.contact.channels`
-  - Link para `/faq`
-
-- **`Field`**: Componente interno de input reutilizável
+- **`ContatoPage`** (default export) — Página completa com:
+  - Header com título "Fale com a equipe"
+  - Seção de formulário (nome, e-mail, assunto, mensagem + botão enviar)
+  - Seção de canais (email, WhatsApp, horário) com link para `/faq`
+- **`Field`** — Componente interno de input estilizado
   - Props: `label`, `type`, `placeholder`
 
-## Dependências
-- **`publicContent`** (mock-db): dados dos canais de contato
-- **`next/link`**: navegação para FAQ
+## Dados
+- `contactChannels`: array estático com 3 canais (label + value)
+
+## Bibliotecas
+- `next/link` — Link para FAQ
+
+## Conexões
+- Link para `/faq` (perguntas frequentes)
+- Layout público via rota `(public)`
 
 <!-- aurora:relacoes -->
 
 ## 🔗 Importa
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
 - **Externos/APIs:** next/link
 
 ## 📤 Exporta
@@ -45,7 +49,4 @@ label, placeholder, type
 
 ## 📞 O que cada função chama
 - `ContatoPage()` → map
-
-## 🔁 Chama (arquivos)
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
 

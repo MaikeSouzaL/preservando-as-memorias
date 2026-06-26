@@ -1,7 +1,7 @@
 ---
 origem: src/data/platform-store.json
 origem_hash: 8331d89348c94c8c3ce0a83f42428e8762022d54
-gerado_em: 2026-06-25T23:37:25
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/data/platform-store.json`

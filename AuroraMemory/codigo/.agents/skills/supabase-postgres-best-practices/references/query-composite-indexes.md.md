@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md
 origem_hash: 7d8c141ca06d124ea85dfa56202f471b6240bef7
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md`

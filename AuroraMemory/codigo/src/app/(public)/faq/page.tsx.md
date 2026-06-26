@@ -1,35 +1,31 @@
 ---
 origem: src/app/(public)/faq/page.tsx
-origem_hash: 1c343af115180b94058e7d9b6a8ffa61923b2899
-gerado_em: 2026-06-25T23:37:29
+origem_hash: a5859f81fd073422e4c85e69abd1504f980a4cee
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/faq/page.tsx`
 
-# FAQ Page
+### `src/app/(public)/faq/page.tsx`
 
-Página de perguntas frequentes (rota `/faq`), componente cliente que exibe um acordeão interativo com perguntas e respostas.
+**Responsabilidade:** Página pública de FAQ (Perguntas Frequentes) do memorial.
 
-## Funcionalidade
+**Componente principal:**
+- **`FaqPage`** (default export) — *não recebe props*. Renderiza lista de perguntas/respostas em acordeão.
 
-- **Estado `openIndex`**: controla qual item do acordeão está aberto (índice 0 por padrão)
-- **Renderização**: mapeia `publicContent.faq` (do mock-db) em artigos com botão toggle
-- **Interação**: clique no botão alterna entre abrir/fechar o item; ícone `add`/`remove` indica estado
+**Funcionalidades:**
+- `useState<number>(0)` — controla qual item está aberto (índice); `-1` = todos fechados.
+- `faqItems` — array estático com 5 pares `{ question, answer }`.
+- Botão em cada item alterna `openIndex`; exibe `answer` condicionalmente.
+- Links para `/contato` e `/sobre` usando `next/link`.
 
-## Links de navegação
+**Bibliotecas:** `react` (useState), `next/link`.
 
-- `/contato` — "Ainda com dúvidas? Falar com suporte"
-- `/sobre` — "Conhecer a plataforma"
-
-## Dependências
-
-- `publicContent` de `@/src/mock-db/public-content` (dados mockados)
-- `Link` do Next.js para navegação interna
+**Conexões:** Página pública acessível via rota `/faq`; links internos para `/contato` e `/sobre`.
 
 <!-- aurora:relacoes -->
 
 ## 🔗 Importa
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
 - **Externos/APIs:** next/link, react
 
 ## 📤 Exporta
@@ -43,7 +39,4 @@ Link
 
 ## 📞 O que cada função chama
 - `FaqPage()` → map, setOpenIndex, useState
-
-## 🔁 Chama (arquivos)
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
 

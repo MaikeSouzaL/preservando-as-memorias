@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/termos-uso/page.tsx
 origem_hash: ffa5c677a09f5f4451c3f515fe4f442ea440a1d8
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/termos-uso/page.tsx`

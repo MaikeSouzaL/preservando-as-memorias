@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md
 origem_hash: 5d2a0d4949438c0ed468e15ebbe4f4adede0fa1a
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md`

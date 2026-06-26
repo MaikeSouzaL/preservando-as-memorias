@@ -1,7 +1,7 @@
 ---
 origem: tsconfig.json
 origem_hash: 9a8925066349fe373cb4c5a62434cbb8b9e24928
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `tsconfig.json`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/recuperar-senha/page.tsx
 origem_hash: 92b2f29e59023493447fd9a1d7247dacc0919f08
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/recuperar-senha/page.tsx`

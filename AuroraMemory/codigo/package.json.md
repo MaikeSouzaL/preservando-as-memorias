@@ -1,7 +1,7 @@
 ---
 origem: package.json
 origem_hash: ff973c1eee42bbd2d169c2afdcaa81822f0f4e51
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `package.json`

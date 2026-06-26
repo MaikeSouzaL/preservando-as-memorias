@@ -1,7 +1,7 @@
 ---
 origem: src/hooks/use-cookie-consent.ts
 origem_hash: 03ef4d6d85a459d10734d0270c557ca6ae751848
-gerado_em: 2026-06-25T23:37:25
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/hooks/use-cookie-consent.ts`

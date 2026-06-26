@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/checkout/page.tsx
 origem_hash: 890aec35747f9b0cc766887a68c3dc3148a39908
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/checkout/page.tsx`

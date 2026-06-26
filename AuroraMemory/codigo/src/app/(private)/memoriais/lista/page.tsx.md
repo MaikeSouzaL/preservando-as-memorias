@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/memoriais/lista/page.tsx
 origem_hash: 0288e777d3f4abd242b21585a3725d5baf9ca5b9
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/memoriais/lista/page.tsx`

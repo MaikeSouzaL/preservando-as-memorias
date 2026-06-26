@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/_sections.md
 origem_hash: 4d3802d8f5cfd88e2e8a1cb67a90327b61c4d52a
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/_sections.md`

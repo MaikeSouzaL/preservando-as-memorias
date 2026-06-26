@@ -1,7 +1,7 @@
 ---
 origem: src/components/ui/cookie-banner.tsx
 origem_hash: ec7f263e799dc8ac5c350c5ec57400fa498ae101
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/ui/cookie-banner.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/lib/api-auth.ts
 origem_hash: f2ea88f3688f02d8553e931366a38d2d198b4cd0
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/api-auth.ts`

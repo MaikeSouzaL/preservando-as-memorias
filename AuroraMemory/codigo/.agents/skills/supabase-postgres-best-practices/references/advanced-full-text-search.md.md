@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md
 origem_hash: 6a1536025088fb10c1ddbfdef66f571bf5592494
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md`

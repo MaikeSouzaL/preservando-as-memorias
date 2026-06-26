@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/planos/page.tsx
 origem_hash: a1fe9591160247b45669ebbb344215cacd0c5d16
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/planos/page.tsx`

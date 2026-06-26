@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/data-upsert.md
 origem_hash: fbd2e68c4c843ecc8ee14c38f0a565ec2117a08e
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/data-upsert.md`

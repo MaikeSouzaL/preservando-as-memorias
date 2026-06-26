@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/splash/page.tsx
 origem_hash: a8ea67ac37692b69d292fe84454506ba9936130e
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/splash/page.tsx`
@@ -36,8 +36,7 @@ Página de splash/boas-vindas do aplicativo, responsável pela experiência inic
 <!-- aurora:relacoes -->
 
 ## 🔗 Importa
-- [[public-content.ts]] — `src/mock-db/public-content.ts`
-- **Externos/APIs:** next/image, next/link, next/navigation, react
+- **Externos/APIs:** @/src/mock-db/public-content, next/image, next/link, next/navigation, react
 
 ## 📤 Exporta
 `SplashPage`, `default`

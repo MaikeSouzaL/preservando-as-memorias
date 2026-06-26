@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/conn-pooling.md
 origem_hash: a1bd7ac19cc592b0a61eb17f2126937443ab2fd6
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/conn-pooling.md`

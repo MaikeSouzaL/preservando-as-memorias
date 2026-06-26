@@ -1,7 +1,7 @@
 ---
 origem: src/lib/encrypt.ts
 origem_hash: 2e8a95d8c31a26e7c23257fa56354d8dcf0c6a02
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/encrypt.ts`

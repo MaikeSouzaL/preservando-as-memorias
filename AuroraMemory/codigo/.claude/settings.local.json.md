@@ -1,7 +1,7 @@
 ---
 origem: .claude/settings.local.json
 origem_hash: 9284def48b3633550fceabae4710b7a0b393c7ce
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.claude/settings.local.json`

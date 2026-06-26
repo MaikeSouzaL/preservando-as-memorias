@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/login/acesso/layout.tsx
 origem_hash: b6e59d9f3e0a7ce5d7ad91c79e61efa8a65daa57
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/login/acesso/layout.tsx`

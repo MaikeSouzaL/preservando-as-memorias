@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md
 origem_hash: f76a89f47d269357f3c940d6fe057fd39cc5a3ff
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md`

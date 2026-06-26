@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/funeral-auth/logout/route.ts
 origem_hash: 27cdd144ca85b412d569106c6d8795d8a86814bb
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/funeral-auth/logout/route.ts`

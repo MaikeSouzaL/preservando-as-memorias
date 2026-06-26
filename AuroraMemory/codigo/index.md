@@ -1,6 +1,6 @@
 # Mapa do código — Aurora
 
-_252 arquivos indexados._
+_253 arquivos indexados._
 
 - [.agents/skills/grill-me/SKILL.md](.agents/skills/grill-me/SKILL.md.md)
 - [.agents/skills/supabase-postgres-best-practices/CHANGELOG.md](.agents/skills/supabase-postgres-best-practices/CHANGELOG.md.md)
@@ -230,6 +230,7 @@ _252 arquivos indexados._
 - [src/components/ui/user-avatar.tsx](src/components/ui/user-avatar.tsx.md)
 - [src/data/platform-store.json](src/data/platform-store.json.md)
 - [src/hooks/use-cookie-consent.ts](src/hooks/use-cookie-consent.ts.md)
+- [src/hooks/use-memorial-preview.ts](src/hooks/use-memorial-preview.ts.md)
 - [src/lib/api-auth.ts](src/lib/api-auth.ts.md)
 - [src/lib/auth-options.ts](src/lib/auth-options.ts.md)
 - [src/lib/auth-session.ts](src/lib/auth-session.ts.md)

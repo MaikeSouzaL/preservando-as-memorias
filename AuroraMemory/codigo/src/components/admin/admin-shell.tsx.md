@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/admin-shell.tsx
 origem_hash: 6d627658b39f98b0eb02cdce361744586ed32e10
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/admin-shell.tsx`

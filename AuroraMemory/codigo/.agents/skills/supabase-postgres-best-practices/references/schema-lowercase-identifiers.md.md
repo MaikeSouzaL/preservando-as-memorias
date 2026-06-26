@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md
 origem_hash: 71f326b67aa3ef9a0ad58d0e3ce5479bbb7708aa
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/qr-publico/page.tsx
 origem_hash: a79ed8f0acd3428d77af8d303834493c30b94a11
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/qr-publico/page.tsx`

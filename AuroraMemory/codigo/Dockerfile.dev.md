@@ -1,7 +1,7 @@
 ---
 origem: Dockerfile.dev
 origem_hash: 9448c08cc169a9bcdf9b6d12f3470a3c87c2e76c
-gerado_em: 2026-06-25T23:37:19
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `Dockerfile.dev`

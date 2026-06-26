@@ -1,7 +1,7 @@
 ---
 origem: src/lib/rate-limit.ts
 origem_hash: 8b4daab37b4edefff47b7bef214eddc720da1344
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/rate-limit.ts`

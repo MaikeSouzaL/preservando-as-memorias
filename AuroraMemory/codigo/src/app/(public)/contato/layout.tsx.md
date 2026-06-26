@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/contato/layout.tsx
 origem_hash: 46717dcbfb973331bc1a9d3b36d696f936e9b51b
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/contato/layout.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/bank-data/route.ts
 origem_hash: 15939f92693c3808004a66694a69e73c55e3f02f
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/bank-data/route.ts`

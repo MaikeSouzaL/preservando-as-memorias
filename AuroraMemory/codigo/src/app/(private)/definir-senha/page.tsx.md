@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/definir-senha/page.tsx
 origem_hash: 07e59b94464cee65e02148b9b7e4aafa9f31e69c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/definir-senha/page.tsx`

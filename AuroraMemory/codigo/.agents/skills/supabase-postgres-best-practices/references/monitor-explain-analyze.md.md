@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md
 origem_hash: 87e686c12e94715716f593f70674992a165b1417
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md`

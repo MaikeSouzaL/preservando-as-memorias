@@ -1,7 +1,7 @@
 ---
 origem: src/components/success-modal.tsx
 origem_hash: 5fa95db4c640c4e8cdbd4f940aebd811598eb423
-gerado_em: 2026-06-25T23:37:25
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/success-modal.tsx`

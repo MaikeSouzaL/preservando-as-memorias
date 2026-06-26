@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/memoriais/criar/layout.tsx
 origem_hash: da9ba0d0c5de133a6b6ee6dc0be090f27ba19b1e
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/memoriais/criar/layout.tsx`

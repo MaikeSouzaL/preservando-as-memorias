@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/offer-links/route.ts
 origem_hash: 88df6aaacfaf3d6b721cb82e3e99a69fb346a6b6
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/offer-links/route.ts`

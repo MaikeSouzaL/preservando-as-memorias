@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/homenagens/layout.tsx
 origem_hash: ab89dbc03de034cfce5dfbed52f38a673382c324
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/homenagens/layout.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md
 origem_hash: 215a797bef34bf67fa9bd27eb3b6875e42eb05bd
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md`

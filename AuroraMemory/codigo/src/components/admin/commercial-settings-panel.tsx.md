@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/commercial-settings-panel.tsx
 origem_hash: 0ad569d7bb6c9b84c791554f6f69a68a53a81e1c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/commercial-settings-panel.tsx`

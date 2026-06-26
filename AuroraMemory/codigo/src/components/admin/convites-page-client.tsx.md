@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/convites-page-client.tsx
 origem_hash: 46cb75234525186099d60c70516e478bfbab4389
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/convites-page-client.tsx`

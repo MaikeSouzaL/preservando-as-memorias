@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/funeral-auth/staff/route.ts
 origem_hash: 829fc2bd6ec86bce0e7e6579383bff4b0e0f24fa
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/funeral-auth/staff/route.ts`

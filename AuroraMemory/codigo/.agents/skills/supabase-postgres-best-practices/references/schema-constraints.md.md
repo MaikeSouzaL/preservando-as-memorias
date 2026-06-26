@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-constraints.md
 origem_hash: 1d17f96901ce9874412782cd6d9d6011b3cf0675
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-constraints.md`

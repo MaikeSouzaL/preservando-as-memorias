@@ -1,7 +1,7 @@
 ---
 origem: docker-compose.yml
 origem_hash: 2f5fe19d70bd259ffda0d784eb244c7accdca4b0
-gerado_em: 2026-06-25T23:37:16
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `docker-compose.yml`

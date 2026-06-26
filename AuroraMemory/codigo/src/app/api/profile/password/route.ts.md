@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/profile/password/route.ts
 origem_hash: c4ed422acffcf60fd3dedadc76a765f2d0aa2b3a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/profile/password/route.ts`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/dev/stats/route.ts
 origem_hash: d6e1955410379a4635b4a4eff55b090d5791abe2
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/dev/stats/route.ts`

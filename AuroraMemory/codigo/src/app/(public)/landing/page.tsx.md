@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/landing/page.tsx
 origem_hash: 8d2b2f39d41f725cd9444773ca41800048cfb9c2
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/landing/page.tsx`

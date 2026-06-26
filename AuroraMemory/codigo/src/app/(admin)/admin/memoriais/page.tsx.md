@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/memoriais/page.tsx
 origem_hash: 004f0870beae087dd1c641612dc452765441cc42
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/memoriais/page.tsx`

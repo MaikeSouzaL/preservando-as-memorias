@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md
 origem_hash: d140b4d368a6045805d1a46c98bdb62c149e71ae
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md`

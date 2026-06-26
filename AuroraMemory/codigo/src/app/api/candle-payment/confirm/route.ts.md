@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/candle-payment/confirm/route.ts
 origem_hash: e79cd410c7e9f61119272984e641007ff5839449
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/candle-payment/confirm/route.ts`

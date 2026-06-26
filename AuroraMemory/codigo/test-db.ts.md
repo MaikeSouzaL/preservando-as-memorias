@@ -1,7 +1,7 @@
 ---
 origem: test-db.ts
 origem_hash: c8b3ba4759cb3982dfb8166a03cd09cd0db2a3ad
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `test-db.ts`

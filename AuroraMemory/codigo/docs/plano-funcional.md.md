@@ -1,7 +1,7 @@
 ---
 origem: docs/plano-funcional.md
 origem_hash: 97e9bafbf6df971f228b5b38a02184d215ef9076
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `docs/plano-funcional.md`

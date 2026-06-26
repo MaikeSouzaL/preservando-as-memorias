@@ -1,7 +1,7 @@
 ---
 origem: src/lib/auth-options.ts
 origem_hash: b24a2b7ae5b9d4733301e603146076daabf4f09a
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/auth-options.ts`

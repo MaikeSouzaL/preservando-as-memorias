@@ -1,7 +1,7 @@
 ---
 origem: src/components/dev/commission-config-panel.tsx
 origem_hash: 31baae8e130de037c47b9c37d4065e59633ea647
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/dev/commission-config-panel.tsx`

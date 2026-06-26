@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/assinaturas/layout.tsx
 origem_hash: cc40ff025ae4690fa1862f56e7213ca038333fcb
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/assinaturas/layout.tsx`

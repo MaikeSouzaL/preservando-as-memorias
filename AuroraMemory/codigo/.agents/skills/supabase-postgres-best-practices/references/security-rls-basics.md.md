@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md
 origem_hash: e47b9a555b1bcce2f4a73838b3e9ff4e91054581
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md`

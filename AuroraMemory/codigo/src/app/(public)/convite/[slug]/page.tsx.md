@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/convite/[slug]/page.tsx
 origem_hash: 02a476cdc11946106e58988bcbf1f9de4cca4dd3
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/convite/[slug]/page.tsx`

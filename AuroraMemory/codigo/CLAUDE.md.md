@@ -1,7 +1,7 @@
 ---
 origem: CLAUDE.md
 origem_hash: 16960ff6198a0b0da60e053e8934fda517a2f205
-gerado_em: 2026-06-25T23:37:13
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `CLAUDE.md`

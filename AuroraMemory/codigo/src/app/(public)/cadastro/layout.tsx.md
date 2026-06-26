@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/cadastro/layout.tsx
 origem_hash: 8297055be6435874b0ca60c23e328cb6dce22d14
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/cadastro/layout.tsx`

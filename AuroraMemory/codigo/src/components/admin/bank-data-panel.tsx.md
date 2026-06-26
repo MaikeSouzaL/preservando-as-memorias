@@ -1,7 +1,7 @@
 ---
 origem: src/components/admin/bank-data-panel.tsx
 origem_hash: 438387301459b21b93599e6ed69b5a2d99cf0ac9
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/admin/bank-data-panel.tsx`

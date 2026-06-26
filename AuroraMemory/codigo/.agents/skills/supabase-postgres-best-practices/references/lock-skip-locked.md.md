@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md
 origem_hash: d4e86db12d7a2d8306aa6f0d07cfa0d74b67a13d
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md`

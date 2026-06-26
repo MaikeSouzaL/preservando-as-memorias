@@ -1,7 +1,7 @@
 ---
 origem: src/lib/platform-types.ts
 origem_hash: 985d2f19b9d12a6a261e1191377ccfd2c5eb8b34
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/platform-types.ts`

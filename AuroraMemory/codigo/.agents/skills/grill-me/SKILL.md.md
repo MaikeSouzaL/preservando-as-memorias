@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/grill-me/SKILL.md
 origem_hash: 8dbde08fef2c92afda6b7ca7ba5bfe1067995d1d
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/grill-me/SKILL.md`

@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md
 origem_hash: ad21beafe4f0765c8d7cd5a5ba153b409cb5bcc4
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md`

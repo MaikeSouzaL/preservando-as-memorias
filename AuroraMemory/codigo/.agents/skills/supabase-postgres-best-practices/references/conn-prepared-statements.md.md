@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md
 origem_hash: d7c37a93276cffd98a9157d7ca7cb5ec5c8dd652
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md`

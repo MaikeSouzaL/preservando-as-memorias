@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md
 origem_hash: 72360842b6bcf5438a684bf399493852766c0026
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md`

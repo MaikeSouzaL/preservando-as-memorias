@@ -1,7 +1,7 @@
 ---
 origem: src/lib/platform-data.ts
 origem_hash: f3efd5820bd849d86152964eb7dc83412ba38a02
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/platform-data.ts`

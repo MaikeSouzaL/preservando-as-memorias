@@ -1,7 +1,7 @@
 ---
 origem: src/components/funeral/funeraria-dashboard-client.tsx
 origem_hash: e622e0824162b899c18e36ee63caa890d66a0e59
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/funeral/funeraria-dashboard-client.tsx`

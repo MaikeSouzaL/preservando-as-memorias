@@ -1,7 +1,7 @@
 ---
 origem: src/app/(funeral)/funeraria/dados-bancarios/page.tsx
 origem_hash: 2d55f5548a012eccd958b143d8deada5ff43c158
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(funeral)/funeraria/dados-bancarios/page.tsx`

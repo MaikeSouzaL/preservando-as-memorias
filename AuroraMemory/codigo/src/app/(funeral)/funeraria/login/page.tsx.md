@@ -1,7 +1,7 @@
 ---
 origem: src/app/(funeral)/funeraria/login/page.tsx
 origem_hash: b710df2830f95b928107a24a212756c643c3e95e
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(funeral)/funeraria/login/page.tsx`

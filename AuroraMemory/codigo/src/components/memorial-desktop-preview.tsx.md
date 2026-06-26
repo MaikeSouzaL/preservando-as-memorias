@@ -1,7 +1,7 @@
 ---
 origem: src/components/memorial-desktop-preview.tsx
 origem_hash: 4207214633ad113c3b43c56c704d4439a84a3984
-gerado_em: 2026-06-25T23:37:25
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/memorial-desktop-preview.tsx`

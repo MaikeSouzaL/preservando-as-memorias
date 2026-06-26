@@ -1,7 +1,7 @@
 ---
 origem: AGENTS.md
 origem_hash: 9cff3ed2994b911995d6874b1a9e74defbd5b3bc
-gerado_em: 2026-06-25T23:37:13
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `AGENTS.md`

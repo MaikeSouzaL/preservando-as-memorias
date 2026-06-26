@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/admin/complaints/route.ts
 origem_hash: 80f878aa4226fd3ab45aed01306cf4d83dc9aedd
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/admin/complaints/route.ts`

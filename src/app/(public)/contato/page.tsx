@@ -1,5 +1,10 @@
 ﻿import Link from "next/link";
-import { publicContent } from "@/src/mock-db/public-content";
+
+const contactChannels = [
+  { label: "Email", value: "suporte@preservandoamemoria.com" },
+  { label: "WhatsApp", value: "+55 11 97777-0000" },
+  { label: "Horário", value: "Seg a Sex, 9h às 18h" },
+];
 
 export default function ContatoPage() {
   return (
@@ -40,7 +45,7 @@ export default function ContatoPage() {
         <article className="rounded-xl border border-outline-variant/30 bg-surface-container-low/70 p-6">
           <h2 className="mb-5 font-h3 text-[1.4rem]">Canais de atendimento</h2>
           <ul className="grid gap-4">
-            {publicContent.contact.channels.map((channel) => (
+            {contactChannels.map((channel) => (
               <li key={channel.label} className="rounded-lg border border-tertiary/10 bg-surface-container-high/30 p-4">
                 <p className="text-xs uppercase tracking-[0.12em] text-on-surface-variant">{channel.label}</p>
                 <p className="mt-1 text-on-surface">{channel.value}</p>

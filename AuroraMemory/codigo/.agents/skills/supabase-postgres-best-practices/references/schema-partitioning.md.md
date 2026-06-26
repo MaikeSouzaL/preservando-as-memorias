@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md
 origem_hash: 5f1799d1ef432e823707c1fbd94da1e992567a92
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md`

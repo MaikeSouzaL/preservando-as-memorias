@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/CHANGELOG.md
 origem_hash: 686af9eb8a9cfdf7e6b1fb64bdd6fd9c1315a9ef
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/CHANGELOG.md`

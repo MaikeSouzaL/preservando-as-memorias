@@ -1,7 +1,7 @@
 ---
 origem: eslint.config.mjs
 origem_hash: 60016b2ac108e8469bec195756fc9bfb2eed725d
-gerado_em: 2026-06-25T23:37:19
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `eslint.config.mjs`

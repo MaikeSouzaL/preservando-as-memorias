@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/dev/platform-admin/route.ts
 origem_hash: fb094590dd97841b3ffe5ea5f82dda5b56d83f44
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/dev/platform-admin/route.ts`

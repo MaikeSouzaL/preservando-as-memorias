@@ -1,181 +1,233 @@
 # Conversa — projeto
 
-_Atualizado em 26/06/2026 00:20_
+_Atualizado em 26/06/2026 01:38_
 
 **🧑 Você:**
 
-ola consegue ver o meu projeto ?
+olá
 
 **🤖 Aurora:**
 
-Sim, consigo ver seu projeto! Aqui está um resumo do que encontrei:
+Olá! 👋
 
----
+Sou a Aurora, sua assistente de programação. Estou aqui para ajudar com o projeto.
 
-## 📋 **Preservando Memórias** — Visão Geral
+Pelo que vejo no mapa, este é um projeto com **253 arquivos indexados** — parece ser um sistema de memorial com suporte a áudio, PostgreSQL/Supabase, e várias skills de agentes.
 
-É uma **plataforma de memoriais virtuais** (altar virtual para homenagear falecidos), construída com **Next.js 16 + React 19 + TypeScript + Tailwind CSS v4**.
+Como posso ajudar hoje? Me diga o que você precisa:
 
-### 🏗️ Arquitetura (visão do 🏛️ Arquiteto)
+- **Criar/modificar funcionalidades** no código
+- **Corrigir bugs**
+- **Melhorar arquitetura**
+- **Consultar** partes específicas do projeto
+- **Rodar testes** ou comandos
 
-**Organização por grupos de rotas (Route Groups):**
-- `(public)` — Landing, login, cadastro, planos, memorial público, FAQ, etc.
-- `(private)` — Dashboard do usuário, memoriais, assinaturas, configurações
-- `(admin)` — Painel administrativo (funerárias, memoriais, denúncias, QR codes, ofertas)
-- `(funeral)` — Portal da funerária (cadastro, login, dashboard, dados bancários)
-- `(dev)` — Ferramentas de desenvolvimento (comissões, repasses, admin da plataforma)
-
-**Stack principal:**
-| Camada | Tecnologia |
-|---|---|
-| **Frontend** | Next.js 16 + React 19 + Tailwind CSS v4 |
-| **Autenticação** | NextAuth + Supabase Auth |
-| **Banco** | Supabase (PostgreSQL) + Mock DB (dev) |
-| **Pagamentos** | Stripe |
-| **Cache/Rate-limit** | Upstash Redis |
-| **Email** | Resend |
-| **Áudio** | Howler |
-
-**APIs:** ~40+ rotas de API organizadas por domínio (`auth`, `admin`, `funeral-auth`, `memorials`, `checkout`, `webhooks`, `upload`, etc.)
-
-**Componentes:** Componentes de UI, admin, dev, funeral, privados — com destaque para o `memorial-desktop-preview.tsx` (visualização do altar virtual) e `memorial-form.tsx`.
-
-**Mock DB:** Banco de dados mockado em JSON para desenvolvimento (`src/mock-db/`).
-
----
-
-Em que posso ajudar? Precisa de alguma modificação, correção ou análise específica? 🚀
+É só falar! 🚀
 
 **🧑 Você:**
 
-vc tem acesso a memoria completa ?
+o que da para melhroar  no sistema
 
 **🤖 Aurora:**
 
-Sim! Tenho acesso à **memória completa do projeto** — todos os 252 arquivos indexados. 
-
-Isso significa que eu:
-
-✅ **Conheço a estrutura completa** de diretórios e arquivos  
-✅ **Entendo as relações** entre módulos (quem importa quem)  
-✅ **Sei o conteúdo** de cada arquivo (código, tipos, configurações)  
-✅ **Compreendo a arquitetura** geral e os padrões usados  
+Agora tenho uma visão completa e detalhada do projeto. Aqui está minha análise como **🏛️ Arquiteto de Software**:
 
 ---
 
-### 📊 O que já sei sobre seu projeto sem precisar ler novamente:
+## 📋 Relatório de Melhorias — Projeto Aurora (Preservando Memórias)
 
-| Aspecto | Detalhe |
-|---|---|
-| **Framework** | Next.js 16.2.5 + React 19.2.4 |
-| **Linguagem** | TypeScript 5 |
-| **Estilo** | Tailwind CSS v4 |
-| **Banco** | Supabase (PostgreSQL) + Mock DB (JSON) |
-| **Autenticação** | NextAuth + Supabase Auth |
-| **Pagamentos** | Stripe |
-| **Cache** | Upstash Redis |
-| **Email** | Resend |
-| **Áudio** | Howler |
-| **QR Code** | QRCode library |
-
-**Grupos de rotas:** `(public)`, `(private)`, `(admin)`, `(funeral)`, `(dev)`  
-**APIs:** ~40+ rotas organizadas por domínio  
-**Mock DB:** Banco JSON em `src/mock-db/data/database.json`
+Com base na análise do código-fonte, memória catalogada e arquivos reais, aqui estão as oportunidades de melhoria, ordenadas por impacto:
 
 ---
 
-### 🚀 O que posso fazer por você:
+### 🏆 TOP 3 — Maior Impacto
 
-1. **Modificar código** — editar, criar ou refatorar arquivos
-2. **Corrigir bugs** — analisar e aplicar correções
-3. **Adicionar features** — implementar novas funcionalidades
-4. **Rodar testes** — executar `pytest`, `npm test`, etc.
-5. **Analisar arquitetura** — sugerir melhorias estruturais
-6. **Git operations** — commit, branch, etc.
+#### 1. 🔴 **Centralizar chamadas de API do frontend (cliente HTTP tipado)**
 
-**O que você precisa?** É só pedir! 🎯
+**Onde:** `src/app/(admin)/admin/denuncias/page.tsx` (fetch bruto), e potencialmente outras páginas.
 
-**🧑 Você:**
+**Problema:** A página de denúncias faz `fetch` direto para `/api/admin/complaints` com tratamento de erro mínimo, sem tipagem de resposta, sem abstração. Cada página que precisar de API vai duplicar lógica de headers, parsing, loading, error handling.
 
-o que podemos melhrorar no projeto ?
+**Solução:** Criar `src/lib/api-client.ts` com funções tipadas:
+```typescript
+export async function getComplaints(): Promise<Complaint[]>
+export async function updateComplaintStatus(id: string, status: string): Promise<Complaint[]>
+export async function deleteComplaint(id: string): Promise<Complaint[]>
+```
 
-**🤖 Aurora:**
-
-Ótima pergunta! Como 🏛️ **Arquiteto de Software**, fiz uma análise completa do código-fonte. Aqui estão as **principais oportunidades de melhoria** que identifiquei:
+**Impacto:** Reduz duplicação, facilita manutenção (ex.: adicionar header de autenticação), melhora DX com tipos.
 
 ---
 
-## 🔴 **Críticas (Alta Prioridade)**
+#### 2. 🔴 **Upload com fallback base64 — risco de segurança e performance**
 
-### 1. 🗄️ **Mock DB vs Supabase — Dupla manutenção**
-O projeto mantém **dois bancos paralelos**: Supabase (produção) e Mock DB JSON (desenvolvimento). Isso dobra o esforço de manutenção e já causou inconsistências (ex: `database.json` tem `memorials` com campos diferentes do schema real).
+**Onde:** `src/app/api/upload/route.ts` (linha ~55)
 
-**Solução:** Usar Supabase local (`supabase start`) ou Docker para dev, eliminando o Mock DB.
+**Problema:** Quando o upload para o Supabase Storage falha, o código faz **fallback para base64 inline** na URL. Isso é um problema grave:
+- Base64 é ~33% maior que o binário
+- URLs base64 não são cacheadas por CDN
+- Vaza dados binários em respostas JSON
+- Pode estourar limites de tamanho de resposta
 
-### 2. 🔐 **Autenticação híbrida — NextAuth + Supabase Auth**
-Há **dois sistemas de autenticação** convivendo. Isso pode causar conflitos de sessão e duplicação de lógica.
+**Solução:** Remover o fallback base64. Se o storage falhar, retornar erro 500. Ou, alternativamente, salvar localmente em `public/uploads/` como fallback controlado.
 
-**Solução:** Padronizar para apenas **Supabase Auth** (já que o banco é Supabase) ou apenas **NextAuth** (mais flexível para providers).
-
-### 3. 🧪 **Testes ausentes**
-Não encontrei testes unitários ou de integração. Para um projeto com 40+ rotas de API e múltiplos grupos de usuários, isso é um risco.
-
-**Solução:** Implementar testes com Vitest + Testing Library para componentes e Supertest para APIs.
+**Impacto:** Segurança, performance e previsibilidade.
 
 ---
 
-## 🟡 **Médias (Prioridade Média)**
+#### 3. 🟡 **Rate limiting implementado 2x (memória local + Upstash) — risco em produção multi-instância**
 
-### 4. 🧩 **Componentes monolíticos**
-Várias páginas têm componentes grandes com lógica misturada (ex: `memorial-desktop-preview.tsx`). Dificulta teste e reuso.
+**Onde:** `src/lib/rate-limit.ts`
 
-**Solução:** Extrair hooks customizados e componentes menores (ex: `useMemorial`, `PhotoGallery`, `TributeList`).
+**Problema:** O rate limiting tem fallback para `Map` em memória. Em produção com múltiplas instâncias (escalonamento horizontal), cada instância tem seu próprio `Map`, então um usuário pode fazer `limit * N` requisições (N = número de instâncias). O Redis/Upstash resolve, mas o fallback silencioso esconde o problema.
 
-### 5. 🌐 **i18n — Sem internacionalização**
-Não há suporte a múltiplos idiomas. Para um produto que pode escalar, isso limita o mercado.
+**Solução:** 
+- Logar um aviso quando estiver usando o fallback em memória
+- Ou exigir Redis em produção (falhar cedo se não configurado)
+- Documentar a limitação
 
-**Solução:** Adicionar `next-intl` ou `react-i18next`.
-
-### 6. 📱 **PWA — Sem suporte offline**
-Não há Service Worker nem manifest. Para um memorial virtual (acessado em momentos sensíveis), experiência offline seria valiosa.
-
-**Solução:** Adicionar `next-pwa` ou `@serwist/next`.
+**Impacto:** Segurança contra abuso em produção.
 
 ---
 
-## 🟢 **Leves (Baixa Prioridade)**
+### 🟡 Média Prioridade
 
-### 7. 🎨 **Tema inconsistente**
-Cores hardcoded em vários lugares (`#e9c349`, `#facc15`, etc.) em vez de usar variáveis CSS do Tailwind.
+#### 4. **`platform-data.ts` monolítico — 700+ linhas, muitas responsabilidades**
 
-**Solução:** Centralizar no `tailwind.config.ts` e usar classes utilitárias.
+**Onde:** `src/lib/platform-data.ts`
 
-### 8. 📦 **Bundles grandes**
-Sem análise de bundle. Páginas como o memorial podem carregar código desnecessário.
+**Problema:** Este arquivo faz tudo: leitura/escrita de dados, sync com Supabase, diff de arrays, CRUD de funerárias, ofertas, denúncias, memoriais, etc. Viola o Princípio da Responsabilidade Única.
 
-**Solução:** Usar `next/dynamic` para lazy loading de componentes pesados (ex: player de áudio, QR code).
+**Solução:** Quebrar em módulos:
+- `src/lib/platform-data/reader.ts` — leitura
+- `src/lib/platform-data/writer.ts` — escrita + diff
+- `src/lib/platform-data/sync.ts` — sync com Supabase
+- `src/lib/platform-data/entities/` — operações por entidade
 
-### 9. 🐛 **Error handling genérico**
-APIs usam `try/catch` com `console.error` e retorno `500` genérico. Sem logs estruturados.
-
-**Solução:** Criar middleware de erro com `@sentry/nextjs` ou logs no Supabase.
-
----
-
-## 📊 **Resumo**
-
-| Prioridade | O quê | Impacto |
-|---|---|---|
-| 🔴 Crítica | Unificar banco de dados | Manutenibilidade |
-| 🔴 Crítica | Unificar autenticação | Segurança/Estabilidade |
-| 🔴 Crítica | Adicionar testes | Qualidade/Confiança |
-| 🟡 Média | Componentes menores | Reuso/Testabilidade |
-| 🟡 Média | i18n | Escalabilidade |
-| 🟡 Média | PWA | Experiência do usuário |
-| 🟢 Leve | Tema centralizado | Consistência visual |
-| 🟢 Leve | Lazy loading | Performance |
-| 🟢 Leve | Error handling | Debug/Manutenção |
+**Impacto:** Manutenibilidade, testabilidade, legibilidade.
 
 ---
 
-**Quer que eu implemente alguma dessas melhorias?** Posso começar pela que você achar mais urgente! 🚀
+#### 5. **`funeral-auth/register/route.ts` — hash de senha duplicado com Supabase Auth**
+
+**Onde:** `src/app/api/funeral-auth/register/route.ts`
+
+**Problema:** O registro de funerárias faz hash manual da senha (`hashPassword`) e armazena em `passwordHash` no JSON/Supabase. Mas o Supabase Auth já gerencia autenticação. Isso significa que a funerária não consegue fazer login pelo Supabase Auth — apenas por um fluxo customizado.
+
+**Solução:** Usar `supabase.auth.signUp()` em vez de hash manual, ou documentar claramente que é um fluxo separado.
+
+**Impacto:** Consistência de autenticação, segurança.
+
+---
+
+#### 6. **Componentes inline duplicados em páginas admin**
+
+**Onde:** `src/app/(admin)/admin/comercial/page.tsx` (Metric, CommercialTabInfo, OrderRow), `src/app/(admin)/admin/dashboard/page.tsx` (StatCard, ProgressItem)
+
+**Problema:** `Metric` e `CommercialTabInfo` estão definidos dentro do arquivo de página, não podem ser reutilizados. `StatCard` no dashboard tem função similar a `Metric` mas com props diferentes.
+
+**Solução:** Extrair para `src/components/ui/`:
+- `MetricCard` — unifica StatCard + Metric
+- `TabInfo` —通用 CommercialTabInfo
+- `DataTable` — componente de tabela genérico
+
+**Impacto:** Redução de duplicação, consistência visual, reuso.
+
+---
+
+#### 7. **Webhook Stripe sem idempotência e sem fila**
+
+**Onde:** `src/app/api/webhooks/stripe/route.ts`
+
+**Problema:** O Stripe pode entregar o mesmo evento mais de uma vez (at-least-once). O código não tem verificação de idempotência (`stripeSessionId` é salvo mas não verificado antes de processar). Também não usa fila — o processamento (emails, transferência Stripe) acontece inline no webhook.
+
+**Solução:**
+- Verificar se `order.stripeSessionId` já existe antes de processar
+- Usar `Promise.allSettled` para não falhar o webhook se email falhar (já faz)
+- Idealmente: enfileirar em background job
+
+**Impacto:** Evita duplicação de pedidos/emails.
+
+---
+
+#### 8. **`dynamic = "force-dynamic"` em TODAS as rotas de API**
+
+**Onde:** Praticamente todas as rotas em `src/app/api/`
+
+**Problema:** `force-dynamic` desativa caching do Next.js em todas as rotas. Algumas rotas GET (ex.: `/api/memorials`) poderiam se beneficiar de caching parcial.
+
+**Solução:** Remover `force-dynamic` de rotas GET que podem usar cache, ou usar `revalidate` tags.
+
+**Impacto:** Performance em leitura, redução de carga no banco.
+
+---
+
+#### 9. **Falta de testes automatizados**
+
+**Onde:** Projeto todo
+
+**Problema:** O `package.json` tem `jest` configurado, mas não há testes implementados. Um sistema financeiro (pedidos, repasses, webhooks) sem testes é arriscado.
+
+**Solução:** Começar com testes nos pontos críticos:
+- `platform-types.ts` — `calculateOrderTotals`, `calculateCascadeOrderTotals`, `estimateStripeFeeCents`
+- Webhook Stripe — lógica de negócio
+- Rotas de API — validação de input
+
+**Impacto:** Confiança para deploy, prevenção de regressões.
+
+---
+
+#### 10. **`src/data/platform-store.json` vs Supabase — duas fontes de verdade**
+
+**Onde:** `src/lib/platform-data.ts` + `src/data/platform-store.json`
+
+**Problema:** O sistema lê de `platform-store.json` e faz sync para Supabase via `persistChanges()`. Isso cria duas fontes de verdade. Se o sync falhar parcialmente, os dados ficam inconsistentes.
+
+**Solução:** Migrar para usar Supabase como fonte primária e remover o JSON, ou manter JSON como cache local apenas para leitura.
+
+**Impacto:** Consistência de dados, simplificação.
+
+---
+
+### 🟢 Baixa Prioridade / Cosmético
+
+#### 11. **`asString()` duplicado em várias rotas de API**
+
+**Onde:** `src/app/api/funeral-auth/register/route.ts`, `src/app/api/memorials/route.ts`, etc.
+
+**Problema:** Função `asString()` definida inline em múltiplos arquivos.
+
+**Solução:** Mover para `src/lib/validate.ts` e importar.
+
+---
+
+#### 12. **README.md ainda é o padrão do Next.js**
+
+**Onde:** `README.md`
+
+**Problema:** Não documenta o produto real.
+
+**Solução:** Substituir por documentação real do projeto.
+
+---
+
+### 📊 Resumo
+
+| # | Melhoria | Impacto | Esforço |
+|---|----------|---------|---------|
+| 1 | Cliente HTTP tipado | 🔴 Alto | 🟢 Baixo |
+| 2 | Remover fallback base64 | 🔴 Alto | 🟢 Baixo |
+| 3 | Rate limit multi-instância | 🔴 Alto | 🟢 Baixo |
+| 4 | Quebrar platform-data.ts | 🟡 Médio | 🔴 Alto |
+| 5 | Hash de senha duplicado | 🟡 Médio | 🟢 Baixo |
+| 6 | Componentes inline duplicados | 🟡 Médio | 🟢 Baixo |
+| 7 | Idempotência no webhook | 🟡 Médio | 🟢 Baixo |
+| 8 | force-dynamic em GETs | 🟡 Médio | 🟢 Baixo |
+| 9 | Falta de testes | 🟡 Médio | 🔴 Alto |
+| 10 | Duas fontes de verdade | 🟡 Médio | 🔴 Alto |
+| 11 | asString() duplicado | 🟢 Baixo | 🟢 Baixo |
+| 12 | README padrão | 🟢 Baixo | 🟢 Baixo |
+
+---
+
+**Quer que eu implemente alguma dessas melhorias?** Posso começar pelas de maior impacto e menor esforço (1, 2, 3, 6, 7, 11) — são mudanças localizadas que trazem ganho imediato. É só me dizer qual você quer priorizar! 🚀

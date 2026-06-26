@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase/assets/feedback-issue-template.md
 origem_hash: 520dd4caf83cd1d3a719f348b9f65347eadbeb43
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase/assets/feedback-issue-template.md`

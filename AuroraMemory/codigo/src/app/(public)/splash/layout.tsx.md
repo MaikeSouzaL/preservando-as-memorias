@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/splash/layout.tsx
 origem_hash: 328bb54e99adac9935f383ead23d2daf226c83fe
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/splash/layout.tsx`

@@ -1,7 +1,7 @@
 ---
 origem: src/lib/hash.ts
 origem_hash: 1c2cb05b609be00af6537b54e8de3dc0fafff8bc
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/hash.ts`

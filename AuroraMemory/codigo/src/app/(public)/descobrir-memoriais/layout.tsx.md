@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/descobrir-memoriais/layout.tsx
 origem_hash: b052c52f94f768b04fa985aa735320c39c7e560a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/descobrir-memoriais/layout.tsx`

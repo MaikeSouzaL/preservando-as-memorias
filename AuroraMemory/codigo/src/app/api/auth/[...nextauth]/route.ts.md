@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/auth/[...nextauth]/route.ts
 origem_hash: 3f52088678358aac0cd04ce2f8c3beac048bd62c
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/auth/[...nextauth]/route.ts`

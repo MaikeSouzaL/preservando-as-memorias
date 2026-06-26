@@ -1,7 +1,7 @@
 ---
 origem: src/components/private/memorial-card.tsx
 origem_hash: 1e1285086359b161188e2c7d6b316187c903bf4a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/components/private/memorial-card.tsx`

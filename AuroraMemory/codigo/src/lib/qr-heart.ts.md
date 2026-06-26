@@ -1,7 +1,7 @@
 ---
 origem: src/lib/qr-heart.ts
 origem_hash: b45d06cbc4965cc2684d2067cea963ee62c3586b
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/qr-heart.ts`

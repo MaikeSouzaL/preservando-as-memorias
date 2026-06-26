@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/auth/definir-senha/route.ts
 origem_hash: 9379a83ca4b3ccb67e07b10d3ba38b7b5f802f36
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/api/auth/definir-senha/route.ts`

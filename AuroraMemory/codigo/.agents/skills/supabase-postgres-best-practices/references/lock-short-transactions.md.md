@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md
 origem_hash: e5ec7f8e78902731cb609620583213bb70d88590
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md`

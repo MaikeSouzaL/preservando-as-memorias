@@ -1,7 +1,7 @@
 ---
 origem: src/lib/dev-auth.ts
 origem_hash: 15188c2209bf32f07cfca5433d2950494d290bac
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/dev-auth.ts`

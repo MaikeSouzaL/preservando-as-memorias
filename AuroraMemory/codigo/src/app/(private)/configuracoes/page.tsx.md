@@ -1,7 +1,7 @@
 ---
 origem: src/app/(private)/configuracoes/page.tsx
 origem_hash: c5798f89696fa8dfab35eda2782112b12525030a
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(private)/configuracoes/page.tsx`

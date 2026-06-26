@@ -1,7 +1,7 @@
 ---
 origem: src/app/api/funeral-home-invite/[slug]/route.ts
 origem_hash: b8e7f878ccf1e23207f8b7121acd4bdc021405a3
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/app/api/funeral-home-invite/[slug]/route.ts`

@@ -1,7 +1,7 @@
 ---
 origem: src/app/(admin)/admin/qr-codes/page.tsx
 origem_hash: e4f84187b48fc852a630a0e3a9c3389e59fac4c3
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(admin)/admin/qr-codes/page.tsx`

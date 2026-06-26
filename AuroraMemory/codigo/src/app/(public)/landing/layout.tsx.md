@@ -1,7 +1,7 @@
 ---
 origem: src/app/(public)/landing/layout.tsx
 origem_hash: f27d99bcf5f703ae5657e83612961aa7ebd5243b
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `src/app/(public)/landing/layout.tsx`

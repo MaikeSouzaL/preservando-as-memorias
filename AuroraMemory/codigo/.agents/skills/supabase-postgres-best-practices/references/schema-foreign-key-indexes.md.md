@@ -1,7 +1,7 @@
 ---
 origem: .agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md
 origem_hash: fd35c3a263ac10905e0c668f51780105c0d912a2
-gerado_em: 2026-06-25T23:37:30
+gerado_em: 2026-06-26T00:33:20
 ---
 
 # `.agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md`

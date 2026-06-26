@@ -1,7 +1,7 @@
 ---
 origem: src/lib/auth-session.ts
 origem_hash: 4b7fb4599d0bfd0fd417e81ca0de640dab6f3648
-gerado_em: 2026-06-25T23:37:23
+gerado_em: 2026-06-26T00:33:19
 ---
 
 # `src/lib/auth-session.ts`
