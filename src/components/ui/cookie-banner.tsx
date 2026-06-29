@@ -25,7 +25,7 @@ function useCookieConsent() {
   return { consent, accept };
 }
 
-export default function CookieBanner() {
+export function CookieBanner() {
   const { consent, accept } = useCookieConsent();
 
   if (consent !== null) return null;

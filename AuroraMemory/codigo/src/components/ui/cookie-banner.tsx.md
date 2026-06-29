@@ -1,24 +1,26 @@
 ---
 origem: src/components/ui/cookie-banner.tsx
-origem_hash: ec7f263e799dc8ac5c350c5ec57400fa498ae101
-gerado_em: 2026-06-25T23:37:29
+origem_hash: 2571234da3fe8a51330c33e7fa0fee6059ab2f04
+gerado_em: 2026-06-29T18:31:33
 ---
 
 # `src/components/ui/cookie-banner.tsx`
 
-### CookieBanner
+```markdown
+# `src/components/ui/cookie-banner.tsx`
 
-**Responsabilidade:** Gerenciar o consentimento de cookies do usuário, exibindo um banner fixo no rodapé até que uma escolha seja feita.
+**Responsabilidade** – Banner de consentimento de cookies, armazenando a escolha do usuário no `localStorage`. Exibe-se no rodapé fixo até que o consentimento seja dado.
 
-**Componentes/Funções:**
-- `useCookieConsent()` — Hook que gerencia estado do consentimento via `localStorage` (chave `aurora_cookie_consent`). Retorna `consent` (tipo `'all' | 'essential' | null`) e `accept(type)` para salvar a escolha.
-- `CookieBanner` — Componente principal. Renderiza banner com texto explicativo, links para Política de Privacidade e Termos de Uso, e dois botões: "Apenas essenciais" e "Aceitar todos". Some após consentimento.
+## Funções / Componentes
 
-**Props/Parâmetros:** Nenhum.
-
-**APIs/Endpoints:** Nenhum. Apenas armazenamento local.
-
-**Conexões:** Importado por `src/app/layout.tsx`. Usa `next/link` para navegação interna.
+- **`CookieBanner()`** – Componente React. Renderiza o banner se `consent` for `null`. Exibe:
+  - Mensagem com links para `/politica-privacidade` e `/termos-de-uso`
+  - Botões "Apenas essenciais" (`accept('essential')`) e "Aceitar todos" (`accept('all')`)
+- **`useCookieConsent()`** – Hook customizado. Gerencia estado local `consent`.
+  - **Recebe**: nada.
+  - **Retorna**: `{ consent, accept }`.
+  - **Chama**: `useState`, `useEffect`, `localStorage.getItem` (ao montar), `setConsent` (internamente), `localStorage.setItem` (em `accept`).
+- **`accept(type)`** – Função interna. Salva `
 
 <!-- aurora:relacoes -->
 
@@ -29,7 +31,7 @@ gerado_em: 2026-06-25T23:37:29
 - [[layout.tsx]] — `src/app/layout.tsx`
 
 ## 📤 Exporta
-`CookieBanner`, `default`
+`CookieBanner`
 
 ## 🧩 Componentes usados
 CookieConsent, Link

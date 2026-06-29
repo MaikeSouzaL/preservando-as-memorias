@@ -1,0 +1,499 @@
+# Mapa completo do projeto (AuroraMemory)
+
+_255 arquivos catalogados._
+
+## Arquivos (o que cada um faz)
+- `.agents/skills/grill-me/SKILL.md` — `grill-me` Skill
+- `.agents/skills/supabase-postgres-best-practices/CHANGELOG.md` — CHANGELOG — `supabase-postgres-best-practices`
+- `.agents/skills/supabase-postgres-best-practices/SKILL.md` — Supabase Postgres Best Practices Skill
+- `.agents/skills/supabase-postgres-best-practices/references/_contributing.md` — Writing Guidelines for Postgres References
+- `.agents/skills/supabase-postgres-best-practices/references/_sections.md` — Section Definitions
+- `.agents/skills/supabase-postgres-best-practices/references/_template.md` — Este arquivo é um template para documentar boas práticas do Supabase/PostgreSQL.
+- `.agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md` — Advanced Full-Text Search with tsvector
+- `.agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md` — Advanced JSONB Indexing
+- `.agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md` — Idle Connection Timeout Configuration
+- `.agents/skills/supabase-postgres-best-practices/references/conn-limits.md` — Connection Limits Guide
+- `.agents/skills/supabase-postgres-best-practices/references/conn-pooling.md` — Connection Pooling Guide
+- `.agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md` — Prepared Statements with Connection Pooling
+- `.agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md` — Batch INSERT Statements for Bulk Data
+- `.agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md` — N+1 Query Elimination Reference
+- `.agents/skills/supabase-postgres-best-practices/references/data-pagination.md` — Cursor-Based Pagination Guide
+- `.agents/skills/supabase-postgres-best-practices/references/data-upsert.md` — Data Upsert Best Practice
+- `.agents/skills/supabase-postgres-best-practices/references/lock-advisory.md` — Advisory Lock Reference
+- `.agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md` — Lock Deadlock Prevention
+- `.agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md` — Keep Transactions Short to Reduce Lock Contention
+- `.agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md` — SKIP LOCKED for Non-Blocking Queue Processing
+- `.agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md` — monitor-explain-analyze.md
+- `.agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md` — `monitor-pg-stat-statements.md`
+- `.agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md` — monitor-vacuum-analyze.md
+- `.agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md` — Composite Indexes for Multi-Column Queries
+- `.agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md` — Query Covering Indexes
+- `.agents/skills/supabase-postgres-best-practices/references/query-index-types.md` — Query Index Types Reference
+- `.agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md` — Query Missing Indexes
+- `.agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md` — Partial Indexes for Filtered Queries
+- `.agents/skills/supabase-postgres-best-practices/references/schema-constraints.md` — Schema Constraints — Safe Migration Patterns
+- `.agents/skills/supabase-postgres-best-practices/references/schema-data-types.md` — Schema Data Types Guide
+- `.agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md` — Foreign Key Indexing Guide
+- `.agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md` — Schema: Lowercase Identifiers for Compatibility
+- `.agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md` — Partitioning for Large Tables
+- `.agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md` — Primary Key Strategy Selection Guide
+- `.agents/skills/supabase-postgres-best-practices/references/security-privileges.md` — Security Privileges Reference
+- `.agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md` — Row Level Security (RLS) for Multi-Tenant Data
+- `.agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md` — Security RLS Performance Optimization Guide
+- `.agents/skills/supabase/CHANGELOG.md` — CHANGELOG.md
+- `.agents/skills/supabase/SKILL.md` — Supabase Skill
+- `.agents/skills/supabase/assets/feedback-issue-template.md` — Este arquivo é um template de feedback para reportar erros ou omissões na docume
+- `.agents/skills/supabase/references/skill-feedback.md` — Skill Feedback
+- `.aurora/agentes/debugger-fullstack.md` — ```markdown
+- `.claude/launch.json` — `.claude/launch.json`
+- `.claude/settings.local.json` — Este é um arquivo de configuração de permissões do Claude Code (`.claude/setting
+- `.dockerignore` — .dockerignore
+- `.gitignore` — Arquivo de configuração `.gitignore` que define quais arquivos e diretórios o Gi
+- `.mcp.json` — Arquivo de configuração do MCP (Model Context Protocol) para integração com o Su
+- `.vercel/README.txt` — `.vercel/README.txt`
+- `.vercel/project.json` — `.vercel/project.json`
+- `.vercelignore` — Arquivo de configuração `.vercelignore` para o deploy na Vercel.
+- `AGENTS.md` — AGENTS.md — Regras do Agente Next.js
+- `CLAUDE.md` — CLAUDE.md
+- `Dockerfile.dev` — ```markdown
+- `README.md` — README.md — Preservando as Memórias
+- `alter-db.ts` — `alter-db.ts` — Script de Migração do Banco
+- `check-exact.ts` — ```markdown
+- `docker-compose.yml` — docker-compose.yml
+- `docs/plano-funcional.md` — Plano Funcional - Preservando as Memórias
+- `eslint.config.mjs` — eslint.config.mjs
+- `next-env.d.ts` — ```markdown
+- `next.config.mjs` — ```markdown
+- `next.config.ts` — `next.config.ts` — Configuração do Next.js
+- `package-lock.json` — `package-lock.json` — Aurora Memorial
+- `package.json` — ```markdown
+- `postcss.config.mjs` — postcss.config.mjs
+- `public/audio/README.txt` — `public/audio/README.txt`
+- `public/sw.js` — Este arquivo é um Service Worker que implementa uma estratégia de cache App Shel
+- `skills-lock.json` — Este arquivo `skills-lock.json` é um manifesto de bloqueio de versões para skill
+- `src/app/(admin)/admin/comercial/page.tsx` — Admin Commercial Page
+- `src/app/(admin)/admin/contrato/page.tsx` — Página de Contrato de Parceria (Admin)
+- `src/app/(admin)/admin/convites/page.tsx` — ```markdown
+- `src/app/(admin)/admin/dashboard/layout.tsx` — `src/app/(admin)/admin/dashboard/layout.tsx`
+- `src/app/(admin)/admin/dashboard/page.tsx` — Admin Dashboard Page
+- `src/app/(admin)/admin/denuncias/page.tsx` — AdminComplaintsPage
+- `src/app/(admin)/admin/funerarias/page.tsx` — ```markdown
+- `src/app/(admin)/admin/homenagens/page.tsx` — AdminTributesPage
+- `src/app/(admin)/admin/layout.tsx` — `src/app/(admin)/admin/layout.tsx`
+- `src/app/(admin)/admin/memoriais/page.tsx` — `src/app/(admin)/admin/memoriais/page.tsx`
+- `src/app/(admin)/admin/ofertas/page.tsx` — AdminOfertasPage
+- `src/app/(admin)/admin/page.tsx` — Admin Index Page
+- `src/app/(admin)/admin/qr-codes/page.tsx` — Admin QR Codes Page
+- `src/app/(admin)/admin/usuarios/page.tsx` — AdminUsersPage - Página de Usuários (Admin)
+- `src/app/(admin)/layout.tsx` — Admin Layout (`layout.tsx`)
+- `src/app/(dev)/dev/page.tsx` — `src/app/(dev)/dev/page.tsx` — Dev Console (Sistema)
+- `src/app/(dev)/layout.tsx` — Layout de Proteção para Rotas de Desenvolvimento
+- `src/app/(funeral)/funeraria/cadastro/page.tsx` — Página de Cadastro de Funerária
+- `src/app/(funeral)/funeraria/dados-bancarios/page.tsx` — Dados Bancários - Funerária
+- `src/app/(funeral)/funeraria/dashboard/novo-memorial/page.tsx` — Novo Memorial Page
+- `src/app/(funeral)/funeraria/dashboard/page.tsx` — Página do Dashboard da Funerária
+- `src/app/(funeral)/funeraria/login/page.tsx` — Página de Login da Funerária
+- `src/app/(funeral)/layout.tsx` — `src/app/(funeral)/layout.tsx`
+- `src/app/(private)/assinaturas/layout.tsx` — `src/app/(private)/assinaturas/layout.tsx`
+- `src/app/(private)/assinaturas/page.tsx` — `src/app/(private)/assinaturas/page.tsx`
+- `src/app/(private)/configuracoes/layout.tsx` — `src/app/(private)/configuracoes/layout.tsx`
+- `src/app/(private)/configuracoes/page.tsx` — ConfiguraçõesPage
+- `src/app/(private)/dashboard/layout.tsx` — ```markdown
+- `src/app/(private)/dashboard/page.tsx` — DashboardPage
+- `src/app/(private)/definir-senha/page.tsx` — `definir-senha/page.tsx`
+- `src/app/(private)/homenagens/layout.tsx` — `src/app/(private)/homenagens/layout.tsx`
+- `src/app/(private)/homenagens/page.tsx` — `src/app/(private)/homenagens/page.tsx`
+- `src/app/(private)/layout.tsx` — `src/app/(private)/layout.tsx`
+- `src/app/(private)/memoriais/criar/layout.tsx` — ```markdown
+- `src/app/(private)/memoriais/criar/page.tsx` — Página de Criação/Edição de Memorial
+- `src/app/(private)/memoriais/lista/page.tsx` — `src/app/(private)/memoriais/lista/page.tsx`
+- `src/app/(public)/cadastro/layout.tsx` — `src/app/(public)/cadastro/layout.tsx`
+- `src/app/(public)/cadastro/page.tsx` — Página de Cadastro (`/cadastro`)
+- `src/app/(public)/checkout/page.tsx` — Página de Checkout (`/checkout`)
+- `src/app/(public)/checkout/sucesso/page.tsx` — Página de Sucesso do Checkout
+- `src/app/(public)/compartilhar-memorial/layout.tsx` — `layout.tsx` — Layout da Rota "Compartilhar Memorial"
+- `src/app/(public)/compartilhar-memorial/page.tsx` — CompartilharMemorialPage
+- `src/app/(public)/contato/layout.tsx` — `src/app/(public)/contato/layout.tsx`
+- `src/app/(public)/contato/page.tsx` — Página de Contato
+- `src/app/(public)/convite/[slug]/page.tsx` — ConvitePage
+- `src/app/(public)/criar-memorial/page.tsx` — Página de Criação de Memorial (Público)
+- `src/app/(public)/descobrir-memoriais/layout.tsx` — ```markdown
+- `src/app/(public)/descobrir-memoriais/page.tsx` — `src/app/(public)/descobrir-memoriais/page.tsx`
+- `src/app/(public)/faq/layout.tsx` — ```markdown
+- `src/app/(public)/faq/page.tsx` — FAQ Page
+- `src/app/(public)/homenagens-publicas/layout.tsx` — `src/app/(public)/homenagens-publicas/layout.tsx`
+- `src/app/(public)/homenagens-publicas/page.tsx` — `src/app/(public)/homenagens-publicas/page.tsx`
+- `src/app/(public)/landing/layout.tsx` — ```markdown
+- `src/app/(public)/landing/page.tsx` — Landing Page - Página Inicial Pública
+- `src/app/(public)/login/acesso/layout.tsx` — `src/app/(public)/login/acesso/layout.tsx`
+- `src/app/(public)/login/acesso/page.tsx` — `src/app/(public)/login/acesso/page.tsx`
+- `src/app/(public)/login/layout.tsx` — `src/app/(public)/login/layout.tsx`
+- `src/app/(public)/login/page.tsx` — Página de Login (`/login`)
+- `src/app/(public)/memorial/layout.tsx` — `src/app/(public)/memorial/layout.tsx`
+- `src/app/(public)/memorial/page.tsx` — `src/app/(public)/memorial/page.tsx`
+- `src/app/(public)/nova-senha/page.tsx` — Página de Redefinição de Senha (`nova-senha/page.tsx`)
+- `src/app/(public)/oferta/[slug]/page.tsx` — `src/app/(public)/oferta/[slug]/page.tsx`
+- `src/app/(public)/planos/layout.tsx` — ```markdown
+- `src/app/(public)/planos/page.tsx` — `src/app/(public)/planos/page.tsx`
+- `src/app/(public)/politica-privacidade/page.tsx` — Política de Privacidade — Página Estática
+- `src/app/(public)/qr-publico/layout.tsx` — `src/app/(public)/qr-publico/layout.tsx`
+- `src/app/(public)/qr-publico/page.tsx` — `src/app/(public)/qr-publico/page.tsx`
+- `src/app/(public)/recuperar-senha/layout.tsx` — ```markdown
+- `src/app/(public)/recuperar-senha/page.tsx` — `src/app/(public)/recuperar-senha/page.tsx`
+- `src/app/(public)/sobre/layout.tsx` — ```markdown
+- `src/app/(public)/sobre/page.tsx` — ```markdown
+- `src/app/(public)/splash/layout.tsx` — ```markdown
+- `src/app/(public)/splash/page.tsx` — SplashPage
+- `src/app/(public)/termos-uso/page.tsx` — Termos de Uso — Página Legal
+- `src/app/api/admin/bank-data/route.ts` — ```markdown
+- `src/app/api/admin/complaints/route.ts` — API de Denúncias (Admin)
+- `src/app/api/admin/contracts/route.ts` — ```markdown
+- `src/app/api/admin/funeral-home-invites/[id]/route.ts` — `route.ts` — Admin: Gerenciamento de Convites de Funerárias
+- `src/app/api/admin/funeral-home-invites/route.ts` — Admin – Convites para Funerárias (API)
+- `src/app/api/admin/funeral-homes/[id]/route.ts` — Admin Funeral Homes API Route
+- `src/app/api/admin/funeral-homes/route.ts` — Este arquivo define uma rota de API administrativa (`GET /api/admin/funeral-home
+- `src/app/api/admin/memorial/[id]/delivery/route.ts` — `route.ts` — Admin: Controle de Entrega de QR Code
+- `src/app/api/admin/memorial/route.ts` — Admin Memorial API Route
+- `src/app/api/admin/offer-links/route.ts` — Admin Offer Links API Route
+- `src/app/api/admin/ping/route.ts` — Admin Ping API Route
+- `src/app/api/admin/stats/route.ts` — Admin Stats API Route
+- `src/app/api/admin/tributes/route.ts` — Admin Tributes API Route
+- `src/app/api/auth/[...nextauth]/route.ts` — `src/app/api/auth/[...nextauth]/route.ts`
+- `src/app/api/auth/definir-senha/route.ts` — `src/app/api/auth/definir-senha/route.ts`
+- `src/app/api/auth/login/route.ts` — `POST /api/auth/login` — Autenticação de usuário
+- `src/app/api/auth/logout/route.ts` — ```markdown
+- `src/app/api/auth/register/route.ts` — `src/app/api/auth/register/route.ts`
+- `src/app/api/auth/reset-password/confirm/route.ts` — ```markdown
+- `src/app/api/auth/reset-password/request/route.ts` — ```markdown
+- `src/app/api/candle-payment/confirm/route.ts` — `POST /api/candle-payment/confirm`
+- `src/app/api/candle-payment/route.ts` — `POST /api/candle-payment`
+- `src/app/api/checkout/route.ts` — API de Checkout (Stripe)
+- `src/app/api/dev/backup/route.ts` — API de Backup do Sistema
+- `src/app/api/dev/platform-admin/route.ts` — API de Administração da Plataforma (Dev)
+- `src/app/api/dev/repasse/route.ts` — `src/app/api/dev/repasse/route.ts`
+- `src/app/api/dev/stats/route.ts` — Este arquivo define a rota de API `GET /api/dev/stats` para exibir estatísticas 
+- `src/app/api/dev/users/route.ts` — ```markdown
+- `src/app/api/funeral-auth/bank-data/route.ts` — API de Dados Bancários da Funerária
+- `src/app/api/funeral-auth/documents/route.ts` — API de Documentos Funerários
+- `src/app/api/funeral-auth/inventory/route.ts` — API de Estoque (Funerária)
+- `src/app/api/funeral-auth/login/route.ts` — API de Login para Funerárias
+- `src/app/api/funeral-auth/logout/route.ts` — Este arquivo implementa a rota de logout da API de autenticação funerária.
+- `src/app/api/funeral-auth/me/route.ts` — Este arquivo define a rota de API `GET /api/funeral-auth/me`, que retorna dados 
+- `src/app/api/funeral-auth/memorials/route.ts` — API de Criação de Memorial (Funerária)
+- `src/app/api/funeral-auth/register/route.ts` — `POST /api/funeral-auth/register`
+- `src/app/api/funeral-auth/schedules/route.ts` — API de Agendamentos Funerários (Autenticado)
+- `src/app/api/funeral-auth/services/route.ts` — API de Serviços Funerários (Autenticada)
+- `src/app/api/funeral-auth/staff/route.ts` — API de Staff (Funerária)
+- `src/app/api/funeral-home-invite/[slug]/route.ts` — `GET /api/funeral-home-invite/[slug]`
+- `src/app/api/me/stats/route.ts` — ```markdown
+- `src/app/api/memorial-publico/route.ts` — API Route: POST /api/memorial-publico
+- `src/app/api/memorials/[id]/interactions/route.ts` — API de Interações de Memorial
+- `src/app/api/memorials/[id]/route.ts` — API Route: `/api/memorials/[id]`
+- `src/app/api/memorials/[id]/visit/route.ts` — ```markdown
+- `src/app/api/memorials/route.ts` — API de Memoriais (`/api/memorials`)
+- `src/app/api/offer-links/[slug]/route.ts` — API de Offer Links (`/api/offer-links/[slug]`)
+- `src/app/api/platform-config/route.ts` — API de Configuração da Plataforma
+- `src/app/api/profile/password/route.ts` — ```markdown
+- `src/app/api/profile/route.ts` — API de Perfil do Usuário
+- `src/app/api/tribute-donation/route.ts` — API de Doação para Homenagem
+- `src/app/api/upload/route.ts` — API de Upload de Arquivos
+- `src/app/api/webhooks/stripe/route.ts` — Webhook Stripe — `src/app/api/webhooks/stripe/route.ts`
+- `src/app/auth/callback/route.ts` — `src/app/auth/callback/route.ts` — Rota de Callback OAuth
+- `src/app/globals.css` — `globals.css` — Estilos Globais e Tema
+- `src/app/layout.tsx` — ```markdown
+- `src/app/manifest.ts` — ```markdown
+- `src/app/memorial-publico/page.tsx` — Página Pública de Memorial
+- `src/app/page.tsx` — ```markdown
+- `src/app/pwa-register.tsx` — `src/app/pwa-register.tsx`
+- `src/components/admin/admin-shell.tsx` — AdminShell — Layout do Painel Administrativo
+- `src/components/admin/bank-data-panel.tsx` — BankDataPanel
+- `src/components/admin/commercial-settings-panel.tsx` — CommercialSettingsPanel
+- `src/components/admin/convites-page-client.tsx` — ConvitesPageClient
+- `src/components/admin/criar-memorial-form.tsx` — `CriarMemorialForm` — Formulário multi-etapas para criação de memoriais
+- `src/components/admin/funeral-settings-panel.tsx` — FuneralSettingsPanel
+- `src/components/admin/funerarias-page-client.tsx` — `funerarias-page-client.tsx`
+- `src/components/admin/mark-sent-button.tsx` — MarkSentButton
+- `src/components/admin/memoriais-page-client.tsx` — `memoriais-page-client.tsx` — Painel de Gerenciamento de Memoriais
+- `src/components/admin/price-config-panel.tsx` — PriceConfigPanel
+- `src/components/admin/qr-code-viewer.tsx` — QR Code Viewer
+- `src/components/admin/qr-delivery-panel.tsx` — `QrDeliveryPanel` — Painel de Configuração de Entrega de QR Codes
+- `src/components/dev/commission-config-panel.tsx` — CommissionConfigPanel
+- `src/components/dev/criar-memorial-button.tsx` — `CriarMemorialButton`
+- `src/components/dev/platform-admin-panel.tsx` — PlatformAdminPanel
+- `src/components/dev/repasse-panel.tsx` — `repasse-panel.tsx` — Painel de Repasses Manuais
+- `src/components/funeral/funeraria-dashboard-client.tsx` — FunerariaDashboardClient
+- `src/components/memorial-desktop-preview.tsx` — `memorial-desktop-preview.tsx`
+- `src/components/memorial-form.tsx` — `memorial-form.tsx` — Formulário de Criação de Memorial
+- `src/components/private/memorial-card.tsx` — MemorialCard
+- `src/components/private/private-shell.tsx` — PrivateShell — Layout Privado da Aplicação
+- `src/components/screen-placeholder.tsx` — ScreenPlaceholder
+- `src/components/success-modal.tsx` — SuccessModal
+- `src/components/ui/cookie-banner.tsx` — ```markdown
+- `src/components/ui/pwa-install-banner.tsx` — PWA Install Banner
+- `src/components/ui/user-avatar.tsx` — UserAvatar
+- `src/data/platform-store.json` — `platform-store.json` — Configuração da Loja da Plataforma
+- `src/hooks/use-cookie-consent.ts` — `useCookieConsent` Hook
+- `src/hooks/use-memorial-preview.ts` — `src/hooks/use-memorial-preview.ts`
+- `src/lib/api-auth.ts` — `src/lib/api-auth.ts` — Guarda de Autenticação para Rotas Admin
+- `src/lib/auth-options.ts` — `src/lib/auth-options.ts`
+- `src/lib/auth-session.ts` — `auth-session.ts` — Sessão de Autenticação
+- `src/lib/dev-auth.ts` — `src/lib/dev-auth.ts` — Guarda de Autenticação para Desenvolvedor
+- `src/lib/email.ts` — `src/lib/email.ts` — Serviço de e-mails transacionais
+- `src/lib/encrypt.ts` — `src/lib/encrypt.ts` — Criptografia AES-256-GCM para dados bancários
+- `src/lib/funeral-auth.ts` — `src/lib/funeral-auth.ts`
+- `src/lib/hash.ts` — `src/lib/hash.ts`
+- `src/lib/platform-data.ts` — `src/lib/platform-data.ts`
+- `src/lib/platform-types.ts` — `platform-types.ts` — Tipos e utilitários de planos e comissões
+- `src/lib/qr-heart.ts` — `qr-heart.ts` — Gerador de QR Code em Formato de Coração
+- `src/lib/rate-limit.ts` — Rate Limit Utility (`src/lib/rate-limit.ts`)
+- `src/lib/supabase-browser.ts` — `supabase-browser.ts`
+- `src/lib/supabase.ts` — `src/lib/supabase.ts` — Clientes Supabase
+- `src/mock-db/data/database.json` — `database.json` — Dados Mockados do Memorial
+- `src/mock-db/data/public-content.json` — `src/mock-db/data/public-content.json`
+- `src/mock-db/database.ts` — `src/mock-db/database.ts` — Banco de Dados Mockado
+- `src/mock-db/index.ts` — `src/mock-db/index.ts`
+- `src/mock-db/public-content.ts` — `src/mock-db/public-content.ts`
+- `src/mock-db/public-index.ts` — `src/mock-db/public-index.ts`
+- `test-db.ts` — `test-db.ts` — Teste de Conexão com Supabase
+- `test-results/.last-run.json` — ```markdown
+- `tsconfig.json` — ```markdown
+- `tsconfig.tsbuildinfo` — `tsconfig.tsbuildinfo` — Resumo
+
+## Ligações entre os arquivos (quem usa/importa quem)
+- `.agents/skills/supabase/SKILL.md` ↔ `.agents/skills/supabase/references/skill-feedback.md`
+- `.agents/skills/supabase/assets/feedback-issue-template.md` ↔ `.agents/skills/supabase/references/skill-feedback.md`
+- `src/app/(admin)/admin/comercial/page.tsx` ↔ `src/components/admin/bank-data-panel.tsx`
+- `src/app/(admin)/admin/comercial/page.tsx` ↔ `src/components/admin/price-config-panel.tsx`
+- `src/app/(admin)/admin/comercial/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/admin/comercial/page.tsx` ↔ `src/lib/platform-types.ts`
+- `src/app/(admin)/admin/contrato/page.tsx` ↔ `src/app/api/admin/contracts/route.ts`
+- `src/app/(admin)/admin/contrato/page.tsx` ↔ `src/app/api/admin/funeral-homes/route.ts`
+- `src/app/(admin)/admin/contrato/page.tsx` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/(admin)/admin/convites/page.tsx` ↔ `src/components/admin/convites-page-client.tsx`
+- `src/app/(admin)/admin/dashboard/page.tsx` ↔ `src/components/admin/mark-sent-button.tsx`
+- `src/app/(admin)/admin/dashboard/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/admin/denuncias/page.tsx` ↔ `src/app/api/admin/complaints/route.ts`
+- `src/app/(admin)/admin/funerarias/page.tsx` ↔ `src/components/admin/funerarias-page-client.tsx`
+- `src/app/(admin)/admin/homenagens/page.tsx` ↔ `src/app/api/admin/tributes/route.ts`
+- `src/app/(admin)/admin/layout.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(admin)/admin/memoriais/page.tsx` ↔ `src/components/admin/memoriais-page-client.tsx`
+- `src/app/(admin)/admin/memoriais/page.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(admin)/admin/memoriais/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/admin/ofertas/page.tsx` ↔ `src/app/api/admin/offer-links/route.ts`
+- `src/app/(admin)/admin/ofertas/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/admin/ofertas/page.tsx` ↔ `src/lib/platform-types.ts`
+- `src/app/(admin)/admin/qr-codes/page.tsx` ↔ `src/components/admin/qr-code-viewer.tsx`
+- `src/app/(admin)/admin/qr-codes/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/admin/qr-codes/page.tsx` ↔ `src/lib/qr-heart.ts`
+- `src/app/(admin)/admin/usuarios/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(admin)/layout.tsx` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/components/dev/commission-config-panel.tsx`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/components/dev/criar-memorial-button.tsx`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/components/dev/platform-admin-panel.tsx`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/components/dev/repasse-panel.tsx`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/lib/dev-auth.ts`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/lib/encrypt.ts`
+- `src/app/(dev)/dev/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(dev)/layout.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(funeral)/funeraria/cadastro/page.tsx` ↔ `src/app/api/funeral-auth/register/route.ts`
+- `src/app/(funeral)/funeraria/dados-bancarios/page.tsx` ↔ `src/app/api/funeral-auth/bank-data/route.ts`
+- `src/app/(funeral)/funeraria/dashboard/novo-memorial/page.tsx` ↔ `src/app/api/funeral-auth/memorials/route.ts`
+- `src/app/(funeral)/funeraria/dashboard/novo-memorial/page.tsx` ↔ `src/components/memorial-form.tsx`
+- `src/app/(funeral)/funeraria/dashboard/page.tsx` ↔ `src/components/funeral/funeraria-dashboard-client.tsx`
+- `src/app/(funeral)/funeraria/dashboard/page.tsx` ↔ `src/lib/funeral-auth.ts`
+- `src/app/(funeral)/funeraria/dashboard/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(funeral)/funeraria/dashboard/page.tsx` ↔ `src/lib/qr-heart.ts`
+- `src/app/(funeral)/funeraria/login/page.tsx` ↔ `src/app/api/funeral-auth/login/route.ts`
+- `src/app/(private)/assinaturas/page.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(private)/assinaturas/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(private)/configuracoes/page.tsx` ↔ `src/app/api/dev/backup/route.ts`
+- `src/app/(private)/configuracoes/page.tsx` ↔ `src/app/api/profile/password/route.ts`
+- `src/app/(private)/configuracoes/page.tsx` ↔ `src/app/api/profile/route.ts`
+- `src/app/(private)/configuracoes/page.tsx` ↔ `src/app/api/upload/route.ts`
+- `src/app/(private)/configuracoes/page.tsx` ↔ `src/components/ui/user-avatar.tsx`
+- `src/app/(private)/dashboard/page.tsx` ↔ `src/components/private/memorial-card.tsx`
+- `src/app/(private)/dashboard/page.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(private)/dashboard/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(private)/dashboard/page.tsx` ↔ `src/lib/qr-heart.ts`
+- `src/app/(private)/definir-senha/page.tsx` ↔ `src/app/api/auth/definir-senha/route.ts`
+- `src/app/(private)/homenagens/page.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(private)/homenagens/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(private)/layout.tsx` ↔ `src/components/private/private-shell.tsx`
+- `src/app/(private)/layout.tsx` ↔ `src/lib/auth-session.ts`
+- `src/app/(private)/memoriais/criar/page.tsx` ↔ `src/app/api/memorials/[id]/route.ts`
+- `src/app/(private)/memoriais/criar/page.tsx` ↔ `src/app/api/memorials/route.ts`
+- `src/app/(private)/memoriais/criar/page.tsx` ↔ `src/components/memorial-form.tsx`
+- `src/app/(private)/memoriais/lista/page.tsx` ↔ `src/app/api/memorials/route.ts`
+- `src/app/(public)/cadastro/page.tsx` ↔ `src/app/api/auth/register/route.ts`
+- `src/app/(public)/cadastro/page.tsx` ↔ `src/lib/supabase-browser.ts`
+- `src/app/(public)/checkout/page.tsx` ↔ `src/app/api/checkout/route.ts`
+- `src/app/(public)/checkout/page.tsx` ↔ `src/app/api/memorials/[id]/route.ts`
+- `src/app/(public)/checkout/page.tsx` ↔ `src/app/api/platform-config/route.ts`
+- `src/app/(public)/checkout/page.tsx` ↔ `src/lib/platform-types.ts`
+- `src/app/(public)/compartilhar-memorial/page.tsx` ↔ `src/app/api/memorials/route.ts`
+- `src/app/(public)/contato/page.tsx` ↔ `src/mock-db/public-content.ts`
+- `src/app/(public)/convite/[slug]/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/convite/[slug]/page.tsx` ↔ `src/lib/platform-types.ts`
+- `src/app/(public)/criar-memorial/page.tsx` ↔ `src/app/api/memorial-publico/route.ts`
+- `src/app/(public)/criar-memorial/page.tsx` ↔ `src/app/api/platform-config/route.ts`
+- `src/app/(public)/criar-memorial/page.tsx` ↔ `src/app/api/profile/route.ts`
+- `src/app/(public)/criar-memorial/page.tsx` ↔ `src/app/api/upload/route.ts`
+- `src/app/(public)/criar-memorial/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/descobrir-memoriais/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/faq/page.tsx` ↔ `src/mock-db/public-content.ts`
+- `src/app/(public)/homenagens-publicas/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/landing/page.tsx` ↔ `src/app/page.tsx`
+- `src/app/(public)/login/page.tsx` ↔ `src/app/api/auth/login/route.ts`
+- `src/app/(public)/login/page.tsx` ↔ `src/lib/supabase-browser.ts`
+- `src/app/(public)/memorial/page.tsx` ↔ `src/components/success-modal.tsx`
+- `src/app/(public)/memorial/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/memorial/page.tsx` ↔ `src/mock-db/database.ts`
+- `src/app/(public)/nova-senha/page.tsx` ↔ `src/app/api/auth/reset-password/confirm/route.ts`
+- `src/app/(public)/oferta/[slug]/page.tsx` ↔ `src/components/memorial-form.tsx`
+- `src/app/(public)/oferta/[slug]/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/planos/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/planos/page.tsx` ↔ `src/lib/platform-types.ts`
+- `src/app/(public)/qr-publico/page.tsx` ↔ `src/lib/platform-data.ts`
+- `src/app/(public)/qr-publico/page.tsx` ↔ `src/lib/qr-heart.ts`
+- `src/app/(public)/recuperar-senha/page.tsx` ↔ `src/app/api/auth/reset-password/request/route.ts`
+- `src/app/(public)/sobre/page.tsx` ↔ `src/mock-db/public-content.ts`
+- `src/app/(public)/splash/page.tsx` ↔ `src/mock-db/public-content.ts`
+- `src/app/api/admin/bank-data/route.ts` ↔ `src/components/admin/bank-data-panel.tsx`
+- `src/app/api/admin/bank-data/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/bank-data/route.ts` ↔ `src/lib/encrypt.ts`
+- `src/app/api/admin/bank-data/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/complaints/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/complaints/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/contracts/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/admin/contracts/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/contracts/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/funeral-home-invites/[id]/route.ts` ↔ `src/components/admin/convites-page-client.tsx`
+- `src/app/api/admin/funeral-home-invites/[id]/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/funeral-home-invites/[id]/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/funeral-home-invites/route.ts` ↔ `src/components/admin/convites-page-client.tsx`
+- `src/app/api/admin/funeral-home-invites/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/funeral-home-invites/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/funeral-home-invites/route.ts` ↔ `src/lib/platform-types.ts`
+- `src/app/api/admin/funeral-homes/[id]/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/admin/funeral-homes/[id]/route.ts` ↔ `src/components/admin/funerarias-page-client.tsx`
+- `src/app/api/admin/funeral-homes/[id]/route.ts` ↔ `src/components/admin/qr-delivery-panel.tsx`
+- `src/app/api/admin/funeral-homes/[id]/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/funeral-homes/[id]/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/funeral-homes/route.ts` ↔ `src/components/admin/funerarias-page-client.tsx`
+- `src/app/api/admin/funeral-homes/route.ts` ↔ `src/components/admin/qr-delivery-panel.tsx`
+- `src/app/api/admin/funeral-homes/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/funeral-homes/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/memorial/[id]/delivery/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/admin/memorial/[id]/delivery/route.ts` ↔ `src/components/admin/mark-sent-button.tsx`
+- `src/app/api/admin/memorial/[id]/delivery/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/memorial/[id]/delivery/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/memorial/route.ts` ↔ `src/components/admin/criar-memorial-form.tsx`
+- `src/app/api/admin/memorial/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/admin/memorial/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/memorial/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/admin/offer-links/route.ts` ↔ `src/components/admin/funerarias-page-client.tsx`
+- `src/app/api/admin/offer-links/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/ping/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/admin/ping/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/admin/ping/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/admin/stats/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/admin/stats/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/stats/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/admin/stats/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/admin/tributes/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/admin/tributes/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/auth/[...nextauth]/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/definir-senha/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/auth/definir-senha/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/login/route.ts` ↔ `src/lib/rate-limit.ts`
+- `src/app/api/auth/login/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/logout/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/auth/logout/route.ts` ↔ `src/components/private/private-shell.tsx`
+- `src/app/api/auth/logout/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/register/route.ts` ↔ `src/lib/rate-limit.ts`
+- `src/app/api/auth/register/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/reset-password/confirm/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/auth/reset-password/request/route.ts` ↔ `src/lib/rate-limit.ts`
+- `src/app/api/auth/reset-password/request/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/candle-payment/confirm/route.ts` ↔ `src/app/memorial-publico/page.tsx`
+- `src/app/api/candle-payment/confirm/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/candle-payment/route.ts` ↔ `src/app/memorial-publico/page.tsx`
+- `src/app/api/candle-payment/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/checkout/route.ts` ↔ `src/components/funeral/funeraria-dashboard-client.tsx`
+- `src/app/api/checkout/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/checkout/route.ts` ↔ `src/lib/platform-types.ts`
+- `src/app/api/dev/backup/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/dev/backup/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/dev/platform-admin/route.ts` ↔ `src/components/dev/platform-admin-panel.tsx`
+- `src/app/api/dev/platform-admin/route.ts` ↔ `src/lib/dev-auth.ts`
+- `src/app/api/dev/platform-admin/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/dev/platform-admin/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/dev/repasse/route.ts` ↔ `src/components/dev/repasse-panel.tsx`
+- `src/app/api/dev/repasse/route.ts` ↔ `src/lib/dev-auth.ts`
+- `src/app/api/dev/repasse/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/dev/stats/route.ts` ↔ `src/lib/dev-auth.ts`
+- `src/app/api/dev/stats/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/dev/users/route.ts` ↔ `src/components/dev/platform-admin-panel.tsx`
+- `src/app/api/dev/users/route.ts` ↔ `src/lib/dev-auth.ts`
+- `src/app/api/dev/users/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/funeral-auth/bank-data/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/bank-data/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/documents/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/documents/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/inventory/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/inventory/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/login/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/login/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/logout/route.ts` ↔ `src/components/funeral/funeraria-dashboard-client.tsx`
+- `src/app/api/funeral-auth/me/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/me/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/memorials/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/memorials/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/register/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/schedules/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/schedules/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/services/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/services/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-auth/staff/route.ts` ↔ `src/lib/funeral-auth.ts`
+- `src/app/api/funeral-auth/staff/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/funeral-home-invite/[slug]/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/me/stats/route.ts` ↔ `src/components/private/private-shell.tsx`
+- `src/app/api/me/stats/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/me/stats/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/memorial-publico/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/memorial-publico/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/memorial-publico/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/memorials/[id]/interactions/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/memorials/[id]/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/memorials/[id]/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/memorials/[id]/visit/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/memorials/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/memorials/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/offer-links/[slug]/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/admin/commercial-settings-panel.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/admin/funeral-settings-panel.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/admin/funerarias-page-client.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/admin/price-config-panel.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/admin/qr-delivery-panel.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/components/dev/commission-config-panel.tsx`
+- `src/app/api/platform-config/route.ts` ↔ `src/lib/api-auth.ts`
+- `src/app/api/platform-config/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/platform-config/route.ts` ↔ `src/lib/dev-auth.ts`
+- `src/app/api/platform-config/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/profile/password/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/profile/password/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/profile/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/profile/route.ts` ↔ `src/components/private/private-shell.tsx`
+- `src/app/api/profile/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/profile/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/tribute-donation/route.ts` ↔ `src/app/memorial-publico/page.tsx`
+- `src/app/api/tribute-donation/route.ts` ↔ `src/lib/platform-data.ts`
+- `src/app/api/upload/route.ts` ↔ `src/components/admin/admin-shell.tsx`
+- `src/app/api/upload/route.ts` ↔ `src/components/admin/criar-memorial-form.tsx`
+- `src/app/api/upload/route.ts` ↔ `src/components/memorial-form.tsx`
+- `src/app/api/upload/route.ts` ↔ `src/components/private/private-shell.tsx`
+- `src/app/api/upload/route.ts` ↔ `src/lib/auth-session.ts`
+- `src/app/api/upload/route.ts` ↔ `src/lib/supabase.ts`
+- `src/app/api/webhooks/stripe/route.ts` ↔ `src/lib/email.ts`
+- `src/app/api/webhooks/stripe/route.ts` ↔ `src/lib/platform-data.ts`
+- …(+36 ligações)

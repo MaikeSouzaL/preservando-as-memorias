@@ -1,32 +1,15 @@
 ---
 origem: tsconfig.tsbuildinfo
-origem_hash: a674672822594d7d96d76ddd48e88ea8e7162ebe
-gerado_em: 2026-06-25T23:37:23
+origem_hash: 678d0999aac9a2cf2e404a963be3eae3c07b59d6
+gerado_em: 2026-06-29T18:00:43
 ---
 
 # `tsconfig.tsbuildinfo`
 
-# `tsconfig.tsbuildinfo`
+## `tsconfig.tsbuildinfo` — Resumo
 
-## O que é
-
-Arquivo de cache gerado automaticamente pelo compilador TypeScript (`tsc`) para acelerar recompilações incrementais.
-
-## Responsabilidade Principal
-
-Armazenar metadados sobre o estado da compilação, incluindo:
-- Lista completa de arquivos `.d.ts` e `.ts` do projeto e dependências
-- Informações de dependência entre arquivos
-- Versões e timestamps para detectar mudanças
-
-## Como se Liga aos Outros
-
-- **Gerado por**: `tsconfig.json` (configuração do TypeScript)
-- **Consumido por**: Compilador TypeScript em execuções subsequentes
-- **Não deve ser versionado** (está no `.gitignore`)
-
-## Observações
-
-- Arquivo binário/JSON, não editável manualmente
-- Pode ser deletado com segurança (será recriado na próxima compilação)
-- Seu conteúdo é truncado por ser muito extenso
+- **Responsabilidade**: Arquivo gerado automaticamente pelo TypeScript (`tsc`) como cache de build, contendo metadados sobre arquivos compilados, dependências e versões de tipos.
+- **Não contém**: lógica de aplicação, funções, classes, interfaces, props, retornos, endpoints, tabelas, variáveis de ambiente, mensagens ao usuário, regras de validação ou efeitos colaterais.
+- **Conteúdo**: Lista de paths de arquivos `.d.ts` (declarações de tipos do TypeScript, Node, React, Next, Stripe, Supabase, etc.) e arquivos-fonte do projeto (`alter-db.ts`, `test-db.ts`, `src/...`), além de metadados de versão e hash de compilação.
+- **Uso**: Apenas consultado pelo compilador TypeScript para acelerar recompilações; não é lido ou executado em tempo de execução.
+- **Conexões**: Nenhuma com lógica do projeto; apenas registra que os arquivos listados foram verificados na compilação.

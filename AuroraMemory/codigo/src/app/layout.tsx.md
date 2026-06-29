@@ -1,28 +1,24 @@
 ---
 origem: src/app/layout.tsx
 origem_hash: c06b98e0ddb178ae2a76b60271b2ff10c632fd51
-gerado_em: 2026-06-25T23:37:29
+gerado_em: 2026-06-29T18:31:48
 ---
 
 # `src/app/layout.tsx`
 
-# Root Layout (`src/app/layout.tsx`)
-
-**Responsabilidade:** Layout raiz da aplicação Next.js, define estrutura HTML base e componentes globais.
-
-**Componentes chave:**
-- `RootLayout`: Componente principal que envolve toda a aplicação com `<html>` e `<body>`
-- `PwaRegister`: Registra service worker para PWA
-- `PwaInstallBanner`: Banner de instalação do PWA
-- `CookieBanner`: Banner de consentimento de cookies
-
-**Props:** `children` (ReactNode) - conteúdo das páginas filhas
-
-**Metadados:** Título "Preservando Memórias", descrição sobre memorial digital com QR Code
-
-**Fontes externas:** Material Symbols e Material Icons do Google Fonts
-
-**Conexões:** Importa estilos globais (`globals.css`), componentes de PWA e cookie banner; exporta metadados e layout padrão do Next.js.
+```markdown
+Este arquivo define o layout raiz do Next.js para o app "Preservando Memórias".  
+**Responsabilidade**: Renderizar a estrutura HTML `<html><body>` com filhos e componentes globais.  
+**Exporta**: `metadata` (título, descrição, nome do app) e o componente `RootLayout` (default).  
+**RootLayout**:  
+- **Recebe**: `children: React.ReactNode`  
+- **Retorna**: `<html lang="pt-BR">` com classes `h-full antialiased`, `<head>` com fontes do Google (Material Symbols, Material Icons), e `<body>` com `min-h-full flex flex-col`.  
+- **Chama/usa componentes**: `<PwaRegister />`, `<PwaInstallBanner />`, `<CookieBanner />`.  
+- **Links com outros arquivos**: Importa `globals.css`, `pwa-register.tsx`, `cookie-banner.tsx` e `pwa-install-banner.tsx`.  
+- **Bibliotecas**: Next (Metadata, next).  
+- **Efeitos colaterais**: Carrega folhas de estilo externas de fontes (CSS via link).  
+- **Mensagens/textos**: Nenhum texto visível ao usuário diretamente.  
+```
 
 <!-- aurora:relacoes -->
 

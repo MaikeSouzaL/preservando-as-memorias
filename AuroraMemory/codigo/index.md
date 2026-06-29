@@ -1,6 +1,6 @@
 # Mapa do código — Aurora
 
-_252 arquivos indexados._
+_255 arquivos indexados._
 
 - [.agents/skills/grill-me/SKILL.md](.agents/skills/grill-me/SKILL.md.md)
 - [.agents/skills/supabase-postgres-best-practices/CHANGELOG.md](.agents/skills/supabase-postgres-best-practices/CHANGELOG.md.md)
@@ -43,6 +43,7 @@ _252 arquivos indexados._
 - [.agents/skills/supabase/SKILL.md](.agents/skills/supabase/SKILL.md.md)
 - [.agents/skills/supabase/assets/feedback-issue-template.md](.agents/skills/supabase/assets/feedback-issue-template.md.md)
 - [.agents/skills/supabase/references/skill-feedback.md](.agents/skills/supabase/references/skill-feedback.md.md)
+- [.aurora/agentes/debugger-fullstack.md](.aurora/agentes/debugger-fullstack.md.md)
 - [.claude/launch.json](.claude/launch.json.md)
 - [.claude/settings.local.json](.claude/settings.local.json.md)
 - [.dockerignore](.dockerignore.md)
@@ -61,6 +62,7 @@ _252 arquivos indexados._
 - [docs/plano-funcional.md](docs/plano-funcional.md.md)
 - [eslint.config.mjs](eslint.config.mjs.md)
 - [next-env.d.ts](next-env.d.ts.md)
+- [next.config.mjs](next.config.mjs.md)
 - [next.config.ts](next.config.ts.md)
 - [package-lock.json](package-lock.json.md)
 - [package.json](package.json.md)
@@ -230,6 +232,7 @@ _252 arquivos indexados._
 - [src/components/ui/user-avatar.tsx](src/components/ui/user-avatar.tsx.md)
 - [src/data/platform-store.json](src/data/platform-store.json.md)
 - [src/hooks/use-cookie-consent.ts](src/hooks/use-cookie-consent.ts.md)
+- [src/hooks/use-memorial-preview.ts](src/hooks/use-memorial-preview.ts.md)
 - [src/lib/api-auth.ts](src/lib/api-auth.ts.md)
 - [src/lib/auth-options.ts](src/lib/auth-options.ts.md)
 - [src/lib/auth-session.ts](src/lib/auth-session.ts.md)
