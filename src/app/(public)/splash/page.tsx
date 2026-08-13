@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { publicContent } from "@/src/mock-db/public-content";
+import { brand } from "@/src/content/site";
 
 export default function SplashPage() {
   const router = useRouter();
@@ -77,7 +77,7 @@ export default function SplashPage() {
           </div>
 
           <h1 className="mb-6 font-h1 text-[clamp(2.5rem,6vw,4.5rem)] font-light leading-[1.1] tracking-[-0.02em] text-[#e5e2e1] text-glow">
-            {publicContent.brand.name}
+            {brand.name}
           </h1>
           
           {isRedirecting ? (
@@ -91,7 +91,7 @@ export default function SplashPage() {
             </div>
           ) : (
             <p className="max-w-lg font-body-lg text-[1.125rem] leading-[1.7] tracking-[0.01em] text-[#c4c7c7]/80">
-              {publicContent.brand.tagline}
+              {brand.tagline}
             </p>
           )}
         </section>

@@ -6,7 +6,7 @@ export default async function RootPage() {
   const session = await getAuthSession();
 
   if (session) {
-    if (session.isAdmin) redirect("/admin/dashboard");
+    if (session.isAdmin) redirect("/painel");
     else redirect("/dashboard");
   }
 

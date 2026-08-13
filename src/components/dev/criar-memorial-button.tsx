@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CriarMemorialForm } from "@/src/components/admin/criar-memorial-form";
+import { CriarMemorialForm } from "@/src/components/owner/criar-memorial-form";
 
 export function CriarMemorialButton() {
   const [open, setOpen] = useState(false);

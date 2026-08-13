@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { publicContent } from "@/src/mock-db/public-content";
+import { about } from "@/src/content/site";
 
 export default function SobrePage() {
   return (
@@ -11,16 +11,16 @@ export default function SobrePage() {
         <h1 className="font-h2 text-[clamp(2rem,5vw,3rem)] font-light leading-[1.2] tracking-[-0.01em] text-on-surface">
           Tecnologia a servico da memoria afetiva
         </h1>
-        <p className="mt-3 max-w-3xl text-on-surface-variant">{publicContent.about.story}</p>
+        <p className="mt-3 max-w-3xl text-on-surface-variant">{about.story}</p>
       </header>
 
       <section className="mb-8 rounded-xl border border-tertiary/10 bg-surface-container/70 p-6">
         <h2 className="mb-3 font-h3 text-[1.5rem]">Nossa missao</h2>
-        <p className="leading-8 text-on-surface-variant">{publicContent.about.mission}</p>
+        <p className="leading-8 text-on-surface-variant">{about.mission}</p>
       </section>
 
       <section className="mb-10 grid gap-4 md:grid-cols-2">
-        {publicContent.about.values.map((value) => (
+        {about.values.map((value) => (
           <article key={value} className="rounded-xl border border-outline-variant/30 bg-surface-container-low/70 p-5">
             <div className="mb-2 flex items-center gap-2 text-tertiary">
               <span className="material-symbols-outlined">favorite</span>

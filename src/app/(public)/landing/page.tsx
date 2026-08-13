@@ -8,45 +8,45 @@ const steps = [
   {
     icon: "edit_document",
     title: "1. Crie o memorial",
-    description: "Reuna fotos, relatos e biografias em um espaco digital seguro e sofisticado.",
+    description: "Reúna fotos, relatos e a história de vida em um espaço digital seguro.",
   },
   {
     icon: "qr_code_2",
     title: "2. Gere o QR Code",
-    description: "Um codigo unico gravado em placa premium conecta o fisico ao digital.",
+    description: "Um código único, gravado em placa de aço, conecta o túmulo ao memorial digital.",
   },
   {
     icon: "location_on",
     title: "3. Instale com facilidade",
-    description: "Fixe a placa de identificacao no local de descanso com praticidade.",
+    description: "Fixe a placa no local de descanso. É autoadesiva e resistente ao tempo.",
   },
   {
     icon: "hourglass_empty",
     title: "4. Preserve para sempre",
-    description: "Compartilhe o legado com futuras geracoes mantendo a memoria viva.",
+    description: "Compartilhe o legado com as próximas gerações e mantenha a memória viva.",
   },
 ];
 
 const faqs = [
   {
-    question: "Como funciona a conexao com o QR Code fisico?",
+    question: "Como funciona a conexão com o QR Code físico?",
     answer:
-      "A placa memorial possui um QR exclusivo. Ao escanear com o celular, o visitante abre o memorial digital instantaneamente, sem app adicional.",
+      "A placa tem um QR exclusivo. Ao escanear com o celular, o memorial abre na hora, sem precisar instalar nada.",
   },
   {
     question: "O memorial digital dura para sempre?",
     answer:
-      "Sim. Utilizamos armazenamento seguro com redundancia e backups para preservar historias, fotos e audios ao longo do tempo.",
+      "Sim. As fotos, os áudios e a história ficam em armazenamento com redundância e backup.",
   },
   {
-    question: "A familia pode editar o memorial depois?",
+    question: "A família pode editar o memorial depois?",
     answer:
-      "Sim. O curador tem acesso a um painel protegido por senha para atualizar conteudos e moderar homenagens quando quiser.",
+      "Sim. Quem criou o memorial acessa com e-mail e senha e pode atualizar o conteúdo quando quiser.",
   },
   {
-    question: "As placas sao resistentes ao tempo?",
+    question: "As placas são resistentes ao tempo?",
     answer:
-      "Sim. As placas sao preparadas para ambientes externos e recebem gravacao de alta durabilidade.",
+      "Sim. São preparadas para ambientes externos e recebem gravação de alta durabilidade.",
   },
 ];
 
@@ -239,7 +239,7 @@ export default function LandingPage() {
             </span>
 
             <h1 className="font-serif text-[clamp(2rem,9vw,4.2rem)] font-light leading-tight text-white">
-              Porque cada historia merece <span className="italic text-[#e9c349]">viver para sempre</span>
+              Porque cada história merece <span className="italic text-[#e9c349]">viver para sempre</span>
             </h1>
 
             <p className="max-w-lg text-[1.08rem] leading-relaxed text-[#c4c7c7]">
@@ -253,7 +253,7 @@ export default function LandingPage() {
               <a href="#simulator" className="rounded-full border border-[#e9c349]/20 bg-white/5 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e0e3e2] transition hover:border-[#e9c349]/40 hover:bg-white/10">
                 Como funciona
               </a>
-              <Link href="/memorial?from=landing" className="rounded-full border border-[#e9c349] bg-[#e9c349]/10 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:bg-[#e9c349]/20 hover:shadow-[0_0_30px_rgba(233,195,73,0.1)]">
+              <Link href="/memorial-publico?memorial=2771cc02-e7d4-4470-bda7-11501722b9f4&from=landing" className="rounded-full border border-[#e9c349] bg-[#e9c349]/10 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:bg-[#e9c349]/20 hover:shadow-[0_0_30px_rgba(233,195,73,0.1)]">
                 Ver demo
               </Link>
             </div>
@@ -275,11 +275,14 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Sem contadores de "prova social": os números anteriores (+12.450
+            histórias, 342.180 homenagens) eram inventados e não vinham de lugar
+            nenhum. Aqui ficam só afirmações verificáveis sobre o produto. */}
         <section className="border-y border-[#e9c349]/10 bg-[#161c1c]/20 py-10">
           <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-6 text-center md:grid-cols-3">
-            <Stat value="+12.450" label="Historias preservadas" />
-            <Stat value="342.180" label="Homenagens e velas" middle />
-            <Stat value="100% Nobre" label="Aco cirurgico premium" />
+            <Stat value="Aço inox" label="Placa resistente ao tempo" />
+            <Stat value="Sem app" label="Abre direto no navegador" middle />
+            <Stat value="Você edita" label="O memorial continua seu" />
           </div>
         </section>
 
@@ -309,15 +312,15 @@ export default function LandingPage() {
             <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-[#e9c349]/3 blur-[100px]" />
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
               <div className="space-y-6 lg:col-span-7">
-                <span className="text-xs uppercase tracking-widest text-[#e9c349]">Do fisico ao eterno</span>
+                <span className="text-xs uppercase tracking-widest text-[#e9c349]">Do físico ao eterno</span>
                 <h2 className="font-serif text-3xl font-light leading-snug text-white sm:text-4xl">
-                  Uma ponte de amor conectando o local fisico ao universo digital de memorias
+                  A ponte entre o local de descanso e a história de quem você ama
                 </h2>
                 <p className="leading-relaxed text-[#c4c7c7]">
-                  Ao aproximar qualquer smartphone da placa, o QR revela um santuario onde familiares podem navegar pela cronologia de vida, ouvir mensagens e acender velas virtuais.
+                  Basta aproximar o celular da placa. O memorial abre com a história de vida, as fotos, a voz que ficou registrada — e quem visita pode acender uma vela.
                 </p>
                 <div className="pt-2">
-                  <Link href="/memorial?from=landing" className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:text-white">
+                  <Link href="/memorial-publico?memorial=2771cc02-e7d4-4470-bda7-11501722b9f4&from=landing" className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#e9c349] transition hover:text-white">
                     Explorar memorial demonstrativo
                     <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
                   </Link>
@@ -329,8 +332,8 @@ export default function LandingPage() {
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e9c349]/10">
                     <span className="material-symbols-outlined text-4xl text-[#e9c349]">qr_code_scanner</span>
                   </div>
-                  <h4 className="font-serif text-lg font-medium text-white">Placa Fisica e Celular</h4>
-                  <p className="text-xs font-light text-[#c4c7c7]">Aproximacao sem fios, carregamento instantaneo e eternidade garantida.</p>
+                  <h4 className="font-serif text-lg font-medium text-white">Placa física e celular</h4>
+                  <p className="text-xs font-light text-[#c4c7c7]">Sem app, sem cadastro: aproxime o celular e o memorial abre.</p>
                   <div className="mt-2 h-[2px] w-12 bg-[#e9c349]/40" />
                 </div>
               </div>
@@ -341,8 +344,8 @@ export default function LandingPage() {
         <section id="faq" className="mx-auto max-w-[800px] px-6 py-20">
           <div className="mb-12 space-y-4 text-center">
             <span className="text-xs uppercase tracking-widest text-[#e9c349]">Perguntas frequentes</span>
-            <h2 className="font-serif text-3xl font-light text-white">Duvidas comuns das familias</h2>
-            <p className="text-xs uppercase tracking-wider text-[#c4c7c7]">Como ajudamos voce a preservar com seguranca</p>
+            <h2 className="font-serif text-3xl font-light text-white">Dúvidas comuns das famílias</h2>
+            <p className="text-xs uppercase tracking-wider text-[#c4c7c7]">Como ajudamos você a preservar com segurança</p>
           </div>
 
           <div className="space-y-4">
@@ -369,10 +372,10 @@ export default function LandingPage() {
           <div className="space-y-4">
             <h3 className="flex items-center gap-2 font-serif text-xl font-semibold italic tracking-widest text-[#e9c349]">
               <span className="material-symbols-outlined text-2xl">local_fire_department</span>
-              PRESERVANDO MEMORIAS
+              PRESERVANDO MEMÓRIAS
             </h3>
             <p className="max-w-xs text-xs leading-relaxed text-[#c4c7c7]/80">
-              Santuario perpetuo de recordacao. Eternismo digital para manter viva a chama de quem amamos.
+              Memoriais digitais com QR Code para manter viva a história de quem amamos.
             </p>
           </div>
 

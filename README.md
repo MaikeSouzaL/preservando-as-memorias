@@ -1,59 +1,81 @@
 # Preservando as Memórias
 
-Aplicação Next.js para criação de memoriais digitais com QR Code. O cliente cadastra dados, história, fotos, áudio e linha do tempo de um ente querido; o sistema gera uma página pública acessível por QR Code para uso em placa ou lápide.
+Memoriais digitais acessíveis por QR Code. A família preenche a história do ente querido; o sistema publica uma página pública e gera um QR Code que vai gravado numa placa fixada no local de descanso. Quem escaneia abre o memorial no celular.
 
-## Estado do MVP
+## Os três atores
 
-- Backend-for-frontend em Route Handlers dentro do Next.js.
-- Persistência local em `src/data/platform-store.json`.
-- Checkout sandbox com cálculo de comissão de 15%.
-- Cadastro, login simples, área privada, criação/edição de memorial e upload local.
-- Memorial público com homenagens e velas persistidas.
-- Painel admin para comercial, usuários, memoriais, QR Codes, homenagens e denúncias.
+| Ator | Onde entra | O que faz |
+|---|---|---|
+| **Familiar** | `/criar-memorial` | Preenche os dados do falecido, paga e recebe o QR. Depois só acompanha a entrega da placa. Sem painel administrativo. |
+| **Funerária** | `/funeraria` | Parceira revendedora: inclui o memorial no plano funerário, cadastra o falecido, gera e imprime o QR para a família. |
+| **Dono** | `/painel` | Painel único: preços, funerárias, planos de cobrança, faturas, métricas, entregas e moderação. |
+
+O papel de "representante/operador", que ficava com 85% de cada venda, foi extinto. A venda ao familiar é integralmente da plataforma; a funerária é cobrada por assinatura.
+
+## Como a funerária é cobrada
+
+Configurável em `/painel/planos-cobranca`, com plano padrão global e override por parceira:
+
+- **Mensalidade** — valor fixo por mês, com uma cota de memoriais inclusos e preço por memorial excedente.
+- **Por QR Code** — sem mensalidade, cobra por memorial gerado.
+
+Tabelas: `funeral_billing_plans`, `funeral_invoices`, `funeral_homes.billing_plan_id` (NULL herda o padrão).
+
+## Stack
+
+Next.js 14 (App Router) · React 18 · Tailwind v4 · Supabase (Postgres + Auth + Storage) · Stripe · Resend · Upstash Redis (rate limit)
 
 ## Rodando localmente
 
 ```bash
 npm install
+```
+
+```bash
 npm run dev
 ```
 
-Por padrão o app roda em `http://localhost:3000`. Se a porta estiver ocupada:
-
-```bash
-npm run dev -- -p 3001
-```
+Sobe em `http://localhost:3001` (porta definida em `.claude/launch.json`).
 
 ## Validações
 
 ```bash
 npx tsc --noEmit
-npm run lint
+```
+
+```bash
 npm run build
 ```
 
-## Dados e uploads
+## Variáveis de ambiente
 
-- Dados persistidos: `src/data/platform-store.json`.
-- Uploads locais: `public/uploads`.
-- Em produção, substituir JSON por PostgreSQL/Prisma e uploads locais por storage externo.
+Obrigatórias em `.env`:
 
-## Pagamentos
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `FUNERAL_SESSION_SECRET` — assina o cookie de sessão da funerária (HMAC-SHA256, mínimo 32 caracteres). Sem ele o login de funerária falha fechado, de propósito.
+- `NEXT_PUBLIC_URL`
 
-O checkout atual registra pedidos e calcula:
+Recomendadas:
 
-- valor bruto do plano;
-- desconto de cupom;
-- comissão da plataforma;
-- repasse do operador.
+- `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` — sem elas o rate limit cai para memória do processo, o que **não funciona em serverless**: cada invocação tem seu próprio contador e o limite nunca se aplica de fato.
+- `RESEND_API_KEY` — e-mails transacionais.
 
-O gateway real ainda precisa ser ativado por integração com Asaas, Mercado Pago ou Stripe e confirmado por webhook.
+Gerar o segredo da sessão:
 
-## Próximos passos antes de hospedar
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-1. Implementar autenticação real e autorização de admin/cliente.
-2. Trocar senhas em texto por hash.
-3. Migrar o JSON local para banco real.
-4. Migrar uploads para storage externo.
-5. Integrar gateway real com webhook.
-6. Remover ou conectar telas que ainda usam conteúdo institucional estático.
+## Autenticação
+
+Dois mecanismos convivem:
+
+- **Familiar e dono** — Supabase Auth (cookies `sb-*`). O dono é identificado por `profiles.is_dev_admin`.
+- **Funerária** — tabela própria `funeral_homes` com hash scrypt e cookie `funeral_session` assinado com HMAC e validade de 12 horas.
+
+`src/middleware.ts` barra o acesso óbvio às rotas protegidas; a autorização real fica em cada layout e handler.
+
+## Dados
+
+Toda persistência é Supabase. Não há mais store em JSON local. Nenhuma tela deve exibir número inventado: sem dado, mostre estado vazio.

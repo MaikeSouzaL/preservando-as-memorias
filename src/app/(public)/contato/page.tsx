@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { publicContent } from "@/src/mock-db/public-content";
+import { contact } from "@/src/content/site";
 
 export default function ContatoPage() {
   return (
@@ -40,7 +40,7 @@ export default function ContatoPage() {
         <article className="rounded-xl border border-outline-variant/30 bg-surface-container-low/70 p-6">
           <h2 className="mb-5 font-h3 text-[1.4rem]">Canais de atendimento</h2>
           <ul className="grid gap-4">
-            {publicContent.contact.channels.map((channel) => (
+            {contact.channels.map((channel) => (
               <li key={channel.label} className="rounded-lg border border-tertiary/10 bg-surface-container-high/30 p-4">
                 <p className="text-xs uppercase tracking-[0.12em] text-on-surface-variant">{channel.label}</p>
                 <p className="mt-1 text-on-surface">{channel.value}</p>

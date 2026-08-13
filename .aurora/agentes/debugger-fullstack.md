@@ -37,3 +37,19 @@ Você é um agente especialista em depuração fullstack. Seu objetivo é identi
 Pre
   Causa: O componente da página está retornando null ou undefined devido a um erro de renderização no servidor (provavelmente falha ao carregar dados assíncronos ou hook quebrado), resultando em tela branca sem nenhum elemento DOM.
   Correção: Envolver o conteúdo do componente em um error boundary ou verificar se há chamadas assíncronas (ex: fetch de dados) que estão falhando silenciosamente. Adicionar um fallback de loading e tratamento de erro com try/catch no componente. Verificar se o layout pai (src/app/(funeral)/layout.tsx) está renderizando corretamente o children.  (arquivo: src/app/(funeral)/funeraria/cadastro/page.tsx)
+- Sintoma: Cadastro de Funerária /funeraria/cadastro ync patchIncorrectLockfile (C:\Users\Administrator\Desktop\preservando-as-memorias\node_modules\ne
+  Causa: O formulário de cadastro está tentando consultar a Receita Federal via CNPJ, mas a API retorna 500 (Internal Server Error) com a mensagem 'CNPJ não encontrado na Receita Federal', impedindo o preenchimento dos campos seguintes e causando loop no teste.
+  Correção: Verificar a rota de API que consulta o CNPJ (provavelmente em src/app/api/funeral-auth/register/route.ts ou um serviço externo). Corrigir a integração com a API da Receita Federal ou implementar um fallback/mock para permitir o cadastro mesmo quando a consulta falhar. Adicionar tratamento de erro adequado no frontend para exibir mensagem amigável e permitir continuar o cadastro manualmente.  (arquivo: src/app/(funeral)/funeraria/cadastro/page.tsx)
+- Sintoma: Cadastro de Funerária /funeraria/cadastro und
+  🌐 GET /funeraria/cadastro?_rsc=1pep7 → 200
+  🌐 GET /css2?family=Material+Symbols+Outlined:wg
+  Causa: O formulário de cadastro tenta consultar CNPJ via API externa (BrasilAPI) que retorna 400 para CNPJ inválido, e o erro não é tratado, causando falha no preenchimento dos campos seguintes e loop no teste.
+  Correção: Adicionar tratamento de erro na consulta de CNPJ: se a API retornar erro (400/500), exibir mensagem amigável e permitir que o usuário continue preenchendo manualmente os campos, sem travar o fluxo.  (arquivo: src/app/(funeral)/funeraria/cadastro/page.tsx)
+- Sintoma: Cadastro de Funerária /funeraria/cadastro ✓ O projeto já está rodando em http://localhost:3000 — vou testar nele (não subo outra cópia).
+Pre
+  Causa: O componente tenta consultar CNPJ via API externa na renderização inicial, e a falha da requisição (ex: 400/500) quebra a página com HTTP 500
+  Correção: Envolver a chamada assíncrona em try/catch, adicionar estado de loading e fallback para permitir preenchimento manual dos campos mesmo quando a consulta de CNPJ falhar  (arquivo: src/app/(funeral)/funeraria/cadastro/page.tsx)
+- Sintoma: Cadastro de Funerária /funeraria/cadastro ✓ O projeto já está rodando em http://localhost:3000 — vou testar nele (não subo outra cópia).
+Pre
+  Causa: O formulário de cadastro consulta CNPJ via BrasilAPI que retorna 400 para CNPJ inválido, e o erro não é tratado, causando falha no fluxo de cadastro e impedindo a submissão do formulário.
+  Correção: Adicionar tratamento de erro na consulta de CNPJ: envolver a chamada em try/catch, exibir mensagem amigável e permitir que o usuário continue preenchendo manualmente os campos mesmo quando a consulta falhar, sem travar o fluxo de cadastro.  (arquivo: src/app/(funeral)/funeraria/cadastro/page.tsx)

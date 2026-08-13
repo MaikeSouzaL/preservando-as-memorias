@@ -11,11 +11,10 @@ type PrivateShellProps = {
   isAdmin?: boolean;
 };
 
-const menuItems = [
-  { href: "/dashboard", label: "Meus Memoriais", icon: "auto_stories" },
-  { href: "/homenagens", label: "Homenagens", icon: "volunteer_activism" },
-  { href: "/configuracoes", label: "Configurações", icon: "settings" },
-];
+// A área do familiar é deliberadamente mínima: depois de criar e pagar, ele só
+// precisa pegar o QR Code e acompanhar a entrega da placa. Assinaturas,
+// configurações e moderação de homenagens saíram — não é um painel de gestão.
+const menuItems = [{ href: "/dashboard", label: "Meus memoriais", icon: "auto_stories" }];
 
 export function PrivateShell({ children, isDevAdmin, isAdmin }: PrivateShellProps) {
   const pathname = usePathname();
@@ -176,25 +175,14 @@ export function PrivateShell({ children, isDevAdmin, isAdmin }: PrivateShellProp
             </Link>
           ))}
 
-          {isAdmin && (
+          {(isAdmin || isDevAdmin) && (
             <Link
-              href="/admin/dashboard"
+              href="/painel"
               className="flex items-center space-x-4 rounded-lg px-4 py-3 transition-all duration-300 mt-4 border border-tertiary/20 bg-tertiary/5 text-tertiary hover:bg-tertiary/10"
               onClick={() => setMobileOpen(false)}
             >
               <span className="material-symbols-outlined">admin_panel_settings</span>
-              <span className="text-sm font-semibold">Painel Admin</span>
-            </Link>
-          )}
-
-          {isDevAdmin && (
-            <Link
-              href="/dev"
-              className="flex items-center space-x-4 rounded-lg px-4 py-3 transition-all duration-300 mt-4 border border-[#e9c349]/20 bg-[#e9c349]/5 text-[#e9c349] hover:bg-[#e9c349]/10"
-              onClick={() => setMobileOpen(false)}
-            >
-              <span className="material-symbols-outlined">construction</span>
-              <span className="text-sm font-semibold">Dev Console</span>
+              <span className="text-sm font-semibold">Painel do Dono</span>
             </Link>
           )}
         </nav>
@@ -284,25 +272,14 @@ export function PrivateShell({ children, isDevAdmin, isAdmin }: PrivateShellProp
                         <span>Configurações</span>
                       </button>
 
-                      {isAdmin && (
+                      {(isAdmin || isDevAdmin) && (
                         <Link
-                          href="/admin/dashboard"
+                          href="/painel"
                           onClick={() => setDropdownOpen(false)}
                           className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-tertiary hover:bg-tertiary/10 transition-all text-left font-medium"
                         >
                           <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
-                          <span>Painel Admin</span>
-                        </Link>
-                      )}
-
-                      {isDevAdmin && (
-                        <Link
-                          href="/dev"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-[#e9c349] hover:bg-[#e9c349]/10 transition-all text-left font-medium"
-                        >
-                          <span className="material-symbols-outlined text-[20px]">construction</span>
-                          <span>Dev Console</span>
+                          <span>Painel do Dono</span>
                         </Link>
                       )}
 

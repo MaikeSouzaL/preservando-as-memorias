@@ -48,6 +48,9 @@ const STEPS_BASE = [
 ];
 const STEP_ENTREGA = { id: 9, label: "Entrega do QR" };
 
+/** Onde o rascunho do formulário fica guardado no navegador da pessoa. */
+const RASCUNHO_KEY = "memorial:rascunho";
+
 export default function CriarMemorialPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -85,6 +88,43 @@ export default function CriarMemorialPage() {
   });
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [rascunhoRestaurado, setRascunhoRestaurado] = useState(false);
+
+  // ── Rascunho local ──────────────────────────────────────────────────────────
+  // Quem preenche isto acabou de perder alguém. Uma ligação, uma pausa para
+  // chorar, a bateria acabando — e o formulário inteiro se perdia, incluindo as
+  // fotos já enviadas. O rascunho fica só no navegador da pessoa.
+  useEffect(() => {
+    try {
+      const salvo = window.localStorage.getItem(RASCUNHO_KEY);
+      if (!salvo) return;
+
+      const { form: formSalvo, step: stepSalvo, deliveryAddress: enderecoSalvo } = JSON.parse(salvo);
+      if (formSalvo?.name || formSalvo?.biography || formSalvo?.imageUrl) {
+        setForm((atual) => ({ ...atual, ...formSalvo }));
+        if (enderecoSalvo) setDeliveryAddress((atual) => ({ ...atual, ...enderecoSalvo }));
+        if (typeof stepSalvo === "number") setStep(stepSalvo);
+        setRascunhoRestaurado(true);
+      }
+    } catch {
+      // rascunho corrompido: seguir com o formulário limpo
+    }
+  }, []);
+
+  useEffect(() => {
+    const temConteudo = form.name || form.biography || form.imageUrl || form.gallery.length > 0;
+    if (!temConteudo) return;
+
+    const id = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(RASCUNHO_KEY, JSON.stringify({ form, step, deliveryAddress }));
+      } catch {
+        // cota do localStorage estourada: não vale quebrar o formulário por isso
+      }
+    }, 600);
+
+    return () => window.clearTimeout(id);
+  }, [form, step, deliveryAddress]);
 
   useEffect(() => {
     fetch("/api/platform-config")
@@ -180,7 +220,10 @@ export default function CriarMemorialPage() {
       });
       const payload = await res.json();
       if (!res.ok) { setError(payload.error ?? "Não foi possível criar o memorial."); return; }
-      
+
+      // Memorial gravado no servidor — o rascunho local já cumpriu seu papel.
+      try { window.localStorage.removeItem(RASCUNHO_KEY); } catch {}
+
       if (isAdmin) {
         router.push("/dashboard");
       } else {
@@ -360,6 +403,25 @@ export default function CriarMemorialPage() {
             />
           )}
         </div>
+
+        {rascunhoRestaurado && (
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#e9c349]/20 bg-[#e9c349]/5 px-4 py-3">
+            <span className="material-symbols-outlined text-[1.1rem] text-[#e9c349]">history</span>
+            <div className="flex-1 text-sm text-[#c4c7c7]">
+              <p>Recuperamos o que você já tinha preenchido. Pode continuar de onde parou.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  try { window.localStorage.removeItem(RASCUNHO_KEY); } catch {}
+                  window.location.reload();
+                }}
+                className="mt-1 text-xs text-[#e9c349] underline underline-offset-2 hover:text-[#ffe088]"
+              >
+                Começar do zero
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Error */}
         {error && (

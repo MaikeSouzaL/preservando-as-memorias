@@ -4,6 +4,15 @@ import Image from "next/image";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 
+/** Acompanhamento da placa física, quando a plataforma é responsável pelo envio. */
+export type DeliveryStatus = {
+  status: string;
+  trackingCode: string | null;
+  carrier: string | null;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+};
+
 type Props = {
   id: string;
   name: string;
@@ -18,6 +27,7 @@ type Props = {
   candleCount?: number;
   flowers?: number;
   hearts?: number;
+  delivery?: DeliveryStatus | null;
 };
 
 const statusLabel: Record<string, { text: string; color: string }> = {
@@ -26,7 +36,22 @@ const statusLabel: Record<string, { text: string; color: string }> = {
   rascunho: { text: "Rascunho", color: "text-outline bg-outline/10 border-outline/20" },
 };
 
-export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrlDark, qrDataUrlLight, tributeCount, candleCount, flowers, hearts }: Props) {
+/** Como o familiar enxerga cada etapa da entrega. Sem jargão interno. */
+const deliveryLabel: Record<string, { text: string; icon: string; color: string }> = {
+  pending: { text: "Placa em preparação", icon: "schedule", color: "text-[#c4c7c7]" },
+  printing: { text: "Placa sendo gravada", icon: "precision_manufacturing", color: "text-[#e9c349]" },
+  shipped: { text: "Placa a caminho", icon: "local_shipping", color: "text-sky-300" },
+  delivered: { text: "Placa entregue", icon: "check_circle", color: "text-emerald-400" },
+  cancelled: { text: "Envio cancelado", icon: "cancel", color: "text-red-300" },
+};
+
+function formatDate(iso: string | null) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}
+
+export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, editUrl, qrDataUrlDark, qrDataUrlLight, tributeCount, candleCount, flowers, hearts, delivery }: Props) {
   const [showQr, setShowQr] = useState(false);
   const [qrTheme, setQrTheme] = useState<"dark" | "light">("dark");
   const s = statusLabel[status] ?? statusLabel.rascunho;
@@ -74,6 +99,40 @@ export function MemorialCard({ id, name, years, imageUrl, status, publicUrl, edi
             <span title="Velas">🕯️ {candleCount ?? 0}</span>
             <span title="Flores">🌸 {flowers ?? 0}</span>
             <span title="Corações">❤️ {hearts ?? 0}</span>
+          </div>
+        )}
+
+        {/* Entrega da placa física */}
+        {delivery && (
+          <div className="border-t border-[var(--pm-border-faint)] px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span
+                className={`material-symbols-outlined text-[1.1rem] ${deliveryLabel[delivery.status]?.color ?? "text-on-surface-variant"}`}
+              >
+                {deliveryLabel[delivery.status]?.icon ?? "inventory_2"}
+              </span>
+              <p className={`text-xs font-medium ${deliveryLabel[delivery.status]?.color ?? "text-on-surface-variant"}`}>
+                {deliveryLabel[delivery.status]?.text ?? "Entrega em andamento"}
+              </p>
+            </div>
+
+            {delivery.trackingCode && (
+              <p className="mt-1 text-[0.7rem] text-on-surface-variant/70">
+                Rastreio: <span className="font-mono">{delivery.trackingCode}</span>
+                {delivery.carrier ? ` · ${delivery.carrier}` : ""}
+              </p>
+            )}
+
+            {formatDate(delivery.deliveredAt) && (
+              <p className="mt-1 text-[0.7rem] text-on-surface-variant/70">
+                Entregue em {formatDate(delivery.deliveredAt)}
+              </p>
+            )}
+            {!delivery.deliveredAt && formatDate(delivery.shippedAt) && (
+              <p className="mt-1 text-[0.7rem] text-on-surface-variant/70">
+                Enviada em {formatDate(delivery.shippedAt)}
+              </p>
+            )}
           </div>
         )}
 

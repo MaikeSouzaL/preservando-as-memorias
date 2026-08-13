@@ -93,6 +93,7 @@ function Step1({
 }) {
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState("");
+  const [manualInput, setManualInput] = useState(false);
 
   async function lookup() {
     const digits = cleanCnpj(cnpj);
@@ -115,6 +116,7 @@ function Step1({
       });
     } catch (err) {
       setFetchError(err instanceof Error ? err.message : "Erro ao consultar CNPJ.");
+      setManualInput(true);
     } finally {
       setFetching(false);
     }
@@ -128,7 +130,7 @@ function Step1({
 
   const digits = cleanCnpj(cnpj);
   const canLookup = digits.length === 14;
-  const canProceed = company !== null;
+  const canProceed = company !== null || manualInput;
 
   return (
     <div className="space-y-6">

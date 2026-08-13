@@ -1,14 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
-export default function FunerariaLoginPage() {
+const REASON_MESSAGES: Record<string, string> = {
+  suspenso: "Sua conta foi suspensa pela plataforma. Entre em contato com o suporte para regularizar.",
+  pendente: "Seu cadastro ainda está em análise. Você recebe acesso assim que for aprovado.",
+  reprovado: "Seu cadastro não foi aprovado. Entre em contato com o suporte.",
+  conta: "Não foi possível confirmar sua conta. Faça login novamente.",
+};
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({ email: "", password: "" });
+
+  const motivo = searchParams.get("motivo");
+  const sessionMessage = motivo ? REASON_MESSAGES[motivo] : undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +64,12 @@ export default function FunerariaLoginPage() {
             Entre com suas credenciais corporativas para gerenciar memoriais digitais e serviços.
           </p>
         </div>
+
+        {sessionMessage && !error && (
+          <div className="mb-6 rounded-xl border border-[#e9c349]/30 bg-[#e9c349]/10 p-4 text-center text-[#e9c349] text-xs tracking-wide">
+            {sessionMessage}
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center text-red-400 text-xs tracking-wide">
@@ -121,5 +138,13 @@ export default function FunerariaLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FunerariaLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-[#0a192f] to-[#0b0f0f]" />}>
+      <LoginForm />
+    </Suspense>
   );
 }

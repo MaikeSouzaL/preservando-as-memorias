@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { publicContent } from "@/src/mock-db/public-content";
+import { faq } from "@/src/content/site";
 
 export default function FaqPage() {
   const [openIndex, setOpenIndex] = useState<number>(0);
@@ -22,7 +22,7 @@ export default function FaqPage() {
       </header>
 
       <section className="grid gap-3">
-        {publicContent.faq.map((item, index) => {
+        {faq.map((item, index) => {
           const isOpen = openIndex === index;
           return (
             <article key={item.question} className="rounded-xl border border-outline-variant/35 bg-surface-container/70 p-5">

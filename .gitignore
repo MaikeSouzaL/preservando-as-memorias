@@ -45,3 +45,7 @@ next-env.d.ts
 
 # database mock files
 src/data/platform-store.json
+
+# AuroraMemory
+/AuroraMemory
+.aurora

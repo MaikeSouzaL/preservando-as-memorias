@@ -44,9 +44,6 @@ export default async function ConvitePage({ params }: { params: Promise<{ slug: 
               Você foi convidado(a)
             </p>
             <h2 className="text-2xl font-light text-white">{invite.label}</h2>
-            {invite.notes && (
-              <p className="mt-2 text-sm text-[#c4c7c7]/60">{invite.notes}</p>
-            )}
           </div>
 
           {/* Terms */}
@@ -55,19 +52,9 @@ export default async function ConvitePage({ params }: { params: Promise<{ slug: 
               Condições deste convite
             </p>
 
-            {invite.adminCommissionPercent !== undefined && (
-              <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-3">
-                <span className="material-symbols-outlined text-[#e9c349]">percent</span>
-                <div>
-                  <p className="text-sm text-white font-medium">
-                    Comissão de {invite.adminCommissionPercent}%
-                  </p>
-                  <p className="text-xs text-[#c4c7c7]/50">
-                    Percentual aplicado sobre os memoriais criados pela sua funerária
-                  </p>
-                </div>
-              </div>
-            )}
+            {/* A cobrança da funerária deixou de ser comissão por venda: agora é
+                assinatura (mensalidade ou por QR gerado). As condições vêm do
+                plano de cobrança abaixo. */}
 
             {plan && (
               <div className="flex items-center gap-3 rounded-xl border border-[#e9c349]/15 bg-[#e9c349]/5 px-4 py-3">
@@ -91,7 +78,7 @@ export default async function ConvitePage({ params }: { params: Promise<{ slug: 
               </div>
             )}
 
-            {!invite.adminCommissionPercent && !plan && (
+            {!plan && (
               <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-3">
                 <span className="material-symbols-outlined text-[#c4c7c7]/60">info</span>
                 <p className="text-sm text-[#c4c7c7]/60">

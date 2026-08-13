@@ -65,9 +65,7 @@ function LoginContent() {
       }
 
       if (data.session?.isDevAdmin === true) {
-        router.push("/dev");
-      } else if (data.session?.isAdmin === true) {
-        router.push("/admin/dashboard");
+        router.push("/painel");
       } else {
         router.push(next);
       }

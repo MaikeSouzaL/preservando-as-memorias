@@ -67,7 +67,7 @@ function CadastroContent() {
       localStorage.setItem("has_logged_in", "true");
 
       if (payload.session?.isAdmin === true) {
-        router.push("/admin/dashboard");
+        router.push("/painel");
       } else {
         router.push(next);
       }

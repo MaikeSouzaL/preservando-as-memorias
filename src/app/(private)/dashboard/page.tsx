@@ -2,8 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/src/lib/auth-session";
 import { readPlatformData } from "@/src/lib/platform-data";
+import { createAdminClient } from "@/src/lib/supabase";
 import { generateHeartQr } from "@/src/lib/qr-heart";
-import { MemorialCard } from "@/src/components/private/memorial-card";
+import { MemorialCard, type DeliveryStatus } from "@/src/components/private/memorial-card";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,6 @@ function shortName(full: string, max = 13): string {
 export default async function DashboardPage() {
   const session = await getAuthSession();
   if (!session) redirect("/login");
-  if (session.needsPassword) redirect("/definir-senha?source=memorial");
 
   const data = await readPlatformData();
   const memorials = data.memorials.filter(
@@ -48,6 +48,30 @@ export default async function DashboardPage() {
   const candlesByMemorial: Record<string, number> = {};
   for (const t of data.tributes) tributesByMemorial[t.memorialId] = (tributesByMemorial[t.memorialId] ?? 0) + 1;
   for (const c of data.candles) candlesByMemorial[c.memorialId] = (candlesByMemorial[c.memorialId] ?? 0) + 1;
+
+  // Acompanhamento da placa física. Consulta direta e filtrada — os memoriais
+  // desta pessoa, nada além disso.
+  const deliveryByMemorial: Record<string, DeliveryStatus> = {};
+  if (memorials.length > 0) {
+    const supabase = await createAdminClient();
+    const { data: deliveries } = await supabase
+      .from("qr_deliveries")
+      .select("memorial_id, status, tracking_code, carrier, shipped_at, delivered_at")
+      .in(
+        "memorial_id",
+        memorials.map((m) => m.id)
+      );
+
+    for (const d of deliveries ?? []) {
+      deliveryByMemorial[d.memorial_id] = {
+        status: d.status,
+        trackingCode: d.tracking_code ?? null,
+        carrier: d.carrier ?? null,
+        shippedAt: d.shipped_at ?? null,
+        deliveredAt: d.delivered_at ?? null,
+      };
+    }
+  }
 
   const baseUrl = (process.env.NEXT_PUBLIC_URL ?? "http://localhost:3001")
     .replace("://preservandomemorias.com.br", "://www.preservandomemorias.com.br");
@@ -144,6 +168,7 @@ export default async function DashboardPage() {
                 candleCount={candlesByMemorial[memorial.id] ?? 0}
                 flowers={memorial.flowers ?? 0}
                 hearts={memorial.hearts ?? 0}
+                delivery={deliveryByMemorial[memorial.id] ?? null}
               />
             );
           })}

@@ -365,8 +365,6 @@ function CheckoutSuccess({ order, plan }: { order: CheckoutOrder; plan: Platform
 
         <div className="my-6 grid gap-3 rounded-lg border border-white/5 bg-[#0b0f0f]/40 p-4 text-left text-sm">
           <SummaryLine label="Total pago" value={centsToBRL(order.grossAmountCents)} strong />
-          <SummaryLine label="Comissão da plataforma" value={centsToBRL(order.platformCommissionCents)} />
-          <SummaryLine label="Repasse ao operador" value={centsToBRL(order.operatorAmountCents)} />
         </div>
 
         <Link href="/dashboard" className="block w-full rounded-full bg-[#e9c349] py-3 text-center text-xs font-semibold uppercase tracking-widest text-[#1c1b1b] transition hover:bg-[#ffe088]">
@@ -433,8 +431,6 @@ function OrderSummary({
         <SummaryLine label="Subtotal" value={centsToBRL(plan.priceCents)} />
         {totals.discountCents > 0 ? <SummaryLine label="Desconto" value={`- ${centsToBRL(totals.discountCents)}`} /> : null}
         <SummaryLine label="Total" value={centsToBRL(totals.grossAmountCents)} strong />
-        <SummaryLine label={`Comissão ${commissionPercent}%`} value={centsToBRL(totals.platformCommissionCents)} />
-        <SummaryLine label="Repasse ao operador" value={centsToBRL(totals.operatorAmountCents)} />
       </div>
     </div>
   );
@@ -466,7 +462,6 @@ function MemorialOrderSummary({
       <div className="mt-5 space-y-3">
         <SummaryLine label="Valor" value={centsToBRL(priceCents)} />
         <SummaryLine label="Total" value={centsToBRL(totals.grossAmountCents)} strong />
-        <SummaryLine label={`Taxa do sistema ${commissionPercent}%`} value={centsToBRL(totals.platformCommissionCents)} />
       </div>
     </div>
   );
