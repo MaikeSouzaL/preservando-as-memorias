@@ -16,6 +16,7 @@ está aplicado, consulte o histórico de migrações no painel do Supabase.
 | `20260812133213` | `qr_plaque_delivery_tracking` | Criou `qr_deliveries` (rastreio da placa física) e índices em 10 chaves estrangeiras. |
 | `20260812133230` | `fix_security_advisors_and_rls` | Fixou `search_path` das funções, revogou `EXECUTE` público de `handle_new_user`, e removeu a policy que deixava **qualquer visitante inserir uma funerária já aprovada**. |
 | `20260812135255` | `add_auto_approve_tributes_config` | Tornou configurável se homenagens entram aprovadas ou pendentes. |
+| `20260813041956` | `add_payment_session_id_to_candles` | Criou `candles.payment_session_id`. Mesmo defeito de `flowers`/`hearts`: o código gravava a coluna, ela não existia e **toda vela falhava**. O índice único impede acender duas velas com a mesma sessão de pagamento. |
 
 ## Cobrança da funerária
 
