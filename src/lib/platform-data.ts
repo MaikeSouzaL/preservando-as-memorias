@@ -107,6 +107,8 @@ export type ManagedComplaint = {
 
 export type PlatformOrder = {
   id: string;
+  /** Conta Supabase de quem comprou. Ausente em compra sem login. */
+  userId?: string;
   userName: string;
   userEmail: string;
   customerDocument: string;
@@ -416,6 +418,7 @@ function mapProfile(r: any): CuratorProfile {
 function mapOrder(r: any): PlatformOrder {
   return {
     id: r.id,
+    userId: r.user_id ?? undefined,
     userName: r.user_name ?? "",
     userEmail: r.email,
     customerDocument: r.customer_document ?? "",
@@ -444,7 +447,9 @@ function mapOrder(r: any): PlatformOrder {
 function toDbOrder(o: PlatformOrder) {
   return {
     id: o.id,
-    user_id: null,
+    // Estava fixo em null: nenhum pedido ficava ligado à conta de quem comprou,
+    // então a família não conseguia ver o próprio histórico.
+    user_id: o.userId ?? null,
     email: o.userEmail,
     user_name: o.userName,
     customer_document: o.customerDocument,

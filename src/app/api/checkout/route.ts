@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { updatePlatformData } from "@/src/lib/platform-data";
 import { calculateOrderTotals, calculateCascadeOrderTotals, type PaymentMethod } from "@/src/lib/platform-types";
+import { getAuthSession } from "@/src/lib/auth-session";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,10 @@ export async function POST(request: Request) {
     const gateway = process.env.NEXT_PUBLIC_PAYMENT_GATEWAY || "sandbox";
 
     let autoPublishWithinQuota = false;
+
+    // Vincula o pedido à conta de quem está comprando, quando há sessão. Sem
+    // isso o familiar não consegue ver o próprio histórico de pedidos.
+    const session = await getAuthSession();
 
     const order = await updatePlatformData((data) => {
       let priceCents: number;
@@ -201,6 +206,7 @@ export async function POST(request: Request) {
 
       const nextOrder = {
         id: `ord_${Date.now().toString(36)}`,
+        userId: session?.userId,
         userName,
         userEmail,
         customerDocument,

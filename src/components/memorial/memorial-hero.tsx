@@ -45,15 +45,37 @@ export function MemorialHero({
       id="hero"
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-[240px] pb-24 md:pt-[160px]"
     >
-      {/* Fundo em CSS puro. A versão anterior usava uma imagem temporária de IA
-          (googleusercontent/aida-public) que expira e quebraria todos os
-          memoriais de uma vez. */}
+      {/* Fundo: a própria foto da pessoa, desfocada e escurecida.
+          A versão original usava uma imagem fixa vinda de uma URL temporária de
+          IA (googleusercontent/aida-public) — igual em todo memorial e sujeita a
+          expirar de uma vez para todos. Assim a atmosfera é única de cada
+          memorial e não depende de nenhum arquivo externo. */}
+      {imageUrl && (
+        <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            priority={false}
+            sizes="100vw"
+            aria-hidden="true"
+            className="memorial-backdrop object-cover opacity-[0.62] blur-[28px] grayscale"
+          />
+        </div>
+      )}
+
+      {/* Brilho quente no centro, atrás do retrato. */}
       <div
-        className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(233,195,73,0.08)_0%,transparent_65%)]"
+        className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(233,195,73,0.16)_0%,transparent_58%)]"
+        aria-hidden="true"
+      />
+      {/* Vinheta: escurece as bordas e garante contraste do texto sobre a foto. */}
+      <div
+        className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(16,20,20,0.88)_100%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#101414]/40 to-[#101414]"
+        className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-transparent to-[#101414]"
         aria-hidden="true"
       />
 

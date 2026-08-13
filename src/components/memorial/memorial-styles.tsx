@@ -35,6 +35,17 @@ export function MemorialStyles() {
       .memorial-fade-in {
         animation: memorial-fade-in 0.4s ease-out both;
       }
+      /* Fundo do hero: a foto da pessoa, desfocada, com uma deriva muito lenta
+         para o cenário não parecer congelado. */
+      @keyframes memorial-drift {
+        0%, 100% { transform: scale(1.12) translate3d(0, 0, 0); }
+        50%      { transform: scale(1.18) translate3d(-1.5%, -1%, 0); }
+      }
+      .memorial-backdrop {
+        animation: memorial-drift 40s ease-in-out infinite;
+        will-change: transform;
+      }
+
       /* Aura atrás do retrato — luz de vela, respirando devagar.
          Substitui a antiga imagem de fundo que vinha de uma URL temporária. */
       @keyframes memorial-breathe {
@@ -59,9 +70,11 @@ export function MemorialStyles() {
       /* Quem pediu menos movimento no sistema não vê a animação. */
       @media (prefers-reduced-motion: reduce) {
         .memorial-aura,
-        .memorial-aura-ring {
+        .memorial-aura-ring,
+        .memorial-backdrop {
           animation: none;
         }
+        .memorial-backdrop { transform: scale(1.12); }
       }
       @keyframes memorial-flicker {
         0%, 100% { transform: scale(1) rotate(-1deg); opacity: 0.95; }
